@@ -1,0 +1,20 @@
+// ponytail: alias Phosphor icons under the names shadcn templates use, so upstream diffs stay small
+export {
+  XIcon,
+  MagnifyingGlassIcon as SearchIcon,
+  CheckIcon,
+  CaretRightIcon as ChevronRightIcon,
+  CaretRightIcon as ChevronRight,
+  CaretLeftIcon as ChevronLeftIcon,
+  CaretDownIcon as ChevronDownIcon,
+  CaretUpIcon as ChevronUpIcon,
+  DotsThreeIcon as MoreHorizontalIcon,
+  DotsThreeIcon as MoreHorizontal,
+  CircleIcon,
+  SidebarSimpleIcon as PanelLeftIcon,
+  CheckCircleIcon as CircleCheckIcon,
+  InfoIcon,
+  SpinnerIcon as Loader2Icon,
+  XCircleIcon as OctagonXIcon,
+  WarningIcon as TriangleAlertIcon,
+} from "@phosphor-icons/react"

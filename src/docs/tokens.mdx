@@ -1,0 +1,65 @@
+import { Meta } from "@storybook/addon-docs/blocks"
+
+<Meta title="Docs/Design tokens" />
+
+# Design tokens
+
+Colors follow [GitHub Primer](https://primer.style/foundations/primitives/color). Values live as CSS variables in `src/styles/globals.css`; Tailwind utilities read them (`bg-primary`, `text-muted-foreground`, `border-border`).
+
+**Dark is the default.** An app that sets no class on `<html>` renders dark. Add `class="light"` to opt out. `class="dark"` also works, so `next-themes` with `attribute="class"` behaves normally in both directions.
+
+<div className="not-prose grid gap-2 rounded-md border border-[var(--border)] p-4" style={{ background: "var(--background)", color: "var(--foreground)" }}>
+  {[
+    ["background", "#0d1117", "#ffffff", "Page"],
+    ["card / popover", "#151b23", "#ffffff", "Boxes, menus, dialogs"],
+    ["foreground", "#f0f6fc", "#1f2328", "Body text"],
+    ["muted-foreground", "#9198a1", "#59636e", "Secondary text"],
+    ["primary", "#238636", "#1f883d", "Primary buttons (GitHub green)"],
+    ["secondary", "#212830", "#f6f8fa", "Neutral button fill"],
+    ["accent", "#262c36", "#eff2f5", "Hover surfaces"],
+    ["destructive", "#da3633", "#cf222e", "Delete, danger"],
+    ["border / input", "#3d444d", "#d1d9e0", "All borders"],
+    ["field", "#0d1117", "#ffffff", "Input backgrounds"],
+    ["ring / link", "#4493f8", "#0969da", "Focus rings and links"],
+    ["tooltip", "#3d444d", "#24292f", "Tooltip surface"],
+  ].map(([name, dark, light, use]) => (
+    <div key={name} style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 13 }}>
+      <span style={{ width: 22, height: 22, borderRadius: 6, background: dark, border: "1px solid #3d444d" }} />
+      <span style={{ width: 22, height: 22, borderRadius: 6, background: light, border: "1px solid #3d444d" }} />
+      <code style={{ minWidth: 160 }}>{name}</code>
+      <code style={{ minWidth: 90, opacity: 0.7 }}>{dark}</code>
+      <code style={{ minWidth: 90, opacity: 0.7 }}>{light}</code>
+      <span style={{ opacity: 0.7 }}>{use}</span>
+    </div>
+  ))}
+</div>
+
+Swatches are dark then light.
+
+## Two interactive colors
+
+GitHub uses green for the primary action and blue for links and focus. So does this system: `--primary` is green, `--link` and `--ring` are blue. Use `text-link` for inline links, never `text-primary`. Links sitting inside a sentence also need `underline underline-offset-4` — colour alone fails WCAG 1.4.1, and the a11y addon will flag it.
+
+## Radius
+
+Flat, like GitHub: 6px on controls and boxes (`rounded-md`, `rounded-lg`), 4px small, 8px for the largest surfaces. This overrides the shadcn 8/12px scale.
+
+## Typography
+
+The GitHub system stack (`-apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial`), mono is `ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas`. Page titles `text-2xl font-semibold tracking-tight`, body `text-sm`, helper text `text-sm text-muted-foreground`.
+
+## Spacing rules of thumb
+
+- Page content padding: `p-6`
+- Gap between page sections: `gap-6`
+- Gap between form fields: `gap-5`
+- Gap between inline controls: `gap-2`
+
+## Overriding per app
+
+Redefine any variable after importing the stylesheet:
+
+```css
+@import "@ziku/ui/styles.css";
+:root { --primary: #8250df; }
+```

@@ -1,0 +1,55 @@
+import { Meta, Canvas } from "@storybook/addon-docs/blocks"
+import * as Auth from "../blocks/auth/auth.stories"
+
+<Meta title="Docs/Auth flows" />
+
+# Auth flows
+
+Every app uses the same three screens. Routes are conventions the blocks link to by default; override with props if an app differs.
+
+| Route | Block | Links to |
+|---|---|---|
+| `/login` | `LoginForm` | `/register`, `/forgot-password` |
+| `/register` | `RegisterForm` | `/login` |
+| `/forgot-password` | `ForgotPasswordForm` | `/login` |
+
+All three sit inside `AuthLayout` (centered card, optional logo and footer).
+
+## Login
+
+<Canvas of={Auth.Login} />
+
+```tsx
+<AuthLayout logo={<Logo />} footer={<>By continuing you agree to our <a href="/terms">Terms</a>.</>}>
+  <LoginForm
+    onSubmit={async ({ email, password }) => { await signIn(email, password) }}
+    error={serverError}
+    providers={<Button variant="outline"><GoogleLogoIcon /> Google</Button>}
+  />
+</AuthLayout>
+```
+
+Behaviour that is fixed across apps:
+
+- Client validation with zod (`loginSchema`, exported). Errors show under the field.
+- Submit button disables and shows a spinner while `onSubmit` is pending.
+- Server errors go in the `error` prop and render in a destructive alert above the fields.
+- `autoComplete` attributes are set so password managers work.
+
+<Canvas of={Auth.LoginWithError} />
+
+## Register
+
+Name, email, password, confirm. Password min 8 chars; mismatch is caught client-side.
+
+<Canvas of={Auth.Register} />
+
+## Forgot password
+
+Pass `sent` once the request succeeds; the block swaps to the "check your inbox" state. Message is deliberately the same whether or not the account exists.
+
+<Canvas of={Auth.ForgotPassword} />
+
+## What the app still owns
+
+Session handling, redirects after success, OAuth callbacks, rate limiting. The blocks are UI only.

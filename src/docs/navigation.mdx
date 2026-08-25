@@ -1,0 +1,47 @@
+import { Meta, Canvas } from "@storybook/addon-docs/blocks"
+import * as Shell from "../blocks/shell/app-shell.stories"
+
+<Meta title="Docs/Navigation" />
+
+# Navigation
+
+Authenticated pages use `AppShell`: a collapsible left sidebar, a 56px top bar, and a padded content area. On mobile the sidebar becomes a sheet.
+
+<Canvas of={Shell.Dashboard} />
+
+```tsx
+const nav = [
+  { label: "Workspace", items: [
+    { title: "Dashboard", href: "/", icon: HouseIcon },
+    { title: "Projects", href: "/projects", icon: FolderIcon },
+  ]},
+  { label: "Account", items: [
+    { title: "Settings", href: "/settings", icon: GearIcon },
+  ]},
+]
+
+<AppShell
+  brand={<Logo />}
+  nav={nav}
+  currentPath={pathname}
+  user={{ name, email, avatarUrl }}
+  onSignOut={signOut}
+  headerContent={<Breadcrumbs />}
+  headerActions={<NotificationsButton />}
+>
+  <PageHeader title="Dashboard" actions={<Button>New</Button>} />
+  ...
+</AppShell>
+```
+
+## Rules
+
+- Sidebar groups: first group is the product's main areas, last group is account-level (Billing, Settings).
+- Max 7 items per group. More than that means the IA needs work, not a longer list.
+- Every item has a Phosphor icon so the collapsed (icon-only) state stays usable.
+- `currentPath` drives the active highlight. Pass the pathname from your router.
+- User menu lives at the bottom of the sidebar. Sign out is always the last item.
+- Top bar left: breadcrumbs or the page title. Right: search, notifications, or nothing.
+- Every page starts with `PageHeader`. Empty collections render `EmptyState` with one call to action.
+
+<Canvas of={Shell.EmptyPage} />

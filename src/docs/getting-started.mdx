@@ -1,0 +1,70 @@
+import { Meta } from "@storybook/addon-docs/blocks"
+
+<Meta title="Docs/Getting started" />
+
+# Ziku design system
+
+One component library for every Ziku web app. Built on [shadcn/ui](https://ui.shadcn.com) (Radix primitives + Tailwind v4), themed after GitHub and dark by default, with prebuilt pages and flows so a new app ships with the same login, register, and navigation every time.
+
+## Install
+
+```bash
+pnpm add @ziku/ui react react-dom
+```
+
+Import the stylesheet once, at the app root:
+
+```tsx
+import "@ziku/ui/styles.css"
+```
+
+That file contains the Tailwind import, the Ziku tokens, and `tw-animate-css`. Your app does **not** need its own Tailwind setup unless you write custom utilities. If it does, add `@import "@ziku/ui/styles.css";` at the top of your CSS instead.
+
+## Use components
+
+```tsx
+import { Button, Card, Input } from "@ziku/ui"
+```
+
+Everything under `Components/` in the sidebar is a direct shadcn component with Ziku tokens applied. Same API as upstream docs.
+
+## Use blocks
+
+Blocks are full page sections: auth forms, the app shell, the ⌘K command palette, the data table, page header, empty state. See `Blocks/` in the sidebar and the **Auth flows**, **Navigation** and **Search and data** docs pages.
+
+## Routing
+
+Blocks render links with a plain `<a>` by default. Wrap your app once so they use your router:
+
+```tsx
+import NextLink from "next/link"
+import { LinkProvider } from "@ziku/ui"
+
+<LinkProvider component={NextLink}>{children}</LinkProvider>
+```
+
+## Dark mode
+
+Dark is the default — do nothing and the app renders dark, styled after GitHub. To opt a page into light, put `class="light"` on `<html>`. `class="dark"` is also honoured, so `next-themes` works:
+
+```tsx
+<ThemeProvider attribute="class" defaultTheme="dark">
+```
+
+Use the theme toggle in the Storybook toolbar to preview both.
+
+## Icons
+
+Phosphor only (`@phosphor-icons/react`). Never Lucide or Heroicons. Components pass icons as the component reference (`icon={HouseIcon}`) or as children (`<Button><PlusIcon /> Add</Button>`).
+
+## Adding a component
+
+```bash
+pnpm dlx shadcn@latest add <name>
+```
+
+Then replace any `lucide-react` import with `@/lib/icons` (add aliases there if missing), write a `<name>.stories.tsx` next to it, and add the export to `src/index.ts`.
+
+## Verifying
+
+`pnpm test` renders every story in jsdom and fails on any React error or warning. Run it after adding or changing a component — it is what catches missing providers and bad icon imports.

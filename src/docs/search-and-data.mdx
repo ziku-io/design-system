@@ -1,0 +1,70 @@
+import { Meta, Canvas } from "@storybook/addon-docs/blocks"
+import * as Search from "../blocks/search/command-menu.stories"
+import * as Data from "../blocks/data/data-table.stories"
+
+<Meta title="Docs/Search and data" />
+
+# Search and data
+
+Two patterns every app repeats. Both have one implementation here — don't hand-roll either.
+
+## Search: `CommandMenu`
+
+[cmdk](https://cmdk.paco.me) palette. It binds ⌘K / Ctrl+K itself, so mounting it once anywhere is enough.
+
+<Canvas of={Search.Default} />
+
+```tsx
+<SearchTrigger onClick={() => setOpen(true)} />
+<CommandMenu
+  open={open}
+  onOpenChange={setOpen}
+  groups={[
+    { heading: "Go to", items: [{ id: "/projects", label: "Projects", icon: FolderIcon, onSelect: () => router.push("/projects") }] },
+    { heading: "Actions", items: [{ id: "new", label: "New project", icon: PlusIcon, shortcut: "⌘N", onSelect: createProject }] },
+  ]}
+/>
+```
+
+- `SearchTrigger` is the header control: it looks like an input, behaves like a button. In `AppShell` it goes in `headerActions`.
+- Leave `open` off entirely and the menu manages itself — the trigger is then optional.
+- `keywords` adds hidden match terms. `shortcut` is display only; bind the actual key yourself.
+- For server-side results, pass `onQueryChange` and feed the response back through `groups`.
+- Selecting an item closes the menu. `onSelect` runs first.
+
+Rules: one palette per app, groups ordered navigation first then actions, and every item gets an icon.
+
+## Data: `DataTable`
+
+[TanStack Table v9](https://tanstack.com/table). Sorting, filtering and pagination are wired up; you supply columns and rows.
+
+<Canvas of={Data.Default} />
+
+```tsx
+const helper = createDataTableColumnHelper<Member>()
+const columns = [
+  helper.accessor("name", { header: "Name" }),
+  helper.accessor("status", {
+    header: "Status",
+    cell: (c) => <Badge>{c.getValue()}</Badge>,
+  }),
+]
+
+<DataTable
+  columns={columns}
+  data={members}
+  filterColumn="name"
+  actions={<Button size="sm"><PlusIcon /> Invite</Button>}
+/>
+```
+
+v9 registers features explicitly. `dataTableFeatures` already includes sorting, column filtering, pagination, row selection and column visibility, and `createDataTableColumnHelper` is bound to it — use that helper so your column types line up.
+
+- `filterColumn` is a column id; omit it to hide the search box.
+- `pageSize={0}` renders everything and drops the pager.
+- `loading` swaps in skeleton rows; `empty` is the no-rows message.
+- Headers sort on click unless the column sets `enableSorting: false`.
+
+<Canvas of={Data.Loading} />
+
+For a table that isn't a list of records — a summary, a spec sheet — use the raw `Table` components instead.
