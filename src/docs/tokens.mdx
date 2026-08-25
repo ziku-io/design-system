@@ -1,5 +1,7 @@
 import { Meta } from "@storybook/addon-docs/blocks"
 
+import { AccentPalette, ChartPalette, StatusPalette, TokenTable } from "./palette"
+
 <Meta title="Docs/Design tokens" />
 
 # Design tokens
@@ -7,26 +9,29 @@ import { Meta } from "@storybook/addon-docs/blocks"
 Colours are CSS variables in `src/styles/globals.css`. Tailwind utilities read
 them: `bg-primary`, `text-muted-foreground`, `border-danger-border`.
 
+Every value on this page is read from the live stylesheet, so it cannot drift
+from the CSS — and it follows the **theme switcher in the toolbar**. Flip it to
+see the other half of the palette.
+
 **Dark is the default.** An app that sets no class on `<html>` renders dark. Add
 `class="light"` to opt out. `class="dark"` also works, so `next-themes` with
 `attribute="class"` behaves normally in both directions.
 
 ## Accent
 
-One brand colour, a blue-purple, drives every interactive surface: primary
-buttons, links, focus rings and the sidebar's active state.
+One brand colour, a blue-purple, drives every interactive surface.
 
-<div className="not-prose flex gap-3 py-2">
-  <div style={{ background: "#5b5bd6", color: "#fff", padding: "14px 18px", borderRadius: 6, fontSize: 13 }}>
-    <strong>#5b5bd6</strong> — fill, both themes
-  </div>
-  <div style={{ background: "#4f46e5", color: "#fff", padding: "14px 18px", borderRadius: 6, fontSize: 13 }}>
-    <strong>#4f46e5</strong> — link, light
-  </div>
-  <div style={{ background: "#a5a6ff", color: "#0d1117", padding: "14px 18px", borderRadius: 6, fontSize: 13 }}>
-    <strong>#a5a6ff</strong> — link, dark
-  </div>
-</div>
+<AccentPalette />
+
+<TokenTable
+  rows={[
+    { token: "primary", on: "primary-foreground", use: "Primary buttons, checked controls, the sidebar's active item" },
+    { token: "primary-foreground", use: "Text and icons on a primary fill" },
+    { token: "link", use: "Inline links. Never text-primary — see below" },
+    { token: "ring", use: "Focus rings, at 50% opacity around a 3px outline" },
+    { token: "accent", on: "accent-foreground", use: "Hover surfaces, tinted toward the brand" },
+  ]}
+/>
 
 Links use `text-link`, never `text-primary`: the fill is tuned for white text on
 top of it, the link colour for reading against the page. A link inside a
@@ -35,59 +40,70 @@ WCAG 1.4.1.
 
 ## Status
 
-Four states, each with four jobs. Every pairing below clears 4.5:1 in both
-themes; the numbers were measured, not guessed.
+Four states, each with four jobs. Every pairing clears 4.5:1 in both themes; the
+numbers were measured, not guessed.
 
-| Token | Job |
-|---|---|
-| `--x` | the fill on a button or badge (`bg-danger`) |
-| `--x-foreground` | text on that fill (`text-danger-foreground`) |
-| `--x-fg` | text or an icon on a page background (`text-danger-fg`) |
-| `--x-subtle` / `--x-border` | the banner ground and its border |
+<StatusPalette />
 
-<div className="not-prose grid gap-2 py-2 text-sm">
-  {[
-    ["success", "#1f883d", "#116329", "#dafbe1", "#238636", "#56d364", "#11261a"],
-    ["info", "#0969da", "#0969da", "#ddf4ff", "#1f6feb", "#79c0ff", "#0f1d2e"],
-    ["warning", "#d4a72c", "#7a5200", "#fff8c5", "#d29922", "#e3b341", "#26210f"],
-    ["danger", "#cf222e", "#cf222e", "#ffebe9", "#da3633", "#ff7b72", "#2a1517"],
-  ].map(([name, ls, lfg, lsub, ds, dfg, dsub]) => (
-    <div key={name} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-      <code style={{ minWidth: 76 }}>{name}</code>
-      <span style={{ background: ls, width: 26, height: 22, borderRadius: 4 }} />
-      <span style={{ background: lsub, color: lfg, padding: "3px 8px", borderRadius: 4, fontSize: 12 }}>light</span>
-      <span style={{ background: ds, width: 26, height: 22, borderRadius: 4 }} />
-      <span style={{ background: dsub, color: dfg, padding: "3px 8px", borderRadius: 4, fontSize: 12 }}>dark</span>
-    </div>
-  ))}
-</div>
+<TokenTable
+  rows={[
+    { token: "success", on: "success-foreground", use: "Fill: a confirm button, a passing badge" },
+    { token: "success-fg", use: "Text or an icon on a page or banner background" },
+    { token: "success-subtle", use: "Banner ground" },
+    { token: "success-border", use: "Banner border" },
+  ]}
+/>
 
-Two things worth knowing:
+`info`, `warning` and `danger` carry the same four. Two things worth knowing:
 
 - **`--warning-foreground` is dark, not white.** White on any usable amber tops
   out around 3:1. Every other status fill takes white.
-- **Never use the fill as text.** `text-danger` is `#da3633`, which is 3.8:1 on
-  a dark card — it fails. That is what `--danger-fg` exists for.
+- **Never use the fill as text.** `text-danger` is 3.8:1 on a dark card and
+  fails. That is exactly what `--danger-fg` is for.
 
 `--destructive` is kept as an alias of `--danger` so upstream shadcn snippets
 keep working. New code should say `danger`.
 
 ## Surfaces
 
-| Token | Dark | Light | Use |
-|---|---|---|---|
-| `background` | `#0d1117` | `#ffffff` | the page |
-| `card` / `popover` | `#151b23` | `#ffffff` | boxes, menus, dialogs |
-| `foreground` | `#f0f6fc` | `#1f2328` | body text |
-| `muted-foreground` | `#9198a1` | `#59636e` | secondary text |
-| `secondary` | `#212830` | `#f6f8fa` | neutral button fill |
-| `accent` | `#23233a` | `#f0f0fb` | hover surfaces, tinted toward the brand |
-| `border` / `input` | `#3d444d` | `#d1d9e0` | all borders |
-| `field` | `#0d1117` | `#ffffff` | input backgrounds |
-| `tooltip` | `#3d444d` | `#24292f` | tooltip surface |
+<TokenTable
+  rows={[
+    { token: "background", on: "foreground", use: "The page" },
+    { token: "foreground", use: "Body text" },
+    { token: "card", on: "card-foreground", use: "Boxes, panels, table headers" },
+    { token: "popover", on: "popover-foreground", use: "Menus, dialogs, tooltips' parent surfaces" },
+    { token: "muted", on: "muted-foreground", use: "Subtle fills; its foreground is secondary text" },
+    { token: "secondary", on: "secondary-foreground", use: "Neutral button fill" },
+    { token: "border", use: "Every border, unless a status owns it" },
+    { token: "input", use: "Control borders" },
+    { token: "field", use: "Input backgrounds" },
+    { token: "tooltip", on: "tooltip-foreground", use: "Tooltip surface, solid in both themes" },
+  ]}
+/>
 
 Note that shadcn's `--accent` is the *hover surface*, not the brand colour. The
 brand accent is `--primary`.
+
+## Sidebar
+
+The shell keeps its own set so an app can give the sidebar a different treatment
+without touching the page.
+
+<TokenTable
+  rows={[
+    { token: "sidebar", on: "sidebar-foreground", use: "Sidebar background" },
+    { token: "sidebar-primary", on: "sidebar-primary-foreground", use: "Active item" },
+    { token: "sidebar-accent", on: "sidebar-accent-foreground", use: "Hovered item" },
+    { token: "sidebar-border", use: "The rule between sidebar and content" },
+    { token: "sidebar-ring", use: "Focus inside the sidebar" },
+  ]}
+/>
+
+## Charts
+
+Five hues, ordered so adjacent series stay distinguishable.
+
+<ChartPalette />
 
 ## Radius
 
