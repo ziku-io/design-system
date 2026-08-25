@@ -4,13 +4,24 @@ const config: StorybookConfig = {
   stories: ["../src/**/*.mdx", "../src/**/*.stories.@(ts|tsx)"],
   addons: ["@storybook/addon-docs", "@storybook/addon-a11y"],
   framework: "@storybook/react-vite",
-  // ponytail: reuse vite.config.ts alias/tailwind, but drop the lib build + dts plugin
+
+  /**
+   * Storybook loads the project's vite.config.ts, which is set up to build the
+   * *library*. Two things have to go, or the static build emits `dist/`-style
+   * output into storybook-static and never writes an index.html:
+   *
+   *  - `build.lib` and its externals, which turn the app build into a bundle
+   *  - the dts plugin, which writes .d.ts files into the output directory
+   *
+   * Storybook's own `build` settings are kept — nulling the whole object is
+   * what broke the published site the first time.
+   */
   viteFinal: (cfg) => ({
     ...cfg,
-    build: undefined,
+    build: { ...cfg.build, lib: undefined, rollupOptions: undefined },
     plugins: (cfg.plugins ?? [])
       .flat()
-      .filter((p) => !(p && "name" in p && String(p.name).startsWith("vite:dts"))),
+      .filter((plugin) => !(plugin && "name" in plugin && String(plugin.name).includes("dts"))),
   }),
 }
 export default config
