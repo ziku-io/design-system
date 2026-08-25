@@ -1,0 +1,23 @@
+import { Label as LabelPrimitive, Slot } from 'radix-ui';
+import { ControllerProps, FieldPath, FieldValues } from 'react-hook-form';
+import * as React from "react";
+declare const Form: <TFieldValues extends FieldValues, TContext = any, TTransformedValues = TFieldValues>({ children, watch, getValues, getErrors, getFieldState, setError, clearErrors, setValue, setValues, trigger, formState, resetField, reset, resetDefaultValues, handleSubmit, unregister, control, register, setFocus, subscribe, }: import('react-hook-form').FormProviderProps<TFieldValues, TContext, TTransformedValues>) => React.JSX.Element;
+declare const FormField: <TFieldValues extends FieldValues = FieldValues, TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>>({ ...props }: ControllerProps<TFieldValues, TName>) => React.JSX.Element;
+declare const useFormField: () => {
+    invalid: boolean;
+    isDirty: boolean;
+    isTouched: boolean;
+    isValidating: boolean;
+    error?: import('react-hook-form').FieldError | undefined;
+    id: string;
+    name: string;
+    formItemId: string;
+    formDescriptionId: string;
+    formMessageId: string;
+};
+declare function FormItem({ className, ...props }: React.ComponentProps<"div">): React.JSX.Element;
+declare function FormLabel({ className, ...props }: React.ComponentProps<typeof LabelPrimitive.Root>): React.JSX.Element;
+declare function FormControl({ ...props }: React.ComponentProps<typeof Slot.Root>): React.JSX.Element;
+declare function FormDescription({ className, ...props }: React.ComponentProps<"p">): React.JSX.Element;
+declare function FormMessage({ className, ...props }: React.ComponentProps<"p">): React.JSX.Element | null;
+export { useFormField, Form, FormItem, FormLabel, FormControl, FormDescription, FormMessage, FormField, };

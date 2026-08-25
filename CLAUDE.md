@@ -67,9 +67,16 @@ Storybook 10; the theme switcher is a hand-rolled `globalTypes` toolbar in
 `.storybook/preview.tsx`. Don't reinstall the addon.
 
 **Package shape.** `tw-animate-css` is a runtime dependency, not a dev one — the
-shipped stylesheet imports it. `prepare` runs the build so the package works as
-a git dependency. Consumers compile `globals.css` themselves, so `tailwindcss`
-is a peer.
+shipped stylesheet imports it. Consumers compile `globals.css` themselves, so
+`tailwindcss` is a peer.
+
+**`dist/` is committed.** Consumers install this over a git tarball, and a
+`prepare` script meant every install rebuilt the whole library: it needed the
+full devDependency tree to resolve, an `allowBuilds` allowlist on pnpm 11, and
+it broke the day a transitive dep tripped pnpm's supply-chain age policy.
+Shipping the build removes all of that. **Run `pnpm build` and commit `dist/`
+with any source change** — CI fails if it is stale. The build is reproducible,
+so a clean tree means it is current.
 
 ## Layout
 

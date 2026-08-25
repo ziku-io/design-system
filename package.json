@@ -24,7 +24,6 @@
   "scripts": {
     "dev": "storybook dev -p 6006",
     "build": "tsc -p tsconfig.build.json && vite build",
-    "prepare": "pnpm build || true",
     "build-storybook": "storybook build",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",

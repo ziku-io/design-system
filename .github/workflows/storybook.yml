@@ -37,6 +37,12 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
 
+      # dist/ is committed so consumers install without building. If it is
+      # stale, the package they get does not match this source.
+      - run: pnpm build
+      - name: dist/ is up to date
+        run: git diff --exit-code -- dist || (echo "::error::dist/ is stale — run 'pnpm build' and commit" && exit 1)
+
       - run: pnpm build-storybook
 
       - uses: actions/upload-pages-artifact@v3
