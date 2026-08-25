@@ -36,35 +36,87 @@ Rules: one palette per app, groups ordered navigation first then actions, and ev
 
 ## Data: `DataTable`
 
-[TanStack Table v9](https://tanstack.com/table). Sorting, filtering and pagination are wired up; you supply columns and rows.
+[TanStack Table v9](https://tanstack.com/table) under a declarative column model, with the toolbar ported from the nieusync internal table: filter chips, a multi-column sort stack, grouping, column visibility and saved views.
 
 <Canvas of={Data.Default} />
 
 ```tsx
-const helper = createDataTableColumnHelper<Member>()
-const columns = [
-  helper.accessor("name", { header: "Name" }),
-  helper.accessor("status", {
-    header: "Status",
-    cell: (c) => <Badge>{c.getValue()}</Badge>,
-  }),
+const columns: DataTableColumn<Deal>[] = [
+  { key: "name", header: "Deal", icon: UserIcon },
+  { key: "stage", header: "Stage", icon: CircleDashedIcon, facet: true, order: ["Lead", "Won", "Lost"],
+    render: (r) => <Badge>{r.stage}</Badge> },
+  { key: "value", header: "Value", value: (r) => r.value, render: (r) => euros(r.value),
+    className: "text-right tabular-nums" },
 ]
 
 <DataTable
   columns={columns}
-  data={members}
-  filterColumn="name"
-  actions={<Button size="sm"><PlusIcon /> Invite</Button>}
+  data={deals}
+  rowId={(d) => String(d.id)}
+  viewKey="deals"
+  presets={[{ id: "open", name: "Open", icon: "funnel",
+              state: { columnFilters: [{ id: "stage", value: ["Lead"] }] } }]}
 />
 ```
 
-v9 registers features explicitly. `dataTableFeatures` already includes sorting, column filtering, pagination, row selection and column visibility, and `createDataTableColumnHelper` is bound to it — use that helper so your column types line up.
+### Columns
 
-- `filterColumn` is a column id; omit it to hide the search box.
-- `pageSize={0}` renders everything and drops the pager.
-- `loading` swaps in skeleton rows; `empty` is the no-rows message.
-- Headers sort on click unless the column sets `enableSorting: false`.
+One object per column, not a TanStack `ColumnDef`:
 
-<Canvas of={Data.Loading} />
+- `key` / `header` — id and visible name. A column with no `header` is furniture (row menus, checkboxes): never offered in a picker, never hidden by the user.
+- `value` — what to sort, filter and search on. Return the **visible label**; filters and groups display it verbatim. Defaults to `row[key]`.
+- `render` — the cell. Independent of `value`, so a badge can sort by its text.
+- `facet: true` — turns on the distinct-values filter, and allows grouping by this column.
+- `order` — fixed order for groups and filter options (`["Lead", "Won", "Lost"]`), instead of alphabetical. Labels not in the list sort last.
+- `icon`, `className`, `sortable: false`.
 
-For a table that isn't a list of records — a summary, a spec sheet — use the raw `Table` components instead.
+### Filtering
+
+Chips on the bar under the toolbar. A facet column gives checkboxes with counts; any other column gives a "contains" text box. A chip with nothing in it stays visible and editable rather than being silently dropped.
+
+<Canvas of={Data.Filtered} />
+
+### Ordering
+
+Headers sort on click. The sort icon opens the full stack — several columns applied in order, each with its own direction — because one column is rarely the whole answer.
+
+### Grouping
+
+Group by any facet column: collapsible group rows with counts, ordered by the column's `order`.
+
+<Canvas of={Data.Grouped} />
+
+### Views
+
+The tabs across the top. "All" plus whatever the page pins through `presets`, plus whatever the user saves with `+`. The active view holds the filters, sorts, hidden columns, grouping and layout, and **every change is persisted as it happens** — no save button.
+
+- `viewKey` is the localStorage key. Without it nothing is saved.
+- `presets` are the page's own views; they can be renamed and reset but never deleted.
+- The `…` menu renames the view, changes its icon, and drills into each setting.
+- A view saved before a column existed is pruned on load, so renaming a column does not strand a filter that matches nothing.
+
+### Board
+
+Pass `renderCard` and give the grouped column an `onSet`, and the layout toggle appears. Cards drag between columns; `onSet` is called with the label of the column they land on.
+
+<Canvas of={Data.Board} />
+
+```tsx
+<DataTable
+  columns={columns.map((c) => c.key === "stage" ? { ...c, onSet: (row, stage) => save(row, stage) } : c)}
+  data={deals}
+  rowId={(d) => String(d.id)}
+  defaultMode="board"
+  defaultGroup="stage"
+  boardSubtitle={(rows) => euros(rows.reduce((n, r) => n + r.value, 0))}
+  renderCard={(d) => <DealCard deal={d} />}
+/>
+```
+
+Drag and drop is native HTML5 — fine for desktop mouse use, no touch dragging.
+
+### Pagination
+
+`pageSize` adds a pager. Grouping and the board always show the whole set, so the pager steps aside while either is on. Everything is filtered and sorted in the browser; a server-driven list is not wired up yet — `onStateChange` gives you the active view's state if you want to mirror it into the URL.
+
+For a table that is not a list of records — a summary, a spec sheet — use the raw `Table` components instead.

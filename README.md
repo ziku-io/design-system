@@ -30,7 +30,7 @@ src/components/ui/   shadcn components (+ .stories.tsx each)
 src/blocks/auth/     AuthLayout, LoginForm, RegisterForm, ForgotPasswordForm
 src/blocks/shell/    AppShell (sidebar nav + top bar)
 src/blocks/search/   CommandMenu (cmdk ⌘K palette), SearchTrigger
-src/blocks/data/     DataTable (TanStack Table v9)
+src/blocks/data/     DataTable (TanStack v9: chips, sorting, grouping, saved views), Kanban
 src/blocks/page/     PageHeader, EmptyState
 src/docs/            MDX docs pages
 src/styles/          globals.css (GitHub Primer tokens, dark default)
