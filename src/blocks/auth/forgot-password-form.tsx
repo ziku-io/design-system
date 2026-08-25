@@ -5,12 +5,21 @@ import { SpinnerIcon, EnvelopeSimpleIcon } from "@phosphor-icons/react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Link } from "@/lib/link"
 
-export const forgotPasswordSchema = z.object({ email: z.email("Enter a valid email") })
+export const forgotPasswordSchema = z.object({
+  email: z.email("Enter a valid email"),
+})
 export type ForgotPasswordValues = z.infer<typeof forgotPasswordSchema>
 
 export interface ForgotPasswordFormProps {
@@ -21,7 +30,12 @@ export interface ForgotPasswordFormProps {
   loginHref?: string
 }
 
-export function ForgotPasswordForm({ onSubmit, error, sent, loginHref = "/login" }: ForgotPasswordFormProps) {
+export function ForgotPasswordForm({
+  onSubmit,
+  error,
+  sent,
+  loginHref = "/login",
+}: ForgotPasswordFormProps) {
   const form = useForm<ForgotPasswordValues>({
     resolver: zodResolver(forgotPasswordSchema),
     defaultValues: { email: "" },
@@ -35,7 +49,8 @@ export function ForgotPasswordForm({ onSubmit, error, sent, loginHref = "/login"
           <EnvelopeSimpleIcon className="size-8 text-primary" />
           <CardTitle className="text-xl">Check your inbox</CardTitle>
           <CardDescription>
-            If an account exists for {form.getValues("email") || "that email"}, we sent a reset link.
+            If an account exists for {form.getValues("email") || "that email"}, we sent a reset
+            link.
           </CardDescription>
         </CardHeader>
         <CardContent className="text-center text-sm">
@@ -57,7 +72,7 @@ export function ForgotPasswordForm({ onSubmit, error, sent, loginHref = "/login"
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-5" noValidate>
             {error && (
-              <Alert variant="destructive">
+              <Alert variant="danger">
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
@@ -68,7 +83,12 @@ export function ForgotPasswordForm({ onSubmit, error, sent, loginHref = "/login"
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input type="email" autoComplete="email" placeholder="you@company.com" {...field} />
+                    <Input
+                      type="email"
+                      autoComplete="email"
+                      placeholder="you@company.com"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

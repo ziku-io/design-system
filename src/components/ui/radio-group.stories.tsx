@@ -2,7 +2,11 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import { RadioGroup, RadioGroupItem } from "./radio-group"
 import { Label } from "./label"
 
-const meta: Meta<typeof RadioGroup> = { title: "Components/RadioGroup", component: RadioGroup, tags: ["autodocs"] }
+const meta: Meta<typeof RadioGroup> = {
+  title: "Components/RadioGroup",
+  component: RadioGroup,
+  tags: ["autodocs"],
+}
 export default meta
 type Story = StoryObj<typeof RadioGroup>
 
@@ -12,7 +16,9 @@ export const Default: Story = {
       {["monthly", "yearly"].map((v) => (
         <div key={v} className="flex items-center gap-2">
           <RadioGroupItem value={v} id={v} />
-          <Label htmlFor={v} className="capitalize">{v}</Label>
+          <Label htmlFor={v} className="capitalize">
+            {v}
+          </Label>
         </div>
       ))}
     </RadioGroup>
@@ -24,7 +30,9 @@ export const Disabled: Story = {
       {["monthly", "yearly"].map((v) => (
         <div key={v} className="flex items-center gap-2">
           <RadioGroupItem value={v} id={`d-${v}`} />
-          <Label htmlFor={`d-${v}`} className="capitalize">{v}</Label>
+          <Label htmlFor={`d-${v}`} className="capitalize">
+            {v}
+          </Label>
         </div>
       ))}
     </RadioGroup>

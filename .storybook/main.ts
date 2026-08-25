@@ -8,7 +8,9 @@ const config: StorybookConfig = {
   viteFinal: (cfg) => ({
     ...cfg,
     build: undefined,
-    plugins: (cfg.plugins ?? []).flat().filter((p) => !(p && "name" in p && String(p.name).startsWith("vite:dts"))),
+    plugins: (cfg.plugins ?? [])
+      .flat()
+      .filter((p) => !(p && "name" in p && String(p.name).startsWith("vite:dts"))),
   }),
 }
 export default config

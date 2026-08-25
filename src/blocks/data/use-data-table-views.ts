@@ -28,7 +28,7 @@ function builtIn(base: DataTableState, presets: DataTableView[]): SavedView[] {
 function load(
   viewKey: string | undefined,
   base: DataTableState,
-  presets: DataTableView[]
+  presets: DataTableView[],
 ): { views: SavedView[]; activeId: string } {
   const fixed = builtIn(base, presets)
   const fallback = { views: fixed, activeId: fixed[0].id }
@@ -82,7 +82,7 @@ export function useDataTableViews(
   presets: DataTableView[],
   viewKey: string | undefined,
   /** State of the active view, after unknown columns have been pruned. */
-  liveState: DataTableState
+  liveState: DataTableState,
 ): UseDataTableViews {
   const [{ views, activeId }, setStore] = React.useState(() => load(viewKey, base, presets))
   const active = views.find((v) => v.id === activeId) ?? views[0]
@@ -97,7 +97,7 @@ export function useDataTableViews(
     setStore((s) => ({
       ...s,
       views: s.views.map((v) =>
-        v.id === s.activeId ? { ...v, state: { ...v.state, ...partial } } : v
+        v.id === s.activeId ? { ...v, state: { ...v.state, ...partial } } : v,
       ),
     }))
   }, [])

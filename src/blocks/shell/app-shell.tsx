@@ -102,7 +102,11 @@ export function AppShell({
                 <SidebarMenu>
                   {group.items.map((item) => (
                     <SidebarMenuItem key={item.href}>
-                      <SidebarMenuButton asChild isActive={currentPath === item.href} tooltip={item.title}>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={currentPath === item.href}
+                        tooltip={item.title}
+                      >
                         <Link href={item.href}>
                           {item.icon && <item.icon />}
                           <span>{item.title}</span>
@@ -124,7 +128,9 @@ export function AppShell({
                     <SidebarMenuButton size="lg" className="data-[state=open]:bg-sidebar-accent">
                       <Avatar className="size-8 rounded-lg">
                         <AvatarImage src={user.avatarUrl} alt={user.name} />
-                        <AvatarFallback className="rounded-lg">{initials(user.name)}</AvatarFallback>
+                        <AvatarFallback className="rounded-lg">
+                          {initials(user.name)}
+                        </AvatarFallback>
                       </Avatar>
                       <div className="grid flex-1 text-left text-sm leading-tight">
                         <span className="truncate font-medium">{user.name}</span>
@@ -133,7 +139,11 @@ export function AppShell({
                       <CaretUpDownIcon className="ml-auto size-4" />
                     </SidebarMenuButton>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent side="top" align="start" className="w-(--radix-dropdown-menu-trigger-width) min-w-56">
+                  <DropdownMenuContent
+                    side="top"
+                    align="start"
+                    className="w-(--radix-dropdown-menu-trigger-width) min-w-56"
+                  >
                     <DropdownMenuLabel className="font-normal">
                       <div className="text-sm font-medium">{user.name}</div>
                       <div className="text-xs text-muted-foreground">{user.email}</div>

@@ -1,5 +1,5 @@
-import { Meta, Canvas } from "@storybook/addon-docs/blocks"
-import * as Auth from "../blocks/auth/auth.stories"
+import { Meta, Canvas } from "@storybook/addon-docs/blocks";
+import * as Auth from "../blocks/auth/auth.stories";
 
 <Meta title="Docs/Auth flows" />
 
@@ -7,11 +7,11 @@ import * as Auth from "../blocks/auth/auth.stories"
 
 Every app uses the same three screens. Routes are conventions the blocks link to by default; override with props if an app differs.
 
-| Route | Block | Links to |
-|---|---|---|
-| `/login` | `LoginForm` | `/register`, `/forgot-password` |
-| `/register` | `RegisterForm` | `/login` |
-| `/forgot-password` | `ForgotPasswordForm` | `/login` |
+| Route              | Block                | Links to                        |
+| ------------------ | -------------------- | ------------------------------- |
+| `/login`           | `LoginForm`          | `/register`, `/forgot-password` |
+| `/register`        | `RegisterForm`       | `/login`                        |
+| `/forgot-password` | `ForgotPasswordForm` | `/login`                        |
 
 All three sit inside `AuthLayout` (centered card, optional logo and footer).
 
@@ -20,11 +20,24 @@ All three sit inside `AuthLayout` (centered card, optional logo and footer).
 <Canvas of={Auth.Login} />
 
 ```tsx
-<AuthLayout logo={<Logo />} footer={<>By continuing you agree to our <a href="/terms">Terms</a>.</>}>
+<AuthLayout
+  logo={<Logo />}
+  footer={
+    <>
+      By continuing you agree to our <a href="/terms">Terms</a>.
+    </>
+  }
+>
   <LoginForm
-    onSubmit={async ({ email, password }) => { await signIn(email, password) }}
+    onSubmit={async ({ email, password }) => {
+      await signIn(email, password);
+    }}
     error={serverError}
-    providers={<Button variant="outline"><GoogleLogoIcon /> Google</Button>}
+    providers={
+      <Button variant="outline">
+        <GoogleLogoIcon /> Google
+      </Button>
+    }
   />
 </AuthLayout>
 ```

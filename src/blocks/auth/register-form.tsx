@@ -6,7 +6,15 @@ import { SpinnerIcon } from "@phosphor-icons/react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Link } from "@/lib/link"
@@ -47,7 +55,12 @@ export function RegisterForm({
   })
   const busy = form.formState.isSubmitting
 
-  const text = (name: keyof RegisterValues, label: string, input: React.ComponentProps<typeof Input>, hint?: string) => (
+  const text = (
+    name: keyof RegisterValues,
+    label: string,
+    input: React.ComponentProps<typeof Input>,
+    hint?: string,
+  ) => (
     <FormField
       control={form.control}
       name={name}
@@ -74,14 +87,29 @@ export function RegisterForm({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-5" noValidate>
             {error && (
-              <Alert variant="destructive">
+              <Alert variant="danger">
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-            {text("name", "Name", { autoComplete: "name", placeholder: "Ada Lovelace" })}
-            {text("email", "Email", { type: "email", autoComplete: "email", placeholder: "you@company.com" })}
-            {text("password", "Password", { type: "password", autoComplete: "new-password" }, "At least 8 characters")}
-            {text("confirmPassword", "Confirm password", { type: "password", autoComplete: "new-password" })}
+            {text("name", "Name", {
+              autoComplete: "name",
+              placeholder: "Ada Lovelace",
+            })}
+            {text("email", "Email", {
+              type: "email",
+              autoComplete: "email",
+              placeholder: "you@company.com",
+            })}
+            {text(
+              "password",
+              "Password",
+              { type: "password", autoComplete: "new-password" },
+              "At least 8 characters",
+            )}
+            {text("confirmPassword", "Confirm password", {
+              type: "password",
+              autoComplete: "new-password",
+            })}
             <Button type="submit" className="w-full" disabled={busy}>
               {busy && <SpinnerIcon className="animate-spin" />}
               Create account
@@ -89,7 +117,9 @@ export function RegisterForm({
             {providers && (
               <>
                 <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
-                  <span className="relative z-10 bg-card px-2 text-muted-foreground">or continue with</span>
+                  <span className="relative z-10 bg-card px-2 text-muted-foreground">
+                    or continue with
+                  </span>
                 </div>
                 <div className="grid gap-2">{providers}</div>
               </>

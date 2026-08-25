@@ -13,7 +13,6 @@ const Toaster = ({ theme, ...props }: ToasterProps) => {
   // Follows the .light/.dark class, not the OS: this library is class-driven.
   const resolved = useTheme()
 
-
   return (
     <Sonner
       theme={theme ?? resolved}

@@ -9,14 +9,20 @@ const alertVariants = cva(
     variants: {
       variant: {
         default: "bg-card text-card-foreground",
-        destructive:
-          "bg-card text-destructive *:data-[slot=alert-description]:text-destructive/90 [&>svg]:text-current",
+        // Status banners: a tinted ground, a matching border and text that
+        // clears 4.5:1 against that ground in both themes.
+        danger: "border-danger-border bg-danger-subtle text-danger-fg",
+        warning: "border-warning-border bg-warning-subtle text-warning-fg",
+        success: "border-success-border bg-success-subtle text-success-fg",
+        info: "border-info-border bg-info-subtle text-info-fg",
+        /** @deprecated use `danger` — kept so upstream shadcn snippets work. */
+        destructive: "border-danger-border bg-danger-subtle text-danger-fg",
       },
     },
     defaultVariants: {
       variant: "default",
     },
-  }
+  },
 )
 
 function Alert({
@@ -38,25 +44,19 @@ function AlertTitle({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="alert-title"
-      className={cn(
-        "col-start-2 line-clamp-1 min-h-4 font-medium tracking-tight",
-        className
-      )}
+      className={cn("col-start-2 line-clamp-1 min-h-4 font-medium tracking-tight", className)}
       {...props}
     />
   )
 }
 
-function AlertDescription({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
+function AlertDescription({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="alert-description"
       className={cn(
         "col-start-2 grid justify-items-start gap-1 text-sm text-muted-foreground [&_p]:leading-relaxed",
-        className
+        className,
       )}
       {...props}
     />

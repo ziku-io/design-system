@@ -6,7 +6,14 @@ import { SpinnerIcon } from "@phosphor-icons/react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Link } from "@/lib/link"
@@ -54,7 +61,7 @@ export function LoginForm({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-5" noValidate>
             {error && (
-              <Alert variant="destructive">
+              <Alert variant="danger">
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
@@ -65,7 +72,12 @@ export function LoginForm({
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input type="email" autoComplete="email" placeholder="you@company.com" {...field} />
+                    <Input
+                      type="email"
+                      autoComplete="email"
+                      placeholder="you@company.com"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -78,7 +90,10 @@ export function LoginForm({
                 <FormItem>
                   <div className="flex items-center justify-between">
                     <FormLabel>Password</FormLabel>
-                    <Link href={forgotPasswordHref} className="text-sm text-link underline-offset-4 hover:underline">
+                    <Link
+                      href={forgotPasswordHref}
+                      className="text-sm text-link underline-offset-4 hover:underline"
+                    >
                       Forgot password?
                     </Link>
                   </div>
@@ -96,7 +111,9 @@ export function LoginForm({
             {providers && (
               <>
                 <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
-                  <span className="relative z-10 bg-card px-2 text-muted-foreground">or continue with</span>
+                  <span className="relative z-10 bg-card px-2 text-muted-foreground">
+                    or continue with
+                  </span>
                 </div>
                 <div className="grid gap-2">{providers}</div>
               </>

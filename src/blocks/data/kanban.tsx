@@ -87,7 +87,7 @@ export function Kanban<T>({
               // The border carries the signal and the fill stays quiet.
               ready: "border-ring/50 bg-muted/50",
               over: "border-ring bg-accent",
-            }[state(col.key)]
+            }[state(col.key)],
           )}
         >
           <div className="flex items-baseline justify-between px-2 py-1.5">
@@ -119,7 +119,7 @@ export function Kanban<T>({
                     e.dataTransfer.setDragImage(
                       e.currentTarget,
                       e.clientX - box.left,
-                      e.clientY - box.top
+                      e.clientY - box.top,
                     )
                   }}
                   onDragEnd={() => {
@@ -130,7 +130,7 @@ export function Kanban<T>({
                     "transition-opacity",
                     draggable ? "cursor-grab active:cursor-grabbing" : "cursor-default",
                     // The card left behind: a faint outline of where it was.
-                    dragKey === id && "opacity-30"
+                    dragKey === id && "opacity-30",
                   )}
                 >
                   {renderCard(item)}

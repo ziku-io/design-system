@@ -80,8 +80,20 @@ const columns: DataTableColumn<Deal>[] = [
 ]
 
 const presets: DataTableView[] = [
-  { id: "open", name: "Open", icon: "funnel", state: { columnFilters: [{ id: "stage", value: ["Lead", "Qualified", "Proposal"] }] } },
-  { id: "by-stage", name: "Pipeline", icon: "board", state: { grouping: ["stage"] } },
+  {
+    id: "open",
+    name: "Open",
+    icon: "funnel",
+    state: {
+      columnFilters: [{ id: "stage", value: ["Lead", "Qualified", "Proposal"] }],
+    },
+  },
+  {
+    id: "by-stage",
+    name: "Pipeline",
+    icon: "board",
+    state: { grouping: ["stage"] },
+  },
 ]
 
 type Story = StoryObj<typeof DataTable<Deal>>
@@ -135,10 +147,10 @@ export const Board: Story = {
             ...c,
             onSet: (row, label) =>
               setRows((rs) =>
-                rs.map((r) => (r.id === row.id ? { ...r, stage: label as Deal["stage"] } : r))
+                rs.map((r) => (r.id === row.id ? { ...r, stage: label as Deal["stage"] } : r)),
               ),
           }
-        : c
+        : c,
     )
     return (
       <DataTable
@@ -167,7 +179,9 @@ export const Paginated: Story = {
   ),
 }
 
-export const Loading: Story = { render: () => <DataTable columns={columns} data={[]} loading /> }
+export const Loading: Story = {
+  render: () => <DataTable columns={columns} data={[]} loading />,
+}
 export const Empty: Story = {
   render: () => <DataTable columns={columns} data={[]} empty="No deals yet." />,
 }

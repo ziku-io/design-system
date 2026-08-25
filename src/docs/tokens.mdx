@@ -4,49 +4,102 @@ import { Meta } from "@storybook/addon-docs/blocks"
 
 # Design tokens
 
-Colors follow [GitHub Primer](https://primer.style/foundations/primitives/color). Values live as CSS variables in `src/styles/globals.css`; Tailwind utilities read them (`bg-primary`, `text-muted-foreground`, `border-border`).
+Colours are CSS variables in `src/styles/globals.css`. Tailwind utilities read
+them: `bg-primary`, `text-muted-foreground`, `border-danger-border`.
 
-**Dark is the default.** An app that sets no class on `<html>` renders dark. Add `class="light"` to opt out. `class="dark"` also works, so `next-themes` with `attribute="class"` behaves normally in both directions.
+**Dark is the default.** An app that sets no class on `<html>` renders dark. Add
+`class="light"` to opt out. `class="dark"` also works, so `next-themes` with
+`attribute="class"` behaves normally in both directions.
 
-<div className="not-prose grid gap-2 rounded-md border border-[var(--border)] p-4" style={{ background: "var(--background)", color: "var(--foreground)" }}>
+## Accent
+
+One brand colour, a blue-purple, drives every interactive surface: primary
+buttons, links, focus rings and the sidebar's active state.
+
+<div className="not-prose flex gap-3 py-2">
+  <div style={{ background: "#5b5bd6", color: "#fff", padding: "14px 18px", borderRadius: 6, fontSize: 13 }}>
+    <strong>#5b5bd6</strong> — fill, both themes
+  </div>
+  <div style={{ background: "#4f46e5", color: "#fff", padding: "14px 18px", borderRadius: 6, fontSize: 13 }}>
+    <strong>#4f46e5</strong> — link, light
+  </div>
+  <div style={{ background: "#a5a6ff", color: "#0d1117", padding: "14px 18px", borderRadius: 6, fontSize: 13 }}>
+    <strong>#a5a6ff</strong> — link, dark
+  </div>
+</div>
+
+Links use `text-link`, never `text-primary`: the fill is tuned for white text on
+top of it, the link colour for reading against the page. A link inside a
+sentence also needs `underline underline-offset-4` — colour alone fails
+WCAG 1.4.1.
+
+## Status
+
+Four states, each with four jobs. Every pairing below clears 4.5:1 in both
+themes; the numbers were measured, not guessed.
+
+| Token | Job |
+|---|---|
+| `--x` | the fill on a button or badge (`bg-danger`) |
+| `--x-foreground` | text on that fill (`text-danger-foreground`) |
+| `--x-fg` | text or an icon on a page background (`text-danger-fg`) |
+| `--x-subtle` / `--x-border` | the banner ground and its border |
+
+<div className="not-prose grid gap-2 py-2 text-sm">
   {[
-    ["background", "#0d1117", "#ffffff", "Page"],
-    ["card / popover", "#151b23", "#ffffff", "Boxes, menus, dialogs"],
-    ["foreground", "#f0f6fc", "#1f2328", "Body text"],
-    ["muted-foreground", "#9198a1", "#59636e", "Secondary text"],
-    ["primary", "#238636", "#1f883d", "Primary buttons (GitHub green)"],
-    ["secondary", "#212830", "#f6f8fa", "Neutral button fill"],
-    ["accent", "#262c36", "#eff2f5", "Hover surfaces"],
-    ["destructive", "#da3633", "#cf222e", "Delete, danger"],
-    ["border / input", "#3d444d", "#d1d9e0", "All borders"],
-    ["field", "#0d1117", "#ffffff", "Input backgrounds"],
-    ["ring / link", "#4493f8", "#0969da", "Focus rings and links"],
-    ["tooltip", "#3d444d", "#24292f", "Tooltip surface"],
-  ].map(([name, dark, light, use]) => (
-    <div key={name} style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 13 }}>
-      <span style={{ width: 22, height: 22, borderRadius: 6, background: dark, border: "1px solid #3d444d" }} />
-      <span style={{ width: 22, height: 22, borderRadius: 6, background: light, border: "1px solid #3d444d" }} />
-      <code style={{ minWidth: 160 }}>{name}</code>
-      <code style={{ minWidth: 90, opacity: 0.7 }}>{dark}</code>
-      <code style={{ minWidth: 90, opacity: 0.7 }}>{light}</code>
-      <span style={{ opacity: 0.7 }}>{use}</span>
+    ["success", "#1f883d", "#116329", "#dafbe1", "#238636", "#56d364", "#11261a"],
+    ["info", "#0969da", "#0969da", "#ddf4ff", "#1f6feb", "#79c0ff", "#0f1d2e"],
+    ["warning", "#d4a72c", "#7a5200", "#fff8c5", "#d29922", "#e3b341", "#26210f"],
+    ["danger", "#cf222e", "#cf222e", "#ffebe9", "#da3633", "#ff7b72", "#2a1517"],
+  ].map(([name, ls, lfg, lsub, ds, dfg, dsub]) => (
+    <div key={name} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+      <code style={{ minWidth: 76 }}>{name}</code>
+      <span style={{ background: ls, width: 26, height: 22, borderRadius: 4 }} />
+      <span style={{ background: lsub, color: lfg, padding: "3px 8px", borderRadius: 4, fontSize: 12 }}>light</span>
+      <span style={{ background: ds, width: 26, height: 22, borderRadius: 4 }} />
+      <span style={{ background: dsub, color: dfg, padding: "3px 8px", borderRadius: 4, fontSize: 12 }}>dark</span>
     </div>
   ))}
 </div>
 
-Swatches are dark then light.
+Two things worth knowing:
 
-## Two interactive colors
+- **`--warning-foreground` is dark, not white.** White on any usable amber tops
+  out around 3:1. Every other status fill takes white.
+- **Never use the fill as text.** `text-danger` is `#da3633`, which is 3.8:1 on
+  a dark card — it fails. That is what `--danger-fg` exists for.
 
-GitHub uses green for the primary action and blue for links and focus. So does this system: `--primary` is green, `--link` and `--ring` are blue. Use `text-link` for inline links, never `text-primary`. Links sitting inside a sentence also need `underline underline-offset-4` — colour alone fails WCAG 1.4.1, and the a11y addon will flag it.
+`--destructive` is kept as an alias of `--danger` so upstream shadcn snippets
+keep working. New code should say `danger`.
+
+## Surfaces
+
+| Token | Dark | Light | Use |
+|---|---|---|---|
+| `background` | `#0d1117` | `#ffffff` | the page |
+| `card` / `popover` | `#151b23` | `#ffffff` | boxes, menus, dialogs |
+| `foreground` | `#f0f6fc` | `#1f2328` | body text |
+| `muted-foreground` | `#9198a1` | `#59636e` | secondary text |
+| `secondary` | `#212830` | `#f6f8fa` | neutral button fill |
+| `accent` | `#23233a` | `#f0f0fb` | hover surfaces, tinted toward the brand |
+| `border` / `input` | `#3d444d` | `#d1d9e0` | all borders |
+| `field` | `#0d1117` | `#ffffff` | input backgrounds |
+| `tooltip` | `#3d444d` | `#24292f` | tooltip surface |
+
+Note that shadcn's `--accent` is the *hover surface*, not the brand colour. The
+brand accent is `--primary`.
 
 ## Radius
 
-Flat, like GitHub: 6px on controls and boxes (`rounded-md`, `rounded-lg`), 4px small, 8px for the largest surfaces. This overrides the shadcn 8/12px scale.
+Flat: 6px on controls and boxes (`rounded-md`, `rounded-lg`), 4px small, 8px for
+the largest surfaces.
 
 ## Typography
 
-The GitHub system stack (`-apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial`), mono is `ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas`. Page titles `text-2xl font-semibold tracking-tight`, body `text-sm`, helper text `text-sm text-muted-foreground`.
+System stack (`-apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans",
+Helvetica, Arial`), mono is `ui-monospace, SFMono-Regular, "SF Mono", Menlo,
+Consolas`. Page titles `text-2xl font-semibold tracking-tight`, body `text-sm`,
+helper text `text-sm text-muted-foreground`.
 
 ## Spacing rules of thumb
 
@@ -61,5 +114,5 @@ Redefine any variable after importing the stylesheet:
 
 ```css
 @import "@ziku/ui/styles.css";
-:root { --primary: #8250df; }
+:root { --primary: #0969da; --ring: #0969da; --link: #79c0ff; }
 ```

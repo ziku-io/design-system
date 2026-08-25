@@ -24,7 +24,11 @@ const columns: DataTableColumn<Deal>[] = [
 
 describe("helpers", () => {
   it("ranks by the column's fixed order, not alphabetically", () => {
-    const col: DataTableColumn<Deal> = { key: "stage", header: "Stage", order: ["Lead", "Won"] }
+    const col: DataTableColumn<Deal> = {
+      key: "stage",
+      header: "Stage",
+      order: ["Lead", "Won"],
+    }
     expect(["Won", "Lead"].sort(rank(col))).toEqual(["Lead", "Won"])
     // unknown labels sort after the known ones
     expect(["Zzz", "Won", "Lead"].sort(rank(col))).toEqual(["Lead", "Won", "Zzz"])
@@ -57,14 +61,26 @@ describe("DataTable", () => {
   })
 
   it("narrows the rows to a starting filter", () => {
-    render(<DataTable columns={columns} data={deals} defaultFilters={[{ id: "stage", value: ["Won"] }]} />)
+    render(
+      <DataTable
+        columns={columns}
+        data={deals}
+        defaultFilters={[{ id: "stage", value: ["Won"] }]}
+      />,
+    )
     expect(screen.queryByText("Alpha")).toBeNull()
     expect(screen.getByText("Beta")).toBeTruthy()
     expect(screen.getByText("Gamma")).toBeTruthy()
   })
 
   it("puts a chip on the bar for that filter", () => {
-    render(<DataTable columns={columns} data={deals} defaultFilters={[{ id: "stage", value: ["Won"] }]} />)
+    render(
+      <DataTable
+        columns={columns}
+        data={deals}
+        defaultFilters={[{ id: "stage", value: ["Won"] }]}
+      />,
+    )
     expect(screen.getByText("Stage: Won")).toBeTruthy()
   })
 
@@ -95,7 +111,11 @@ function dataTransfer() {
 
 describe("Kanban", () => {
   const columnsOf = (items: Deal[]) => [
-    { key: "Lead", title: "Lead", items: items.filter((d) => d.stage === "Lead") },
+    {
+      key: "Lead",
+      title: "Lead",
+      items: items.filter((d) => d.stage === "Lead"),
+    },
     { key: "Won", title: "Won", items: items.filter((d) => d.stage === "Won") },
   ]
 
@@ -107,11 +127,13 @@ describe("Kanban", () => {
         itemKey={(d) => String(d.id)}
         renderCard={(d) => <span>{d.name}</span>}
         onDrop={onDrop}
-      />
+      />,
     )
     const dt = dataTransfer()
     // "Alpha" sits in the Lead column; drop it on the Won one.
-    fireEvent.dragStart(screen.getByText("Alpha").parentElement!, { dataTransfer: dt })
+    fireEvent.dragStart(screen.getByText("Alpha").parentElement!, {
+      dataTransfer: dt,
+    })
     const wonColumn = screen.getByText("Won").closest("div[class*='shrink-0']")!
     fireEvent.drop(wonColumn, { dataTransfer: dt })
 
@@ -126,7 +148,7 @@ describe("Kanban", () => {
         columns={columnsOf(deals)}
         itemKey={(d) => String(d.id)}
         renderCard={(d) => <span>{d.name}</span>}
-      />
+      />,
     )
     expect(container.querySelectorAll('[draggable="true"]').length).toBe(0)
   })
@@ -139,7 +161,7 @@ describe("Kanban", () => {
         renderCard={(d) => <span>{d.name}</span>}
         onDrop={() => {}}
         canDrag={(d) => d.stage === "Won"}
-      />
+      />,
     )
     const draggable = [...container.querySelectorAll('[draggable="true"]')]
     expect(draggable.length).toBe(2)

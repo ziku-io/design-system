@@ -10,12 +10,19 @@ export interface EmptyStateProps extends Omit<React.ComponentProps<"div">, "titl
   action?: React.ReactNode
 }
 
-export function EmptyState({ icon: Icon, title, description, action, className, ...props }: EmptyStateProps) {
+export function EmptyState({
+  icon: Icon,
+  title,
+  description,
+  action,
+  className,
+  ...props
+}: EmptyStateProps) {
   return (
     <div
       className={cn(
         "flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed p-12 text-center",
-        className
+        className,
       )}
       {...props}
     >

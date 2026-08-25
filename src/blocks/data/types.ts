@@ -25,8 +25,7 @@ export const isBlankFilter = (v: unknown): boolean =>
   v == null || v === "" || (Array.isArray(v) && v.length === 0)
 
 /** The labels a chip carries, whichever shape it is in. */
-export const labelsOf = (v: unknown): string[] =>
-  Array.isArray(v) ? v.map(str) : [str(v)]
+export const labelsOf = (v: unknown): string[] => (Array.isArray(v) ? v.map(str) : [str(v)])
 
 export interface DataTableColumn<T> {
   key: string
@@ -81,7 +80,7 @@ export interface DataTableView {
 
 /** Sorts by the column's fixed order when it has one, else alphabetically. */
 export const rank =
-  <T,>(col: DataTableColumn<T>) =>
+  <T>(col: DataTableColumn<T>) =>
   (a: string, b: string) => {
     if (!col.order) return compare(a, b)
     const ia = col.order.indexOf(a)
@@ -90,7 +89,7 @@ export const rank =
   }
 
 /** A column the user is shown by name. */
-export const named = <T,>(col: DataTableColumn<T>) => Boolean(col.header)
+export const named = <T>(col: DataTableColumn<T>) => Boolean(col.header)
 
 /** What one chip reads: `Status: Active, Invited`, `Status: Active +2`, `Status`. */
 export function chipLabel<T>(col: DataTableColumn<T>, value: unknown): string {

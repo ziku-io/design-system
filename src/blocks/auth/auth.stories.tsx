@@ -16,11 +16,19 @@ export default meta
 
 const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
 const Logo = <span className="text-lg font-bold tracking-tight text-foreground">ziku</span>
-const Footer = <>By continuing you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</>
+const Footer = (
+  <>
+    By continuing you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.
+  </>
+)
 const Providers = (
   <>
-    <Button variant="outline" type="button"><GoogleLogoIcon /> Google</Button>
-    <Button variant="outline" type="button"><GithubLogoIcon /> GitHub</Button>
+    <Button variant="outline" type="button">
+      <GoogleLogoIcon /> Google
+    </Button>
+    <Button variant="outline" type="button">
+      <GithubLogoIcon /> GitHub
+    </Button>
   </>
 )
 
@@ -49,7 +57,13 @@ function ForgotDemo() {
   const [sent, setSent] = useState(false)
   return (
     <AuthLayout logo={Logo}>
-      <ForgotPasswordForm sent={sent} onSubmit={async () => { await wait(600); setSent(true) }} />
+      <ForgotPasswordForm
+        sent={sent}
+        onSubmit={async () => {
+          await wait(600)
+          setSent(true)
+        }}
+      />
     </AuthLayout>
   )
 }

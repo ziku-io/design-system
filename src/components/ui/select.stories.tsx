@@ -1,7 +1,19 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "./select"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "./select"
 
-const meta: Meta<typeof Select> = { title: "Components/Select", component: Select, tags: ["autodocs"] }
+const meta: Meta<typeof Select> = {
+  title: "Components/Select",
+  component: Select,
+  tags: ["autodocs"],
+}
 export default meta
 type Story = StoryObj<typeof Select>
 
@@ -19,7 +31,9 @@ const items = (
 export const Default: Story = {
   render: () => (
     <Select>
-      <SelectTrigger className="w-56"><SelectValue placeholder="Pick a role" /></SelectTrigger>
+      <SelectTrigger className="w-56">
+        <SelectValue placeholder="Pick a role" />
+      </SelectTrigger>
       {items}
     </Select>
   ),
@@ -27,7 +41,9 @@ export const Default: Story = {
 export const Disabled: Story = {
   render: () => (
     <Select disabled>
-      <SelectTrigger className="w-56"><SelectValue placeholder="Pick a role" /></SelectTrigger>
+      <SelectTrigger className="w-56">
+        <SelectValue placeholder="Pick a role" />
+      </SelectTrigger>
       {items}
     </Select>
   ),
@@ -35,7 +51,9 @@ export const Disabled: Story = {
 export const Invalid: Story = {
   render: () => (
     <Select>
-      <SelectTrigger className="w-56" aria-invalid><SelectValue placeholder="Pick a role" /></SelectTrigger>
+      <SelectTrigger className="w-56" aria-invalid>
+        <SelectValue placeholder="Pick a role" />
+      </SelectTrigger>
       {items}
     </Select>
   ),

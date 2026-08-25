@@ -4,9 +4,7 @@ export type LinkProps = React.ComponentProps<"a"> & { href: string }
 
 // ponytail: one context so blocks work with Next/React Router links without importing either.
 // Default renders a plain <a>. Apps wrap once: <LinkProvider component={NextLink}>.
-const LinkContext = React.createContext<React.ComponentType<LinkProps>>(
-  (props) => <a {...props} />
-)
+const LinkContext = React.createContext<React.ComponentType<LinkProps>>((props) => <a {...props} />)
 
 export function LinkProvider({
   component,

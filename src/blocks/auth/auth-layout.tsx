@@ -12,7 +12,10 @@ export interface AuthLayoutProps extends React.ComponentProps<"main"> {
 export function AuthLayout({ logo, footer, className, children, ...props }: AuthLayoutProps) {
   return (
     <main
-      className={cn("flex min-h-svh flex-col items-center justify-center gap-6 bg-background p-6 md:p-10", className)}
+      className={cn(
+        "flex min-h-svh flex-col items-center justify-center gap-6 bg-background p-6 md:p-10",
+        className,
+      )}
       {...props}
     >
       <div className="flex w-full max-w-sm flex-col gap-6">

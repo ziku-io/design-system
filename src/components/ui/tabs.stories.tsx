@@ -1,15 +1,25 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs"
 
-const meta: Meta<typeof Tabs> = { title: "Components/Tabs", component: Tabs, tags: ["autodocs"] }
+const meta: Meta<typeof Tabs> = {
+  title: "Components/Tabs",
+  component: Tabs,
+  tags: ["autodocs"],
+}
 export default meta
 type Story = StoryObj<typeof Tabs>
 
 const panels = (
   <>
-    <TabsContent value="general" className="text-sm text-muted-foreground">General settings.</TabsContent>
-    <TabsContent value="members" className="text-sm text-muted-foreground">Members list.</TabsContent>
-    <TabsContent value="billing" className="text-sm text-muted-foreground">Billing details.</TabsContent>
+    <TabsContent value="general" className="text-sm text-muted-foreground">
+      General settings.
+    </TabsContent>
+    <TabsContent value="members" className="text-sm text-muted-foreground">
+      Members list.
+    </TabsContent>
+    <TabsContent value="billing" className="text-sm text-muted-foreground">
+      Billing details.
+    </TabsContent>
   </>
 )
 

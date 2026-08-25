@@ -4,7 +4,11 @@ import { PageHeader } from "./page-header"
 import { EmptyState } from "./empty-state"
 import { Button } from "@/components/ui/button"
 
-const meta: Meta = { title: "Blocks/Page", tags: ["autodocs"], parameters: { layout: "padded" } }
+const meta: Meta = {
+  title: "Blocks/Page",
+  tags: ["autodocs"],
+  parameters: { layout: "padded" },
+}
 export default meta
 
 export const Header: StoryObj = {
@@ -12,12 +16,24 @@ export const Header: StoryObj = {
     <PageHeader
       title="Members"
       description="People with access to this workspace."
-      actions={<><Button variant="outline">Export</Button><Button><PlusIcon /> Invite</Button></>}
+      actions={
+        <>
+          <Button variant="outline">Export</Button>
+          <Button>
+            <PlusIcon /> Invite
+          </Button>
+        </>
+      }
     />
   ),
 }
 export const Empty: StoryObj = {
   render: () => (
-    <EmptyState icon={TrayIcon} title="Inbox zero" description="Nothing needs your attention right now." action={<Button variant="outline">Refresh</Button>} />
+    <EmptyState
+      icon={TrayIcon}
+      title="Inbox zero"
+      description="Nothing needs your attention right now."
+      action={<Button variant="outline">Refresh</Button>}
+    />
   ),
 }

@@ -8,8 +8,14 @@ const meta: Meta<typeof Button> = {
   tags: ["autodocs"],
   args: { children: "Button", variant: "default", size: "default" },
   argTypes: {
-    variant: { control: "select", options: ["default", "secondary", "outline", "ghost", "link", "destructive"] },
-    size: { control: "select", options: ["xs", "sm", "default", "lg", "icon", "icon-xs", "icon-sm", "icon-lg"] },
+    variant: {
+      control: "select",
+      options: ["default", "secondary", "outline", "ghost", "link", "danger", "success", "warning"],
+    },
+    size: {
+      control: "select",
+      options: ["xs", "sm", "default", "lg", "icon", "icon-xs", "icon-sm", "icon-lg"],
+    },
   },
 }
 export default meta
@@ -24,7 +30,9 @@ export const Variants: Story = {
       <Button variant="outline">Outline</Button>
       <Button variant="ghost">Ghost</Button>
       <Button variant="link">Link</Button>
-      <Button variant="destructive">Destructive</Button>
+      <Button variant="danger">Danger</Button>
+      <Button variant="success">Success</Button>
+      <Button variant="warning">Warning</Button>
     </div>
   ),
 }
@@ -35,16 +43,31 @@ export const Sizes: Story = {
       <Button size="sm">Small</Button>
       <Button>Default</Button>
       <Button size="lg">Large</Button>
-      <Button size="icon" aria-label="Add"><PlusIcon /></Button>
+      <Button size="icon" aria-label="Add">
+        <PlusIcon />
+      </Button>
     </div>
   ),
 }
 export const WithIcon: Story = {
   render: () => (
     <div className="flex gap-2">
-      <Button><PlusIcon /> New item</Button>
-      <Button variant="destructive"><TrashIcon /> Delete</Button>
+      <Button>
+        <PlusIcon /> New item
+      </Button>
+      <Button variant="danger">
+        <TrashIcon /> Delete
+      </Button>
     </div>
   ),
 }
-export const Loading: Story = { args: { disabled: true, children: <><SpinnerIcon className="animate-spin" /> Saving…</> } }
+export const Loading: Story = {
+  args: {
+    disabled: true,
+    children: (
+      <>
+        <SpinnerIcon className="animate-spin" /> Saving…
+      </>
+    ),
+  },
+}

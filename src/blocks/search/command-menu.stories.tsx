@@ -19,7 +19,12 @@ const meta: Meta<typeof CommandMenu> = {
   component: CommandMenu,
   tags: ["autodocs"],
   parameters: {
-    docs: { description: { component: "Command palette built on cmdk. This is the search surface for every app — press ⌘K." } },
+    docs: {
+      description: {
+        component:
+          "Command palette built on cmdk. This is the search surface for every app — press ⌘K.",
+      },
+    },
   },
 }
 export default meta
@@ -31,14 +36,29 @@ const groups: CommandMenuGroup[] = [
     items: [
       { id: "dashboard", label: "Dashboard", icon: HouseIcon, shortcut: "G D" },
       { id: "projects", label: "Projects", icon: FolderIcon, shortcut: "G P" },
-      { id: "analytics", label: "Analytics", icon: ChartBarIcon, keywords: ["metrics", "reports"] },
-      { id: "team", label: "Team", icon: UsersIcon, keywords: ["members", "people"] },
+      {
+        id: "analytics",
+        label: "Analytics",
+        icon: ChartBarIcon,
+        keywords: ["metrics", "reports"],
+      },
+      {
+        id: "team",
+        label: "Team",
+        icon: UsersIcon,
+        keywords: ["members", "people"],
+      },
     ],
   },
   {
     heading: "Actions",
     items: [
-      { id: "new-project", label: "New project", icon: PlusIcon, shortcut: "⌘N" },
+      {
+        id: "new-project",
+        label: "New project",
+        icon: PlusIcon,
+        shortcut: "⌘N",
+      },
       { id: "invite", label: "Invite member", icon: UserIcon },
       { id: "billing", label: "Billing", icon: CreditCardIcon },
       { id: "settings", label: "Settings", icon: GearIcon, shortcut: "⌘," },

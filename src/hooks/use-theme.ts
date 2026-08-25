@@ -3,8 +3,7 @@ import * as React from "react"
 export type Theme = "dark" | "light"
 
 const read = (): Theme =>
-  typeof document !== "undefined" &&
-  document.documentElement.classList.contains("light")
+  typeof document !== "undefined" && document.documentElement.classList.contains("light")
     ? "light"
     : "dark"
 

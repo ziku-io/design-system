@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/addon-docs/blocks"
+import { Meta } from "@storybook/addon-docs/blocks";
 
 <Meta title="Docs/Getting started" />
 
@@ -15,7 +15,7 @@ pnpm add @ziku/ui react react-dom
 Import the stylesheet once, at the app root:
 
 ```tsx
-import "@ziku/ui/styles.css"
+import "@ziku/ui/styles.css";
 ```
 
 That file contains the Tailwind import, the Ziku tokens, and `tw-animate-css`. Your app does **not** need its own Tailwind setup unless you write custom utilities. If it does, add `@import "@ziku/ui/styles.css";` at the top of your CSS instead.
@@ -23,7 +23,7 @@ That file contains the Tailwind import, the Ziku tokens, and `tw-animate-css`. Y
 ## Use components
 
 ```tsx
-import { Button, Card, Input } from "@ziku/ui"
+import { Button, Card, Input } from "@ziku/ui";
 ```
 
 Everything under `Components/` in the sidebar is a direct shadcn component with Ziku tokens applied. Same API as upstream docs.
@@ -37,10 +37,10 @@ Blocks are full page sections: auth forms, the app shell, the ⌘K command palet
 Blocks render links with a plain `<a>` by default. Wrap your app once so they use your router:
 
 ```tsx
-import NextLink from "next/link"
-import { LinkProvider } from "@ziku/ui"
+import NextLink from "next/link";
+import { LinkProvider } from "@ziku/ui";
 
-<LinkProvider component={NextLink}>{children}</LinkProvider>
+<LinkProvider component={NextLink}>{children}</LinkProvider>;
 ```
 
 ## Dark mode

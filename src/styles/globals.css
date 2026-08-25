@@ -8,42 +8,78 @@
 /* Palette follows GitHub Primer. Hex values are Primer's own tokens. */
 :root,
 .dark {
-  --background: #0d1117;          /* bgColor-default */
-  --foreground: #f0f6fc;          /* fgColor-default */
-  --card: #151b23;                /* bgColor-muted */
+  --background: #0d1117; /* bgColor-default */
+  --foreground: #f0f6fc; /* fgColor-default */
+  --card: #151b23; /* bgColor-muted */
   --card-foreground: #f0f6fc;
-  --popover: #151b23;             /* overlay-bgColor */
+  --popover: #151b23; /* overlay-bgColor */
   --popover-foreground: #f0f6fc;
-  --primary: #238636;             /* button-primary-bgColor-rest */
+
+  /* Brand accent: blue-purple. Drives primary buttons, links and focus rings. */
+  --primary: #5b5bd6;
   --primary-foreground: #ffffff;
-  --secondary: #212830;           /* button-default-bgColor-rest */
+
+  --secondary: #212830; /* button-default-bgColor-rest */
   --secondary-foreground: #f0f6fc;
   --muted: #212830;
-  --muted-foreground: #9198a1;    /* fgColor-muted */
-  --accent: #262c36;              /* button-default-bgColor-hover */
+  --muted-foreground: #9198a1; /* fgColor-muted */
+  /* Hover surface, tinted toward the brand so hovers feel related to it. */
+  --accent: #23233a;
   --accent-foreground: #f0f6fc;
-  --destructive: #da3633;         /* button-danger-bgColor-hover */
-  --destructive-foreground: #ffffff;
-  --border: #3d444d;              /* borderColor-default */
+
+  /* ── Status ────────────────────────────────────────────────────────
+     Each has four jobs: `solid` fills a button or badge, `foreground` is the
+     text on that fill, `fg` is the text/icon on a page background, and
+     `subtle`/`border` are the banner. Every pairing below is >= 4.5:1. */
+  --danger: #da3633;
+  --danger-foreground: #ffffff;
+  --danger-fg: #ff7b72;
+  --danger-subtle: #2a1517;
+  --danger-border: #4d2a28;
+
+  --warning: #d29922;
+  /* Dark text on amber: white on any usable amber is 3:1 at best. */
+  --warning-foreground: #0d1117;
+  --warning-fg: #e3b341;
+  --warning-subtle: #26210f;
+  --warning-border: #4a3c16;
+
+  --success: #238636;
+  --success-foreground: #ffffff;
+  --success-fg: #56d364;
+  --success-subtle: #11261a;
+  --success-border: #22482f;
+
+  --info: #1f6feb;
+  --info-foreground: #ffffff;
+  --info-fg: #79c0ff;
+  --info-subtle: #0f1d2e;
+  --info-border: #1f3c63;
+
+  /* shadcn components reference --destructive; danger is the name we use. */
+  --destructive: var(--danger);
+  --destructive-foreground: var(--danger-foreground);
+
+  --border: #3d444d; /* borderColor-default */
   --input: #3d444d;
-  --field: #0d1117;               /* control-bgColor-rest */
-  --tooltip: #3d444d;             /* bgColor-emphasis */
+  --field: #0d1117; /* control-bgColor-rest */
+  --tooltip: #3d444d; /* bgColor-emphasis */
   --tooltip-foreground: #ffffff;
-  --ring: #4493f8;                /* focus ring / fgColor-accent */
-  --link: #4493f8;
-  --chart-1: #388bfd;
+  --ring: #7d7ce8; /* focus ring follows the brand */
+  --link: #a5a6ff;
+  --chart-1: #5b5bd6;
   --chart-2: #3fb950;
-  --chart-3: #a371f7;
-  --chart-4: #db6d28;
+  --chart-3: #79c0ff;
+  --chart-4: #e3b341;
   --chart-5: #db61a2;
   --sidebar: #0d1117;
   --sidebar-foreground: #f0f6fc;
-  --sidebar-primary: #238636;
+  --sidebar-primary: #5b5bd6;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #262c36;
+  --sidebar-accent: #23233a;
   --sidebar-accent-foreground: #f0f6fc;
   --sidebar-border: #3d444d;
-  --sidebar-ring: #4493f8;
+  --sidebar-ring: #7d7ce8;
 }
 
 .light {
@@ -53,36 +89,64 @@
   --card-foreground: #1f2328;
   --popover: #ffffff;
   --popover-foreground: #1f2328;
-  --primary: #1f883d;
+
+  --primary: #5b5bd6;
   --primary-foreground: #ffffff;
+
   --secondary: #f6f8fa;
   --secondary-foreground: #1f2328;
   --muted: #f6f8fa;
   --muted-foreground: #59636e;
-  --accent: #eff2f5;
+  --accent: #f0f0fb;
   --accent-foreground: #1f2328;
-  --destructive: #cf222e;
-  --destructive-foreground: #ffffff;
+
+  --danger: #cf222e;
+  --danger-foreground: #ffffff;
+  --danger-fg: #cf222e;
+  --danger-subtle: #ffebe9;
+  --danger-border: #ffcecb;
+
+  --warning: #d4a72c;
+  --warning-foreground: #251a00;
+  --warning-fg: #7a5200;
+  --warning-subtle: #fff8c5;
+  --warning-border: #eed888;
+
+  --success: #1f883d;
+  --success-foreground: #ffffff;
+  --success-fg: #116329;
+  --success-subtle: #dafbe1;
+  --success-border: #aceebb;
+
+  --info: #0969da;
+  --info-foreground: #ffffff;
+  --info-fg: #0969da;
+  --info-subtle: #ddf4ff;
+  --info-border: #b6e3ff;
+
+  --destructive: var(--danger);
+  --destructive-foreground: var(--danger-foreground);
+
   --border: #d1d9e0;
   --input: #d1d9e0;
   --field: #ffffff;
   --tooltip: #24292f;
   --tooltip-foreground: #ffffff;
-  --ring: #0969da;
-  --link: #0969da;
-  --chart-1: #0969da;
+  --ring: #5b5bd6;
+  --link: #4f46e5;
+  --chart-1: #5b5bd6;
   --chart-2: #1a7f37;
-  --chart-3: #8250df;
+  --chart-3: #0969da;
   --chart-4: #bc4c00;
   --chart-5: #bf3989;
   --sidebar: #ffffff;
   --sidebar-foreground: #1f2328;
-  --sidebar-primary: #1f883d;
+  --sidebar-primary: #5b5bd6;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #eff2f5;
+  --sidebar-accent: #f0f0fb;
   --sidebar-accent-foreground: #1f2328;
   --sidebar-border: #d1d9e0;
-  --sidebar-ring: #0969da;
+  --sidebar-ring: #5b5bd6;
 }
 
 @theme inline {
@@ -108,6 +172,27 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-danger: var(--danger);
+  --color-danger-foreground: var(--danger-foreground);
+  --color-danger-fg: var(--danger-fg);
+  --color-danger-subtle: var(--danger-subtle);
+  --color-danger-border: var(--danger-border);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-fg: var(--warning-fg);
+  --color-warning-subtle: var(--warning-subtle);
+  --color-warning-border: var(--warning-border);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-fg: var(--success-fg);
+  --color-success-subtle: var(--success-subtle);
+  --color-success-border: var(--success-border);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-info-fg: var(--info-fg);
+  --color-info-subtle: var(--info-subtle);
+  --color-info-border: var(--info-border);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-field: var(--field);
@@ -128,13 +213,20 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica,
+    Arial, sans-serif;
+  --font-mono:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
 }
 
 @layer base {
-  * { @apply border-border outline-ring/50; }
-  body { @apply bg-background text-foreground antialiased; }
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
 }
 
 /* Unlayered on purpose: these beat the utilities baked into the shadcn components,
@@ -152,12 +244,6 @@
 }
 [data-slot="button"][data-variant="outline"]:hover {
   background-color: var(--accent);
-}
-/* GitHub's danger button is solid, not the shadcn dark 60% wash */
-[data-slot="button"][data-variant="destructive"],
-[data-slot="badge"][data-variant="destructive"] {
-  background-color: var(--destructive);
-  color: var(--destructive-foreground);
 }
 /* Links are blue even though the primary action color is green */
 [data-slot="button"][data-variant="link"],

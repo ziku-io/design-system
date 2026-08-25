@@ -1,7 +1,19 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
-import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./card"
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "./card"
 import { Button } from "./button"
-const meta: Meta<typeof Card> = { title: "Components/Card", component: Card, tags: ["autodocs"] }
+const meta: Meta<typeof Card> = {
+  title: "Components/Card",
+  component: Card,
+  tags: ["autodocs"],
+}
 export default meta
 export const Default: StoryObj<typeof Card> = {
   render: () => (
@@ -9,7 +21,11 @@ export const Default: StoryObj<typeof Card> = {
       <CardHeader>
         <CardTitle>Project settings</CardTitle>
         <CardDescription>Manage how this project behaves.</CardDescription>
-        <CardAction><Button variant="ghost" size="sm">Edit</Button></CardAction>
+        <CardAction>
+          <Button variant="ghost" size="sm">
+            Edit
+          </Button>
+        </CardAction>
       </CardHeader>
       <CardContent className="text-sm text-muted-foreground">Body content goes here.</CardContent>
       <CardFooter className="justify-end gap-2">

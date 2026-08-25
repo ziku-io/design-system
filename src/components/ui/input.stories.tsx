@@ -2,7 +2,12 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import { Input } from "./input"
 import { Label } from "./label"
 
-const meta: Meta<typeof Input> = { title: "Components/Input", component: Input, tags: ["autodocs"], args: { placeholder: "you@company.com" } }
+const meta: Meta<typeof Input> = {
+  title: "Components/Input",
+  component: Input,
+  tags: ["autodocs"],
+  args: { placeholder: "you@company.com" },
+}
 export default meta
 type Story = StoryObj<typeof Input>
 
@@ -15,6 +20,10 @@ export const WithLabel: Story = {
     </div>
   ),
 }
-export const Invalid: Story = { args: { "aria-invalid": true, defaultValue: "not-an-email" } }
-export const Disabled: Story = { args: { disabled: true, defaultValue: "read only" } }
+export const Invalid: Story = {
+  args: { "aria-invalid": true, defaultValue: "not-an-email" },
+}
+export const Disabled: Story = {
+  args: { disabled: true, defaultValue: "read only" },
+}
 export const File: Story = { args: { type: "file", placeholder: undefined } }

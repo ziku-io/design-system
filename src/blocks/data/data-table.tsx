@@ -169,7 +169,7 @@ export function DataTable<T extends RowData>({
   const rows = React.useMemo(() => data ?? [], [data])
   const byKey = React.useMemo(
     () => Object.fromEntries(columns.map((c) => [c.key, c])) as Record<string, DataTableColumn<T>>,
-    [columns]
+    [columns],
   )
 
   const base = React.useMemo<DataTableState>(
@@ -184,7 +184,7 @@ export function DataTable<T extends RowData>({
       // arrays must not reset the view the user is on.
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }),
-    [defaultSort, defaultGroup, defaultMode]
+    [defaultSort, defaultGroup, defaultMode],
   )
 
   // A view saved versions ago may point at columns that no longer exist — and,
@@ -198,19 +198,22 @@ export function DataTable<T extends RowData>({
         .map((x) =>
           byKey[x.id]?.facet && !Array.isArray(x.value)
             ? { ...x, value: isBlankFilter(x.value) ? [] : [str(x.value)] }
-            : x
+            : x,
         )
         // A label renamed in the code is left over in storage and would filter
         // to nothing — drop it, keep the rest of the picked values.
         .map((x) => {
           const order = byKey[x.id]?.order
           return order && Array.isArray(x.value)
-            ? { ...x, value: (x.value as string[]).filter((v) => order.includes(str(v))) }
+            ? {
+                ...x,
+                value: (x.value as string[]).filter((v) => order.includes(str(v))),
+              }
             : x
         }),
       grouping: (s.grouping ?? []).filter((x) => byKey[x]),
     }),
-    [byKey]
+    [byKey],
   )
 
   const store = useDataTableViews(base, presets, viewKey, base)
@@ -226,9 +229,10 @@ export function DataTable<T extends RowData>({
     <K extends keyof DataTableState>(key: K) =>
     (u: DataTableState[K] | ((old: DataTableState[K]) => DataTableState[K])) =>
       patch({
-        [key]: typeof u === "function"
-          ? (u as (o: DataTableState[K]) => DataTableState[K])(state[key])
-          : u,
+        [key]:
+          typeof u === "function"
+            ? (u as (o: DataTableState[K]) => DataTableState[K])(state[key])
+            : u,
       } as Partial<DataTableState>)
 
   const defs = React.useMemo<ColumnDef<Features, T, any>[]>(
@@ -263,7 +267,7 @@ export function DataTable<T extends RowData>({
             : cell.toLowerCase().includes(String(value).toLowerCase())
         },
       })),
-    [columns]
+    [columns],
   )
 
   const [expanded, setExpanded] = React.useState<ExpandedState>(true)
@@ -283,7 +287,7 @@ export function DataTable<T extends RowData>({
       group && !state.sorting.some((s) => s.id === group)
         ? [{ id: group, desc: false }, ...state.sorting]
         : state.sorting,
-    [group, state.sorting]
+    [group, state.sorting],
   )
 
   const table = useTable({
@@ -312,9 +316,13 @@ export function DataTable<T extends RowData>({
     onGroupingChange: setter("grouping"),
     onExpandedChange: setExpanded,
     onPaginationChange: (u) => {
-      const next = typeof u === "function"
-        ? u({ pageIndex, pageSize: paginated ? pageSize : Number.MAX_SAFE_INTEGER })
-        : u
+      const next =
+        typeof u === "function"
+          ? u({
+              pageIndex,
+              pageSize: paginated ? pageSize : Number.MAX_SAFE_INTEGER,
+            })
+          : u
       setPageIndex(next.pageIndex)
     },
     globalFilterFn: (row, _id, value) => {
@@ -342,14 +350,15 @@ export function DataTable<T extends RowData>({
 
   /** Columns a condition can be built on: named, sortable, not already a chip. */
   const filterable = columns.filter(
-    (c) => named(c) && c.sortable !== false && !chips.some((f) => f.id === c.key)
+    (c) => named(c) && c.sortable !== false && !chips.some((f) => f.id === c.key),
   )
   const sortable = columns.filter((c) => named(c) && c.sortable !== false)
 
   const addFilter = (key: string) =>
-    patch({ columnFilters: [...chips, { id: key, value: byKey[key]?.facet ? [] : "" }] })
-  const removeFilter = (key: string) =>
-    patch({ columnFilters: chips.filter((f) => f.id !== key) })
+    patch({
+      columnFilters: [...chips, { id: key, value: byKey[key]?.facet ? [] : "" }],
+    })
+  const removeFilter = (key: string) => patch({ columnFilters: chips.filter((f) => f.id !== key) })
 
   /** The values a facet chip offers, with counts. */
   function filterOptions(col: DataTableColumn<T>) {
@@ -372,7 +381,9 @@ export function DataTable<T extends RowData>({
       columns={columns}
       visibility={state.columnVisibility}
       onToggle={(key, visible) =>
-        patch({ columnVisibility: { ...state.columnVisibility, [key]: visible } })
+        patch({
+          columnVisibility: { ...state.columnVisibility, [key]: visible },
+        })
       }
     />
   )
@@ -414,7 +425,7 @@ export function DataTable<T extends RowData>({
               type="button"
               onClick={() => removeFilter(f.id)}
               aria-label={`Remove ${col.header}`}
-              className="shrink-0 rounded-md p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+              className="shrink-0 rounded-md p-1 text-muted-foreground hover:bg-danger/10 hover:text-danger-fg"
             >
               <XIcon className="size-3" weight="bold" />
             </button>
@@ -448,7 +459,7 @@ export function DataTable<T extends RowData>({
                     onClick={() => setLayout(m)}
                     className={cn(
                       "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm hover:bg-accent",
-                      state.mode === m && "font-medium"
+                      state.mode === m && "font-medium",
                     )}
                   >
                     <Ic className="size-4 text-muted-foreground" /> {label}
@@ -530,7 +541,7 @@ export function DataTable<T extends RowData>({
                 "-mb-px flex shrink-0 items-center gap-1.5 border-b-2 px-3 py-2 text-sm font-medium transition-colors",
                 v.id === active.id
                   ? "border-foreground text-foreground"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground",
               )}
             >
               <ViewIcon name={v.icon} className="size-4" />
@@ -617,7 +628,7 @@ export function DataTable<T extends RowData>({
                     "px-2 py-1",
                     state.mode === m
                       ? "bg-foreground text-background"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   <Ic className="size-4" />
@@ -652,7 +663,7 @@ export function DataTable<T extends RowData>({
                         store.remove()
                         close()
                       }}
-                      className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-destructive hover:bg-destructive/10"
+                      className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-danger-fg hover:bg-danger/10"
                     >
                       <TrashIcon className="size-4" /> Delete view
                     </button>
@@ -794,15 +805,20 @@ export function DataTable<T extends RowData>({
                     const dir = h.column.getIsSorted()
                     const Ic = col?.icon
                     const Sort =
-                      dir === "asc" ? CaretUpIcon : dir === "desc" ? CaretDownIcon : SortAscendingIcon
+                      dir === "asc"
+                        ? CaretUpIcon
+                        : dir === "desc"
+                          ? CaretDownIcon
+                          : SortAscendingIcon
                     return (
                       <TableHead
                         key={h.id}
                         onClick={h.column.getToggleSortingHandler()}
                         className={cn(
                           "whitespace-nowrap",
-                          h.column.getCanSort() && "cursor-pointer select-none hover:text-foreground",
-                          col?.className
+                          h.column.getCanSort() &&
+                            "cursor-pointer select-none hover:text-foreground",
+                          col?.className,
                         )}
                       >
                         <span className="inline-flex items-center gap-1.5">
@@ -855,7 +871,7 @@ export function DataTable<T extends RowData>({
                       </TableCell>
                     ))}
                   </TableRow>
-                )
+                ),
               )}
             </TableBody>
           </Table>

@@ -98,14 +98,12 @@ export function Control({
       width={width}
       className={cn(
         "relative shrink-0 rounded-md p-1.5 outline-none transition-colors hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/50",
-        active ? "text-link" : "text-muted-foreground hover:text-foreground"
+        active ? "text-link" : "text-muted-foreground hover:text-foreground",
       )}
       trigger={
         <span title={label} aria-label={label}>
           <Ic className="size-4" weight={active ? "bold" : "regular"} />
-          {active && (
-            <span className="absolute top-0.5 right-0.5 size-1.5 rounded-full bg-link" />
-          )}
+          {active && <span className="absolute top-0.5 right-0.5 size-1.5 rounded-full bg-link" />}
         </span>
       }
     >
@@ -187,7 +185,7 @@ export function FilterPanel<T>({
           type="button"
           onClick={onRemove}
           title="Remove filter"
-          className="rounded-md p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+          className="rounded-md p-1 text-muted-foreground hover:bg-danger/10 hover:text-danger-fg"
         >
           <TrashIcon className="size-3.5" />
         </button>
@@ -226,7 +224,7 @@ export function FilterPanel<T>({
                   onChange(
                     picked.includes(o.value)
                       ? picked.filter((p) => p !== o.value)
-                      : [...picked, o.value]
+                      : [...picked, o.value],
                   )
                 }
               />
@@ -298,7 +296,7 @@ export function SortPanel<T>({
             type="button"
             title="Remove"
             onClick={() => onChange(sorting.filter((_, n) => n !== i))}
-            className="shrink-0 rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-destructive"
+            className="shrink-0 rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-danger-fg"
           >
             <XIcon className="size-3.5" weight="bold" />
           </button>
@@ -317,7 +315,7 @@ export function SortPanel<T>({
         <button
           type="button"
           onClick={() => onChange([])}
-          className={cn(ROW, "text-destructive hover:bg-destructive/10")}
+          className={cn(ROW, "text-danger-fg hover:bg-danger/10")}
         >
           <TrashIcon className="size-3.5" /> Remove sorting
         </button>
@@ -472,7 +470,7 @@ export function ViewSettings({
           onClick={() => setPickingIcon((p) => !p)}
           className={cn(
             "shrink-0 rounded-md border p-2 hover:bg-accent",
-            pickingIcon ? "bg-accent text-link" : "text-muted-foreground"
+            pickingIcon ? "bg-accent text-link" : "text-muted-foreground",
           )}
         >
           <ViewIcon name={icon} className="size-4" />
@@ -497,7 +495,7 @@ export function ViewSettings({
               }}
               className={cn(
                 "rounded-md p-1.5 hover:bg-card",
-                n === icon ? "bg-card text-link" : "text-muted-foreground"
+                n === icon ? "bg-card text-link" : "text-muted-foreground",
               )}
             >
               <ViewIcon name={n} className="size-4" />

@@ -16,7 +16,12 @@ const meta: Meta<typeof Command> = {
   component: Command,
   tags: ["autodocs"],
   parameters: {
-    docs: { description: { component: "cmdk primitives. For the app-wide ⌘K palette use Blocks/CommandMenu instead of assembling these." } },
+    docs: {
+      description: {
+        component:
+          "cmdk primitives. For the app-wide ⌘K palette use Blocks/CommandMenu instead of assembling these.",
+      },
+    },
   },
 }
 export default meta
@@ -29,13 +34,21 @@ export const Inline: StoryObj<typeof Command> = {
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
         <CommandGroup heading="Suggestions">
-          <CommandItem><CalendarIcon /> Calendar</CommandItem>
-          <CommandItem><SmileyIcon /> Search emoji</CommandItem>
+          <CommandItem>
+            <CalendarIcon /> Calendar
+          </CommandItem>
+          <CommandItem>
+            <SmileyIcon /> Search emoji
+          </CommandItem>
         </CommandGroup>
         <CommandSeparator />
         <CommandGroup heading="Settings">
-          <CommandItem><UserIcon /> Profile <CommandShortcut>⌘P</CommandShortcut></CommandItem>
-          <CommandItem><GearIcon /> Settings <CommandShortcut>⌘,</CommandShortcut></CommandItem>
+          <CommandItem>
+            <UserIcon /> Profile <CommandShortcut>⌘P</CommandShortcut>
+          </CommandItem>
+          <CommandItem>
+            <GearIcon /> Settings <CommandShortcut>⌘,</CommandShortcut>
+          </CommandItem>
         </CommandGroup>
       </CommandList>
     </Command>

@@ -19,8 +19,12 @@ describe("every story renders", () => {
     for (const [name, Story] of Object.entries(composed) as [string, ComponentType][]) {
       it(`${path.replace("./", "")} › ${name}`, () => {
         const errors: unknown[][] = []
-        const spy = vi.spyOn(console, "error").mockImplementation((...args) => { errors.push(args) })
-        const warn = vi.spyOn(console, "warn").mockImplementation((...args) => { errors.push(args) })
+        const spy = vi.spyOn(console, "error").mockImplementation((...args) => {
+          errors.push(args)
+        })
+        const warn = vi.spyOn(console, "warn").mockImplementation((...args) => {
+          errors.push(args)
+        })
         try {
           const { container } = render(<Story />)
           expect(container.firstChild, "story rendered nothing").not.toBeNull()
