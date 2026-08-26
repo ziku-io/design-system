@@ -100,8 +100,17 @@ fi
 # ── Commit, tag, push ───────────────────────────────────────────────
 step "Tagging $tag"
 npm version "$next" --no-git-tag-version --allow-same-version > /dev/null
-git add package.json dist
-git -c user.email="$(git config user.email)" commit -q -m "chore(release): $tag"
+
+# The first release of a version already in package.json, with dist already
+# current, has nothing to commit. That is a valid release, not a failure: tag
+# the commit as it stands.
+if [ -n "$(git status --porcelain -- package.json dist)" ]; then
+  git add package.json dist
+  git -c user.email="$(git config user.email)" commit -q -m "chore(release): $tag"
+else
+  printf '  Nothing changed; tagging the current commit.\n'
+fi
+
 git tag -a "$tag" -m "$tag"
 
 step "Pushing"
