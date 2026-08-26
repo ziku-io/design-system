@@ -55,14 +55,24 @@ git rev-parse -q --verify "refs/tags/$tag" > /dev/null &&
 git ls-remote --exit-code --tags origin "$tag" > /dev/null 2>&1 &&
   die "Tag $tag already exists on origin. Bump to the next version instead."
 
-# The floor is whichever is higher: the version in package.json or the highest
-# tag. Comparing against tags alone lets an explicit version walk backwards on a
-# repo that has none yet, which is exactly the state a first release is in.
-# Sorted by version, not by date: a hotfix on an old line tags out of order.
+# Two separate rules, because they answer different questions.
+#
+#   - Above every existing tag: a published tag is immutable, so a new one has
+#     to move forward. Sorted by version, not by date — a hotfix on an old line
+#     tags out of order.
+#   - Not below package.json: releasing 0.0.9 when the source says 0.4.0 ships
+#     a lie. Equal is fine, and is exactly what a first release looks like:
+#     package.json carries a version that was never tagged.
 highest=$(git tag --list 'v*' | sed 's/^v//' | sort -V | tail -1)
-floor=$(printf '%s\n%s\n' "$current" "${highest:-0.0.0}" | sort -V | tail -1)
-if [ "$next" = "$floor" ] || [ "$(printf '%s\n%s\n' "$floor" "$next" | sort -V | tail -1)" != "$next" ]; then
-  die "$next must be above $floor (package.json is $current${highest:+, highest tag is v$highest})."
+
+if [ -n "$highest" ] &&
+   { [ "$next" = "$highest" ] ||
+     [ "$(printf '%s\n%s\n' "$highest" "$next" | sort -V | tail -1)" != "$next" ]; }; then
+  die "$next must be above the highest tag v$highest."
+fi
+
+if [ "$(printf '%s\n%s\n' "$current" "$next" | sort -V | tail -1)" != "$next" ]; then
+  die "$next is below the version in package.json ($current)."
 fi
 
 printf '  %s -> %s\n' "$current" "$next"
