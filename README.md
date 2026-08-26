@@ -1,5 +1,22 @@
 # @ziku/ui
 
+Browse it at **https://ziku-io.github.io/design-system/**
+
+## Install
+
+Pin a tag; the package ships prebuilt, so there is no build step on install.
+
+```jsonc
+"@ziku/ui": "github:ziku-io/design-system#v0.1.0"
+```
+
+```tsx
+import "@ziku/ui/styles.css"
+import { AppShell, Button, DataTable } from "@ziku/ui"
+```
+
+Cut a release with `pnpm release patch` — see CLAUDE.md.
+
 Ziku design system. shadcn/ui components themed after GitHub (dark by default), plus ready-made auth pages and app navigation, documented in Storybook.
 
 ```bash

@@ -78,6 +78,31 @@ Shipping the build removes all of that. **Run `pnpm build` and commit `dist/`
 with any source change** — CI fails if it is stale. The build is reproducible,
 so a clean tree means it is current.
 
+## Releasing
+
+Apps pin a tag, so a tag is a promise: once pushed, someone's lockfile points at
+it forever. Never move or delete one — cut the next version instead.
+
+```bash
+pnpm release patch --dry-run   # every check, nothing written
+pnpm release patch             # 0.1.0 -> 0.1.1
+pnpm release minor
+pnpm release 1.0.0             # an exact version
+```
+
+The script refuses to release from a branch other than main, a dirty tree, a
+tree that has diverged from origin, a version at or below the highest tag, a
+version below package.json, or a tag that already exists locally or on origin.
+It then runs typecheck and tests, rebuilds `dist/`, commits, tags and pushes.
+The tag triggers a workflow that re-verifies all of it and publishes the GitHub
+Release.
+
+Apps then pin it:
+
+```jsonc
+"@ziku/ui": "github:ziku-io/design-system#v0.1.0"
+```
+
 ## Layout
 
 ```
