@@ -55,10 +55,14 @@ git rev-parse -q --verify "refs/tags/$tag" > /dev/null &&
 git ls-remote --exit-code --tags origin "$tag" > /dev/null 2>&1 &&
   die "Tag $tag already exists on origin. Bump to the next version instead."
 
-# Sorting by version, not by date: a hotfix on an old line tags out of order.
+# The floor is whichever is higher: the version in package.json or the highest
+# tag. Comparing against tags alone lets an explicit version walk backwards on a
+# repo that has none yet, which is exactly the state a first release is in.
+# Sorted by version, not by date: a hotfix on an old line tags out of order.
 highest=$(git tag --list 'v*' | sed 's/^v//' | sort -V | tail -1)
-if [ -n "$highest" ] && [ "$(printf '%s\n%s\n' "$highest" "$next" | sort -V | tail -1)" != "$next" ]; then
-  die "$next is not above the highest existing tag v$highest."
+floor=$(printf '%s\n%s\n' "$current" "${highest:-0.0.0}" | sort -V | tail -1)
+if [ "$next" = "$floor" ] || [ "$(printf '%s\n%s\n' "$floor" "$next" | sort -V | tail -1)" != "$next" ]; then
+  die "$next must be above $floor (package.json is $current${highest:+, highest tag is v$highest})."
 fi
 
 printf '  %s -> %s\n' "$current" "$next"
