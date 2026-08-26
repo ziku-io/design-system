@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+#
+# Cut a release: verify, build, bump, tag, push.
+#
+#   ./scripts/release.sh patch          0.1.0 -> 0.1.1
+#   ./scripts/release.sh minor          0.1.0 -> 0.2.0
+#   ./scripts/release.sh 1.0.0          an exact version
+#   ./scripts/release.sh patch --dry-run
+#
+# Apps pin a tag, so a tag is a promise: once pushed, someone's lockfile points
+# at it forever. Every guard below exists to stop a release that would break
+# that promise.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+BUMP="${1:-}"
+DRY_RUN=false
+[ "${2:-}" = "--dry-run" ] && DRY_RUN=true
+
+die() { printf '\n  %s\n\n' "$1" >&2; exit 1; }
+step() { printf '\n▸ %s\n' "$1"; }
+
+case "$BUMP" in
+  patch|minor|major) ;;
+  [0-9]*.[0-9]*.[0-9]*) ;;
+  *) die "usage: ./scripts/release.sh <patch|minor|major|x.y.z> [--dry-run]" ;;
+esac
+
+# ── Refuse to release from a state we cannot reproduce ──────────────
+step "Checking the working tree"
+
+branch=$(git rev-parse --abbrev-ref HEAD)
+[ "$branch" = "main" ] || die "On '$branch'. Releases are cut from main."
+
+[ -z "$(git status --porcelain)" ] || die "Working tree is dirty. Commit or stash first."
+
+git fetch --quiet origin main --tags
+local_head=$(git rev-parse HEAD)
+remote_head=$(git rev-parse origin/main)
+[ "$local_head" = "$remote_head" ] ||
+  die "main and origin/main have diverged. Pull or push first."
+
+current=$(node -p "require('./package.json').version")
+if [ "$BUMP" = "patch" ] || [ "$BUMP" = "minor" ] || [ "$BUMP" = "major" ]; then
+  next=$(npm version "$BUMP" --no-git-tag-version --allow-same-version | tr -d 'v')
+  # Put it back: nothing is written until every check has passed.
+  npm version "$current" --no-git-tag-version --allow-same-version > /dev/null
+else
+  next="$BUMP"
+fi
+
+tag="v$next"
+git rev-parse -q --verify "refs/tags/$tag" > /dev/null &&
+  die "Tag $tag already exists locally. A published tag is never moved."
+git ls-remote --exit-code --tags origin "$tag" > /dev/null 2>&1 &&
+  die "Tag $tag already exists on origin. Bump to the next version instead."
+
+# Sorting by version, not by date: a hotfix on an old line tags out of order.
+highest=$(git tag --list 'v*' | sed 's/^v//' | sort -V | tail -1)
+if [ -n "$highest" ] && [ "$(printf '%s\n%s\n' "$highest" "$next" | sort -V | tail -1)" != "$next" ]; then
+  die "$next is not above the highest existing tag v$highest."
+fi
+
+printf '  %s -> %s\n' "$current" "$next"
+
+# ── Everything that ships has to pass ───────────────────────────────
+step "Running checks"
+pnpm typecheck
+pnpm test
+
+step "Building"
+pnpm build
+
+# dist/ is committed so consumers install without a build step. If the build
+# just changed it, the previous commit shipped stale files.
+if [ -n "$(git status --porcelain -- dist)" ]; then
+  printf '  dist/ was stale and has been rebuilt; it goes into the release commit.\n'
+fi
+
+if [ "$DRY_RUN" = true ]; then
+  git checkout -- dist 2>/dev/null || true
+  step "Dry run: nothing committed, tagged or pushed."
+  exit 0
+fi
+
+# ── Commit, tag, push ───────────────────────────────────────────────
+step "Tagging $tag"
+npm version "$next" --no-git-tag-version --allow-same-version > /dev/null
+git add package.json dist
+git -c user.email="$(git config user.email)" commit -q -m "chore(release): $tag"
+git tag -a "$tag" -m "$tag"
+
+step "Pushing"
+git push --quiet origin main
+git push --quiet origin "$tag"
+
+printf '\n  Released %s\n  https://github.com/ziku-io/design-system/releases/tag/%s\n\n' "$tag" "$tag"
+printf '  Apps pin it with:\n    "@ziku/ui": "github:ziku-io/design-system#%s"\n\n' "$tag"
