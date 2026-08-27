@@ -17,12 +17,15 @@ import {
 import { Input } from "@/components/ui/input"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Link } from "@/lib/link"
+import { useStrings, type UIStrings } from "@/lib/strings"
 
-export const loginSchema = z.object({
-  email: z.email("Enter a valid email"),
-  password: z.string().min(1, "Password is required"),
-})
-export type LoginValues = z.infer<typeof loginSchema>
+/** A factory, not a constant: the messages are the app's, from `UIStringsProvider`. */
+export const loginSchema = (t: UIStrings["auth"]) =>
+  z.object({
+    email: z.email(t.invalidEmail),
+    password: z.string().min(1, t.passwordRequired),
+  })
+export type LoginValues = z.infer<ReturnType<typeof loginSchema>>
 
 export interface LoginFormProps {
   onSubmit: (values: LoginValues) => Promise<void> | void
@@ -30,8 +33,10 @@ export interface LoginFormProps {
   error?: string | null
   title?: string
   description?: string
-  registerHref?: string
-  forgotPasswordHref?: string
+  /** `null` renders no "create one" link — for an app with no self-service sign-up. */
+  registerHref?: string | null
+  /** `null` renders no "forgot password" link — for an app with no mailer. */
+  forgotPasswordHref?: string | null
   /** OAuth / SSO buttons rendered under a divider */
   providers?: React.ReactNode
 }
@@ -39,14 +44,16 @@ export interface LoginFormProps {
 export function LoginForm({
   onSubmit,
   error,
-  title = "Welcome back",
-  description = "Sign in to your account",
+  title,
+  description,
   registerHref = "/register",
   forgotPasswordHref = "/forgot-password",
   providers,
 }: LoginFormProps) {
+  const t = useStrings().auth
+  const schema = React.useMemo(() => loginSchema(t), [t])
   const form = useForm<LoginValues>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(schema),
     defaultValues: { email: "", password: "" },
   })
   const busy = form.formState.isSubmitting
@@ -54,8 +61,8 @@ export function LoginForm({
   return (
     <Card>
       <CardHeader className="text-center">
-        <CardTitle className="text-xl">{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
+        <CardTitle className="text-xl">{title ?? t.loginTitle}</CardTitle>
+        <CardDescription>{description ?? t.loginDescription}</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -70,12 +77,12 @@ export function LoginForm({
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>{t.email}</FormLabel>
                   <FormControl>
                     <Input
                       type="email"
                       autoComplete="email"
-                      placeholder="you@company.com"
+                      placeholder={t.emailPlaceholder}
                       {...field}
                     />
                   </FormControl>
@@ -89,13 +96,15 @@ export function LoginForm({
               render={({ field }) => (
                 <FormItem>
                   <div className="flex items-center justify-between">
-                    <FormLabel>Password</FormLabel>
-                    <Link
-                      href={forgotPasswordHref}
-                      className="text-sm text-link underline-offset-4 hover:underline"
-                    >
-                      Forgot password?
-                    </Link>
+                    <FormLabel>{t.password}</FormLabel>
+                    {forgotPasswordHref && (
+                      <Link
+                        href={forgotPasswordHref}
+                        className="text-sm text-link underline-offset-4 hover:underline"
+                      >
+                        {t.forgotPassword}
+                      </Link>
+                    )}
                   </div>
                   <FormControl>
                     <Input type="password" autoComplete="current-password" {...field} />
@@ -106,24 +115,26 @@ export function LoginForm({
             />
             <Button type="submit" className="w-full" disabled={busy}>
               {busy && <SpinnerIcon className="animate-spin" />}
-              Sign in
+              {t.signIn}
             </Button>
             {providers && (
               <>
                 <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
                   <span className="relative z-10 bg-card px-2 text-muted-foreground">
-                    or continue with
+                    {t.orContinueWith}
                   </span>
                 </div>
                 <div className="grid gap-2">{providers}</div>
               </>
             )}
-            <p className="text-center text-sm text-muted-foreground">
-              No account?{" "}
-              <Link href={registerHref} className="text-link underline underline-offset-4">
-                Create one
-              </Link>
-            </p>
+            {registerHref && (
+              <p className="text-center text-sm text-muted-foreground">
+                {t.noAccount}{" "}
+                <Link href={registerHref} className="text-link underline underline-offset-4">
+                  {t.createOne}
+                </Link>
+              </p>
+            )}
           </form>
         </Form>
       </CardContent>

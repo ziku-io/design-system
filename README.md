@@ -15,6 +15,17 @@ import "@ziku/ui/styles.css"
 import { AppShell, Button, DataTable } from "@ziku/ui"
 ```
 
+Blocks render English until you tell them otherwise. Wrap the app once, next to
+your router's link component, and pass any subset — the rest stays English:
+
+```tsx
+<LinkProvider component={Link}>
+  <UIStringsProvider strings={{ auth: { signIn: "Iniciar sessão" } }}>
+    <App />
+  </UIStringsProvider>
+</LinkProvider>
+```
+
 Cut a release with `pnpm release patch` — see CLAUDE.md.
 
 Ziku design system. shadcn/ui components themed after GitHub (dark by default), plus ready-made auth pages and app navigation, documented in Storybook.
@@ -48,10 +59,12 @@ src/blocks/auth/     AuthLayout, LoginForm, RegisterForm, ForgotPasswordForm
 src/blocks/shell/    AppShell (sidebar nav + top bar)
 src/blocks/search/   CommandMenu (cmdk ⌘K palette), SearchTrigger
 src/blocks/data/     DataTable (TanStack v9: chips, sorting, grouping, saved views), Kanban
+src/blocks/modal/    Modal (title bar, scrolling body, footer)
 src/blocks/page/     PageHeader, EmptyState
 src/docs/            MDX docs pages
 src/styles/          globals.css (GitHub Primer tokens, dark default)
-src/lib/             cn, Link/LinkProvider, Phosphor icon aliases
+src/lib/             cn, Link/LinkProvider, UIStrings/UIStringsProvider, Phosphor icon aliases
 ```
 
-Icons: Phosphor only. Search is cmdk, tables are TanStack.
+Icons: Phosphor only. Search is cmdk, tables are TanStack. Every string a block
+renders lives in `src/lib/strings.tsx` and is overridable per app.

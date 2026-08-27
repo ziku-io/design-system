@@ -13,6 +13,7 @@ import { DataTable } from "./data-table"
 import type { DataTableColumn, DataTableView } from "./types"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { UIStringsProvider } from "@/lib/strings"
 
 const meta: Meta = {
   title: "Blocks/DataTable",
@@ -184,4 +185,57 @@ export const Loading: Story = {
 }
 export const Empty: Story = {
   render: () => <DataTable columns={columns} data={[]} empty="No deals yet." />,
+}
+
+/** The toolbar, the view settings and every panel behind them, in Portuguese.
+ *  The table itself is unchanged: only the dictionary is. */
+export const Translated: Story = {
+  render: () => (
+    <UIStringsProvider
+      strings={{
+        common: {
+          search: "Procurar",
+          searchPlaceholder: "Procurar…",
+          noResults: "Sem resultados.",
+          none: "Nenhum",
+          close: "Fechar",
+        },
+        dataTable: {
+          allView: "Todos",
+          newView: "Nova vista",
+          createView: "Criar",
+          saveView: "Guardar os filtros atuais como uma vista",
+          deleteView: "Eliminar vista",
+          viewSettings: "Definições da vista",
+          viewName: "Nome da vista",
+          changeIcon: "Mudar o ícone",
+          back: "Voltar",
+          layout: "Disposição",
+          table: "Tabela",
+          board: "Quadro",
+          visibleColumns: "Colunas visíveis",
+          hidden: (n) => `${n} ocultas`,
+          filters: "Filtros",
+          filter: "Filtrar",
+          removeFilter: "Remover filtro",
+          is: "é",
+          contains: "contém",
+          findColumn: "Encontrar uma coluna…",
+          typeAValue: "Escreva um valor…",
+          sorting: "Ordenação",
+          sort: "Ordenar",
+          ascending: "Crescente",
+          descending: "Decrescente",
+          addSort: "Adicionar ordenação",
+          removeSort: "Remover",
+          removeSorting: "Remover ordenação",
+          group: "Agrupar",
+          groupBy: "Agrupar por",
+          noGrouping: "Sem agrupamento",
+        },
+      }}
+    >
+      <DataTable columns={columns} data={deals} rowId={(d) => String(d.id)} presets={presets} />
+    </UIStringsProvider>
+  ),
 }

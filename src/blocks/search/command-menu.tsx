@@ -13,6 +13,7 @@ import {
   CommandShortcut,
 } from "@/components/ui/command"
 import { cn } from "@/lib/utils"
+import { useStrings } from "@/lib/strings"
 
 export interface CommandMenuItem {
   /** Stable id, also used as the cmdk value when `label` is ambiguous */
@@ -51,11 +52,12 @@ export function CommandMenu({
   groups,
   open,
   onOpenChange,
-  placeholder = "Search…",
-  emptyMessage = "No results found.",
+  placeholder,
+  emptyMessage,
   onQueryChange,
   disableShortcut,
 }: CommandMenuProps) {
+  const t = useStrings().search
   const [uncontrolled, setUncontrolled] = React.useState(false)
   const isOpen = open ?? uncontrolled
   const setOpen = onOpenChange ?? setUncontrolled
@@ -74,9 +76,9 @@ export function CommandMenu({
 
   return (
     <CommandDialog open={isOpen} onOpenChange={setOpen} showCloseButton={false}>
-      <CommandInput placeholder={placeholder} onValueChange={onQueryChange} />
+      <CommandInput placeholder={placeholder ?? t.placeholder} onValueChange={onQueryChange} />
       <CommandList>
-        <CommandEmpty>{emptyMessage}</CommandEmpty>
+        <CommandEmpty>{emptyMessage ?? t.empty}</CommandEmpty>
         {groups.map((group, i) => (
           <React.Fragment key={group.heading ?? i}>
             {i > 0 && <CommandSeparator />}
@@ -111,11 +113,12 @@ export interface SearchTriggerProps extends React.ComponentProps<"button"> {
 
 /** The search field in the app header. Looks like an input, behaves like a button. */
 export function SearchTrigger({
-  placeholder = "Search…",
+  placeholder,
   shortcut = "⌘K",
   className,
   ...props
 }: SearchTriggerProps) {
+  const t = useStrings().search
   return (
     <button
       type="button"
@@ -128,7 +131,7 @@ export function SearchTrigger({
       {...props}
     >
       <MagnifyingGlassIcon className="size-4 shrink-0" />
-      <span className="flex-1 text-left">{placeholder}</span>
+      <span className="flex-1 text-left">{placeholder ?? t.placeholder}</span>
       {shortcut && (
         <kbd className="pointer-events-none hidden h-5 items-center gap-1 rounded border border-border px-1.5 font-sans text-[10px] font-medium sm:inline-flex">
           {shortcut}
