@@ -6,6 +6,7 @@ import { LoginForm } from "./login-form"
 import { RegisterForm } from "./register-form"
 import { ForgotPasswordForm } from "./forgot-password-form"
 import { Button } from "@/components/ui/button"
+import { UIStringsProvider } from "@/lib/strings"
 
 const meta: Meta = {
   title: "Blocks/Auth",
@@ -68,3 +69,38 @@ function ForgotDemo() {
   )
 }
 export const ForgotPassword: StoryObj = { render: () => <ForgotDemo /> }
+
+/** Nothing here is English. The block is the same block — only the dictionary
+ *  changed, and the app that owns it supplies whatever it likes. */
+export const Translated: StoryObj = {
+  render: () => (
+    <UIStringsProvider
+      strings={{
+        auth: {
+          loginTitle: "Bem-vindo de volta",
+          loginDescription: "Inicie sessão na sua conta",
+          email: "Email",
+          emailPlaceholder: "voce@empresa.pt",
+          password: "Palavra-passe",
+          signIn: "Iniciar sessão",
+          invalidEmail: "Introduza um email válido",
+          passwordRequired: "A palavra-passe é obrigatória",
+        },
+      }}
+    >
+      <AuthLayout logo={Logo}>
+        <LoginForm onSubmit={() => wait(800)} />
+      </AuthLayout>
+    </UIStringsProvider>
+  ),
+}
+
+/** No sign-up and no mailer: both links off, and the form is just the two
+ *  fields and the button. */
+export const NoSelfService: StoryObj = {
+  render: () => (
+    <AuthLayout logo={Logo}>
+      <LoginForm onSubmit={() => wait(800)} registerHref={null} forgotPasswordHref={null} />
+    </AuthLayout>
+  ),
+}

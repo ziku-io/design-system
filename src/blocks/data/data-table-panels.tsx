@@ -31,6 +31,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
+import { useStrings } from "@/lib/strings"
 
 import { isBlankFilter, named, type DataTableColumn, type FilterValue } from "./types"
 import { VIEW_ICON_NAMES } from "./use-data-table-views"
@@ -126,13 +127,14 @@ export function ColumnPicker<T>({
   /** An extra "none" row at the top, e.g. "No grouping". */
   empty?: { label: string; onPick: () => void }
 }) {
+  const { dataTable: t, common } = useStrings()
   const [q, setQ] = React.useState("")
   const shown = columns.filter((c) => c.header.toLowerCase().includes(q.toLowerCase()))
   return (
     <>
       <Input
         className="mb-1 h-8"
-        placeholder="Find a column…"
+        placeholder={t.findColumn}
         autoFocus
         value={q}
         onChange={(e) => setQ(e.target.value)}
@@ -143,7 +145,7 @@ export function ColumnPicker<T>({
         </button>
       )}
       {shown.length === 0 && (
-        <p className="px-2 py-1.5 text-sm text-muted-foreground">No results.</p>
+        <p className="px-2 py-1.5 text-sm text-muted-foreground">{common.noResults}</p>
       )}
       {shown.map((c) => {
         const Ic = c.icon ?? TableIcon
@@ -171,6 +173,7 @@ export function FilterPanel<T>({
   onChange: (value: FilterValue) => void
   onRemove: () => void
 }) {
+  const { dataTable: t, common } = useStrings()
   const [q, setQ] = React.useState("")
   const picked = Array.isArray(value) ? value : []
   const shown = options.filter((o) => o.label.toLowerCase().includes(q.toLowerCase()))
@@ -179,12 +182,12 @@ export function FilterPanel<T>({
     <>
       <div className="mb-1 flex items-center justify-between gap-2 border-b px-1 pb-1.5">
         <span className="text-xs font-medium text-muted-foreground">
-          {col.header} {col.facet ? "is" : "contains"}
+          {col.header} {col.facet ? t.is : t.contains}
         </span>
         <button
           type="button"
           onClick={onRemove}
-          title="Remove filter"
+          title={t.removeFilter}
           className="rounded-md p-1 text-muted-foreground hover:bg-danger/10 hover:text-danger-fg"
         >
           <TrashIcon className="size-3.5" />
@@ -194,7 +197,7 @@ export function FilterPanel<T>({
       {!col.facet ? (
         <Input
           className="h-8"
-          placeholder="Type a value…"
+          placeholder={t.typeAValue}
           autoFocus
           value={Array.isArray(value) ? "" : value}
           onChange={(e) => onChange(e.target.value)}
@@ -204,14 +207,14 @@ export function FilterPanel<T>({
           {options.length >= 8 && (
             <Input
               className="mb-1 h-8"
-              placeholder="Search…"
+              placeholder={common.searchPlaceholder}
               autoFocus
               value={q}
               onChange={(e) => setQ(e.target.value)}
             />
           )}
           {shown.length === 0 && (
-            <p className="px-2 py-1.5 text-sm text-muted-foreground">No results.</p>
+            <p className="px-2 py-1.5 text-sm text-muted-foreground">{common.noResults}</p>
           )}
           {shown.map((o) => (
             <label
@@ -258,6 +261,7 @@ export function SortPanel<T>({
   byKey: Record<string, DataTableColumn<T>>
   onChange: (sorting: SortingState) => void
 }) {
+  const t = useStrings().dataTable
   const free = sortable.filter((c) => !sorting.some((s) => s.id === c.key))
   return (
     <>
@@ -288,13 +292,13 @@ export function SortPanel<T>({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="asc">Ascending</SelectItem>
-              <SelectItem value="desc">Descending</SelectItem>
+              <SelectItem value="asc">{t.ascending}</SelectItem>
+              <SelectItem value="desc">{t.descending}</SelectItem>
             </SelectContent>
           </Select>
           <button
             type="button"
-            title="Remove"
+            title={t.removeSort}
             onClick={() => onChange(sorting.filter((_, n) => n !== i))}
             className="shrink-0 rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-danger-fg"
           >
@@ -308,7 +312,7 @@ export function SortPanel<T>({
           onClick={() => onChange([...sorting, { id: free[0].key, desc: false }])}
           className={cn(ROW, "text-muted-foreground")}
         >
-          <PlusIcon className="size-3.5" weight="bold" /> Add sort
+          <PlusIcon className="size-3.5" weight="bold" /> {t.addSort}
         </button>
       )}
       {sorting.length > 0 && (
@@ -317,7 +321,7 @@ export function SortPanel<T>({
           onClick={() => onChange([])}
           className={cn(ROW, "text-danger-fg hover:bg-danger/10")}
         >
-          <TrashIcon className="size-3.5" /> Remove sorting
+          <TrashIcon className="size-3.5" /> {t.removeSorting}
         </button>
       )}
     </>
@@ -426,6 +430,7 @@ export function ViewSettings({
   footer?: React.ReactNode
   onClose: () => void
 }) {
+  const { dataTable: t, common } = useStrings()
   const [openKey, setOpenKey] = React.useState<string | null>(null)
   const [pickingIcon, setPickingIcon] = React.useState(false)
   const open = rows.find((r) => r.key === openKey)
@@ -437,7 +442,7 @@ export function ViewSettings({
           <button
             type="button"
             onClick={() => setOpenKey(null)}
-            aria-label="Back"
+            aria-label={t.back}
             className="rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
           >
             <CaretLeftIcon className="size-3.5" weight="bold" />
@@ -452,11 +457,11 @@ export function ViewSettings({
   return (
     <>
       <div className="mb-2 flex items-center justify-between gap-2">
-        <span className="text-xs font-medium text-muted-foreground">View settings</span>
+        <span className="text-xs font-medium text-muted-foreground">{t.viewSettings}</span>
         <button
           type="button"
           onClick={onClose}
-          aria-label="Close"
+          aria-label={common.close}
           className="rounded-full p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
         >
           <XIcon className="size-3" weight="bold" />
@@ -466,7 +471,7 @@ export function ViewSettings({
       <div className="mb-2 flex items-center gap-2">
         <button
           type="button"
-          title="Change the icon"
+          title={t.changeIcon}
           onClick={() => setPickingIcon((p) => !p)}
           className={cn(
             "shrink-0 rounded-md border p-2 hover:bg-accent",
@@ -480,7 +485,7 @@ export function ViewSettings({
           className="h-8 min-w-0 flex-1 font-medium"
           value={name}
           onChange={(e) => onRename(e.target.value)}
-          aria-label="View name"
+          aria-label={t.viewName}
         />
       </div>
       {pickingIcon && (

@@ -52,6 +52,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
+import { useStrings } from "@/lib/strings"
 
 import {
   Control,
@@ -147,10 +148,10 @@ export function DataTable<T extends RowData>({
   columns,
   data,
   loading,
-  empty = "No results.",
+  empty,
   rowId,
   search = true,
-  searchPlaceholder = "Search…",
+  searchPlaceholder,
   toolbar,
   onRowClick,
   pageSize = 0,
@@ -166,6 +167,9 @@ export function DataTable<T extends RowData>({
   onStateChange,
   className,
 }: DataTableProps<T>) {
+  const strings = useStrings()
+  const t = strings.dataTable
+  const common = strings.common
   const rows = React.useMemo(() => data ?? [], [data])
   const byKey = React.useMemo(
     () => Object.fromEntries(columns.map((c) => [c.key, c])) as Record<string, DataTableColumn<T>>,
@@ -399,7 +403,7 @@ export function DataTable<T extends RowData>({
     <ColumnPicker
       columns={facets}
       empty={{
-        label: "No grouping",
+        label: t.noGrouping,
         onPick: () => {
           patch({ grouping: [] })
           close?.()
@@ -443,14 +447,14 @@ export function DataTable<T extends RowData>({
           {
             key: "layout",
             icon: TableIcon,
-            label: "Layout",
-            value: state.mode === "board" ? "Board" : "Table",
+            label: t.layout,
+            value: state.mode === "board" ? t.board : t.table,
             panel: (
               <>
                 {(
                   [
-                    ["table", RowsIcon, "Table"],
-                    ["board", SquaresFourIcon, "Board"],
+                    ["table", RowsIcon, t.table],
+                    ["board", SquaresFourIcon, t.board],
                   ] as const
                 ).map(([m, Ic, label]) => (
                   <button
@@ -473,21 +477,21 @@ export function DataTable<T extends RowData>({
     {
       key: "columns",
       icon: EyeIcon,
-      label: "Visible columns",
-      value: hiddenCount ? `${hiddenCount} hidden` : "All",
+      label: t.visibleColumns,
+      value: hiddenCount ? t.hidden(hiddenCount) : t.allView,
       panel: toggles,
     },
     {
       key: "filter",
       icon: FunnelSimpleIcon,
-      label: "Filters",
+      label: t.filters,
       value: chips.length ? String(chips.length) : undefined,
       panel: filtersPanel,
     },
     {
       key: "sort",
       icon: SortAscendingIcon,
-      label: "Sorting",
+      label: t.sorting,
       value: state.sorting.length
         ? state.sorting.length === 1
           ? byKey[state.sorting[0].id]?.header
@@ -500,8 +504,8 @@ export function DataTable<T extends RowData>({
           {
             key: "group",
             icon: RowsIcon,
-            label: "Group by",
-            value: group ? byKey[group]?.header : "None",
+            label: t.groupBy,
+            value: group ? byKey[group]?.header : common.none,
             panel: groupPicker(),
           },
         ]
@@ -550,11 +554,11 @@ export function DataTable<T extends RowData>({
           ))}
           <NameForm
             align="start"
-            title="Save the current filters as a new view"
+            title={t.saveView}
             className="shrink-0 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
             trigger={<PlusIcon className="size-4" weight="bold" />}
-            defaultValue="New view"
-            confirmLabel="Create"
+            defaultValue={t.newView}
+            confirmLabel={t.createView}
             onSubmit={store.add}
           />
         </div>
@@ -565,13 +569,13 @@ export function DataTable<T extends RowData>({
           {search && (
             <Control
               icon={MagnifyingGlassIcon}
-              label="Search"
+              label={common.search}
               active={Boolean(state.globalFilter)}
               width="w-72"
             >
               <Input
                 className="h-8"
-                placeholder={searchPlaceholder}
+                placeholder={searchPlaceholder ?? common.searchPlaceholder}
                 autoFocus
                 value={state.globalFilter}
                 onChange={(e) => patch({ globalFilter: e.target.value })}
@@ -579,7 +583,7 @@ export function DataTable<T extends RowData>({
             </Control>
           )}
 
-          <Control icon={FunnelSimpleIcon} label="Filter" active={chips.length > 0}>
+          <Control icon={FunnelSimpleIcon} label={t.filter} active={chips.length > 0}>
             {(close) => (
               <ColumnPicker
                 columns={filterable}
@@ -593,7 +597,7 @@ export function DataTable<T extends RowData>({
 
           <Control
             icon={SortAscendingIcon}
-            label="Sort"
+            label={t.sort}
             active={state.sorting.length > 0}
             width="w-88"
           >
@@ -601,12 +605,12 @@ export function DataTable<T extends RowData>({
           </Control>
 
           {facets.length > 0 && (
-            <Control icon={RowsIcon} label="Group" active={Boolean(group)}>
+            <Control icon={RowsIcon} label={t.group} active={Boolean(group)}>
               {(close) => groupPicker(close)}
             </Control>
           )}
 
-          <Control icon={EyeIcon} label="Columns" active={hiddenCount > 0} width="w-52">
+          <Control icon={EyeIcon} label={t.visibleColumns} active={hiddenCount > 0} width="w-52">
             {toggles}
           </Control>
 
@@ -614,8 +618,8 @@ export function DataTable<T extends RowData>({
             <div className="ml-1 flex overflow-hidden rounded-md border">
               {(
                 [
-                  ["table", RowsIcon, "Table"],
-                  ["board", SquaresFourIcon, "Board"],
+                  ["table", RowsIcon, t.table],
+                  ["board", SquaresFourIcon, t.board],
                 ] as const
               ).map(([m, Ic, label]) => (
                 <button
@@ -642,7 +646,7 @@ export function DataTable<T extends RowData>({
             width="w-72"
             className="ml-1 rounded-md p-1.5 text-muted-foreground outline-none hover:bg-accent hover:text-foreground"
             trigger={
-              <span aria-label="View settings">
+              <span aria-label={t.viewSettings}>
                 <DotsThreeIcon className="size-4" weight="bold" />
               </span>
             }
@@ -665,7 +669,7 @@ export function DataTable<T extends RowData>({
                       }}
                       className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-danger-fg hover:bg-danger/10"
                     >
-                      <TrashIcon className="size-4" /> Delete view
+                      <TrashIcon className="size-4" /> {t.deleteView}
                     </button>
                   )
                 }
@@ -783,7 +787,9 @@ export function DataTable<T extends RowData>({
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="p-12 text-center text-sm text-muted-foreground">{empty}</div>
+        <div className="p-12 text-center text-sm text-muted-foreground">
+          {empty ?? common.noResults}
+        </div>
       ) : board ? (
         <div className="p-3">
           <Kanban

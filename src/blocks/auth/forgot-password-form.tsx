@@ -1,3 +1,4 @@
+import * as React from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -16,18 +17,22 @@ import {
 import { Input } from "@/components/ui/input"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Link } from "@/lib/link"
+import { useStrings, type UIStrings } from "@/lib/strings"
 
-export const forgotPasswordSchema = z.object({
-  email: z.email("Enter a valid email"),
-})
-export type ForgotPasswordValues = z.infer<typeof forgotPasswordSchema>
+/** A factory, not a constant: the messages are the app's, from `UIStringsProvider`. */
+export const forgotPasswordSchema = (t: UIStrings["auth"]) =>
+  z.object({
+    email: z.email(t.invalidEmail),
+  })
+export type ForgotPasswordValues = z.infer<ReturnType<typeof forgotPasswordSchema>>
 
 export interface ForgotPasswordFormProps {
   onSubmit: (values: ForgotPasswordValues) => Promise<void> | void
   error?: string | null
   /** When true, shows the "check your inbox" state instead of the form */
   sent?: boolean
-  loginHref?: string
+  /** `null` renders no way back — for a page that is not reached from a login. */
+  loginHref?: string | null
 }
 
 export function ForgotPasswordForm({
@@ -36,8 +41,10 @@ export function ForgotPasswordForm({
   sent,
   loginHref = "/login",
 }: ForgotPasswordFormProps) {
+  const t = useStrings().auth
+  const schema = React.useMemo(() => forgotPasswordSchema(t), [t])
   const form = useForm<ForgotPasswordValues>({
-    resolver: zodResolver(forgotPasswordSchema),
+    resolver: zodResolver(schema),
     defaultValues: { email: "" },
   })
   const busy = form.formState.isSubmitting
@@ -47,17 +54,18 @@ export function ForgotPasswordForm({
       <Card>
         <CardHeader className="items-center text-center">
           <EnvelopeSimpleIcon className="size-8 text-primary" />
-          <CardTitle className="text-xl">Check your inbox</CardTitle>
+          <CardTitle className="text-xl">{t.sentTitle}</CardTitle>
           <CardDescription>
-            If an account exists for {form.getValues("email") || "that email"}, we sent a reset
-            link.
+            {t.sentDescription(form.getValues("email") || t.thatEmail)}
           </CardDescription>
         </CardHeader>
-        <CardContent className="text-center text-sm">
-          <Link href={loginHref} className="text-link underline underline-offset-4">
-            Back to sign in
-          </Link>
-        </CardContent>
+        {loginHref && (
+          <CardContent className="text-center text-sm">
+            <Link href={loginHref} className="text-link underline underline-offset-4">
+              {t.backToSignIn}
+            </Link>
+          </CardContent>
+        )}
       </Card>
     )
   }
@@ -65,8 +73,8 @@ export function ForgotPasswordForm({
   return (
     <Card>
       <CardHeader className="text-center">
-        <CardTitle className="text-xl">Reset your password</CardTitle>
-        <CardDescription>Enter your email and we'll send you a link</CardDescription>
+        <CardTitle className="text-xl">{t.resetTitle}</CardTitle>
+        <CardDescription>{t.resetDescription}</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -81,12 +89,12 @@ export function ForgotPasswordForm({
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>{t.email}</FormLabel>
                   <FormControl>
                     <Input
                       type="email"
                       autoComplete="email"
-                      placeholder="you@company.com"
+                      placeholder={t.emailPlaceholder}
                       {...field}
                     />
                   </FormControl>
@@ -96,13 +104,15 @@ export function ForgotPasswordForm({
             />
             <Button type="submit" className="w-full" disabled={busy}>
               {busy && <SpinnerIcon className="animate-spin" />}
-              Send reset link
+              {t.sendResetLink}
             </Button>
-            <p className="text-center text-sm text-muted-foreground">
-              <Link href={loginHref} className="text-link underline underline-offset-4">
-                Back to sign in
-              </Link>
-            </p>
+            {loginHref && (
+              <p className="text-center text-sm text-muted-foreground">
+                <Link href={loginHref} className="text-link underline underline-offset-4">
+                  {t.backToSignIn}
+                </Link>
+              </p>
+            )}
           </form>
         </Form>
       </CardContent>

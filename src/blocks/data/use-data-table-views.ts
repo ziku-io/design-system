@@ -1,5 +1,7 @@
 import * as React from "react"
 
+import { defaultStrings, useStrings } from "@/lib/strings"
+
 import type { DataTableState, DataTableView, SavedView } from "./types"
 
 export const VIEW_ICON_NAMES = [
@@ -18,9 +20,13 @@ const storeKey = (k: string) => `ziku.views.${k}`
 
 /** "All" plus whatever the page pins after it — always present, in this order,
  *  so a store saved before a preset existed still gains it. */
-function builtIn(base: DataTableState, presets: DataTableView[]): SavedView[] {
+function builtIn(
+  base: DataTableState,
+  presets: DataTableView[],
+  allLabel: string = defaultStrings.dataTable.allView,
+): SavedView[] {
   return [
-    { id: "default", name: "All", icon: "table", state: base },
+    { id: "default", name: allLabel, icon: "table", state: base },
     ...presets.map((p) => ({ ...p, state: { ...base, ...p.state } })),
   ]
 }
@@ -29,8 +35,9 @@ function load(
   viewKey: string | undefined,
   base: DataTableState,
   presets: DataTableView[],
+  allLabel: string,
 ): { views: SavedView[]; activeId: string } {
-  const fixed = builtIn(base, presets)
+  const fixed = builtIn(base, presets, allLabel)
   const fallback = { views: fixed, activeId: fixed[0].id }
   if (!viewKey || typeof localStorage === "undefined") return fallback
   try {
@@ -84,7 +91,13 @@ export function useDataTableViews(
   /** State of the active view, after unknown columns have been pruned. */
   liveState: DataTableState,
 ): UseDataTableViews {
-  const [{ views, activeId }, setStore] = React.useState(() => load(viewKey, base, presets))
+  // The built-in view's name comes from the dictionary, but only on first load:
+  // it is stored alongside the user's own views and renaming it is allowed, so
+  // re-reading it on every render would undo a rename.
+  const allLabel = useStrings().dataTable.allView
+  const [{ views, activeId }, setStore] = React.useState(() =>
+    load(viewKey, base, presets, allLabel),
+  )
   const active = views.find((v) => v.id === activeId) ?? views[0]
 
   React.useEffect(() => {

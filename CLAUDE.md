@@ -32,6 +32,20 @@ then: swap the lucide import, write `<name>.stories.tsx` beside it, and export i
 from `src/index.ts`. Check whether `add` overwrote a neighbouring file — it
 sometimes rewrites `dialog.tsx` and reintroduces lucide.
 
+**Every user-facing string goes in the dictionary.** `src/lib/strings.tsx` holds
+one flat, typed record of every word a block renders, English as the default; an
+app wraps `UIStringsProvider` once and overrides any subset. A block reads its
+group with `useStrings()`. Never write a literal into a block — not a label, not
+a placeholder, not an `aria-label`, not a zod message. That is why the auth
+schemas are factories over the strings (`loginSchema(t)`) rather than constants,
+and why props like `title` keep winning over the provider. `defaultStrings` is
+exported so an app can see what it is overriding.
+
+`components/ui/` is exempt: those take their text as children from the caller,
+so there is nothing to translate. The exceptions are the two shadcn writes into
+`dialog.tsx` ("Close", the footer's "Close" button) — leave them, `Modal` is
+what apps use and it goes through the dictionary.
+
 **Dark is the default.** No class on `<html>` renders dark; `.light` opts out;
 `.dark` also works so next-themes behaves. Tokens live on `:root, .dark` and are
 overridden by `.light`. Never define a colour only inside one of those blocks.
@@ -110,9 +124,11 @@ src/components/ui/   shadcn components, each with a co-located .stories.tsx
 src/blocks/auth/     AuthLayout, LoginForm, RegisterForm, ForgotPasswordForm
 src/blocks/shell/    AppShell (sidebar nav, ⌘K palette, user menu)
 src/blocks/data/     DataTable (TanStack v9), Kanban, saved views
+src/blocks/modal/    Modal (title bar, scrolling body, footer)
 src/blocks/search/   CommandMenu (cmdk), SearchTrigger
 src/blocks/page/     PageHeader, EmptyState
 src/docs/            MDX docs pages
+src/lib/             cn, Link/LinkProvider, UIStrings, Phosphor icon aliases
 src/styles/          globals.css — GitHub Primer tokens
 ```
 
@@ -126,7 +142,13 @@ v8 patterns.
 
 Named exports. `interface` for object shapes. Blocks take an `onSubmit` and
 render UI only — no fetching, no routing; links go through `LinkProvider` so the
-consuming app supplies its router.
+consuming app supplies its router, and words go through `UIStringsProvider` so
+it supplies the language.
+
+**A link a block renders has to be optional.** `registerHref`,
+`forgotPasswordHref` and `loginHref` accept `null` to render nothing: not every
+app has sign-up, and one without a mailer has no password reset. A prop that
+only moves where a link points is not enough.
 
 Document a deliberate simplification with a `ponytail:` comment naming the
 ceiling and the upgrade path.

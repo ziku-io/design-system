@@ -28,6 +28,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Link } from "@/lib/link"
+import { useStrings } from "@/lib/strings"
 
 export interface NavItem {
   title: string
@@ -82,6 +83,7 @@ export function AppShell({
   headerContent,
   children,
 }: AppShellProps) {
+  const t = useStrings().shell
   return (
     <SidebarProvider>
       <Sidebar collapsible="icon">
@@ -159,7 +161,7 @@ export function AppShell({
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onSelect={onSignOut}>
                           <SignOutIcon />
-                          Sign out
+                          {t.signOut}
                         </DropdownMenuItem>
                       </>
                     )}
