@@ -38,6 +38,7 @@ export * from './blocks/modal/modal';
 export * from './blocks/page/page-header';
 export * from './blocks/page/empty-state';
 export { cn } from './lib/utils';
+export { setStoragePrefix, storagePrefix, storageKey } from './lib/storage';
 export { UIStringsProvider, useStrings, defaultStrings, type UIStrings, type PartialUIStrings, type UIStringsProviderProps, } from './lib/strings';
 export { Link, LinkProvider, type LinkProps } from './lib/link';
 export { useIsMobile } from './hooks/use-mobile';

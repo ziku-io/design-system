@@ -1,5 +1,6 @@
 import * as React from "react"
 
+import { storageKey } from "@/lib/storage"
 import { defaultStrings, useStrings } from "@/lib/strings"
 
 import type { DataTableState, DataTableView, SavedView } from "./types"
@@ -16,7 +17,7 @@ export const VIEW_ICON_NAMES = [
   "eye",
 ] as const
 
-const storeKey = (k: string) => `ziku.views.${k}`
+const storeKey = (k: string) => storageKey("views", k)
 
 /** "All" plus whatever the page pins after it — always present, in this order,
  *  so a store saved before a preset existed still gains it. */
