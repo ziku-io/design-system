@@ -39,6 +39,7 @@ export * from "./blocks/modal/modal"
 export * from "./blocks/page/page-header"
 export * from "./blocks/page/empty-state"
 export { cn } from "./lib/utils"
+export { setStoragePrefix, storagePrefix, storageKey } from "./lib/storage"
 export {
   UIStringsProvider,
   useStrings,
