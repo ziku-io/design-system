@@ -240,7 +240,7 @@ export function FilterPanel<T>({
               onClick={() => onChange([])}
               className="mt-1 w-full border-t px-2 pt-2 text-left text-xs text-link hover:underline"
             >
-              Clear selection
+              {t.clearSelection}
             </button>
           )}
         </>

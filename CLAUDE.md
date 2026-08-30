@@ -152,3 +152,8 @@ only moves where a link points is not enough.
 
 Document a deliberate simplification with a `ponytail:` comment naming the
 ceiling and the upgrade path.
+
+`src/blocks/no-literal-strings.test.ts` enforces the no-literal rule by reading
+the block sources, so it fails on a word a "Translated" story cannot see: a
+literal nothing overrides renders the same in both languages and the story still
+looks right. Three of them survived a release that way.
