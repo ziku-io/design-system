@@ -102,6 +102,8 @@ export interface UIStrings {
     removeSorting: string
     group: string
     groupBy: string
+    /** The chip on the bar: `groupedBy("stage")` reads "Grouped by stage". */
+    groupedBy: (column: string) => string
     noGrouping: string
     /** The paging bar under a table that has a `pageSize`. */
     rowCount: (count: number) => string
@@ -199,6 +201,7 @@ export const defaultStrings: UIStrings = {
     removeSorting: "Remove sorting",
     group: "Group",
     groupBy: "Group by",
+    groupedBy: (column) => `Grouped by ${column}`,
     noGrouping: "No grouping",
     rowCount: (count) => `${count} row(s)`,
     pageOf: (page, total) => `Page ${page} of ${total}`,

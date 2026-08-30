@@ -1567,6 +1567,7 @@ var Gr = {
 		removeSorting: "Remove sorting",
 		group: "Group",
 		groupBy: "Group by",
+		groupedBy: (e) => `Grouped by ${e}`,
 		noGrouping: "No grouping",
 		rowCount: (e) => `${e} row(s)`,
 		pageOf: (e, t) => `Page ${e} of ${t}`,
@@ -3027,8 +3028,7 @@ function Ui({ columns: t, data: n, loading: r, empty: s, rowId: c, search: l = !
 									className: "size-3.5",
 									weight: "bold"
 								}),
-								"Grouped by ",
-								S[k]?.header.toLowerCase(),
+								b.groupedBy(S[k]?.header.toLowerCase() ?? ""),
 								/* @__PURE__ */ a(ee, {
 									className: "size-2.5 opacity-60",
 									weight: "bold"

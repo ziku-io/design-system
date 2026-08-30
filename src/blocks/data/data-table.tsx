@@ -714,7 +714,7 @@ export function DataTable<T extends RowData>({
               trigger={
                 <span className="flex items-center gap-1.5">
                   <RowsIcon className="size-3.5" weight="bold" />
-                  Grouped by {byKey[group]?.header.toLowerCase()}
+                  {t.groupedBy(byKey[group]?.header.toLowerCase() ?? "")}
                   <CaretDownIcon className="size-2.5 opacity-60" weight="bold" />
                 </span>
               }
