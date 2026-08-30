@@ -1550,7 +1550,10 @@ var Gr = {
 		hidden: (e) => `${e} hidden`,
 		filters: "Filters",
 		filter: "Filter",
+		addFilter: "Filter",
 		removeFilter: "Remove filter",
+		clearFilters: "Clear",
+		clearSelection: "Clear selection",
 		is: "is",
 		contains: "contains",
 		findColumn: "Find a column…",
@@ -1564,7 +1567,11 @@ var Gr = {
 		removeSorting: "Remove sorting",
 		group: "Group",
 		groupBy: "Group by",
-		noGrouping: "No grouping"
+		noGrouping: "No grouping",
+		rowCount: (e) => `${e} row(s)`,
+		pageOf: (e, t) => `Page ${e} of ${t}`,
+		previousPage: "Previous",
+		nextPage: "Next"
 	},
 	search: {
 		placeholder: "Search…",
@@ -2277,7 +2284,7 @@ function Ni({ col: t, options: n, value: r, onChange: s, onRemove: c }) {
 			type: "button",
 			onClick: () => s([]),
 			className: "mt-1 w-full border-t px-2 pt-2 text-left text-xs text-link hover:underline",
-			children: "Clear selection"
+			children: l.clearSelection
 		})
 	] }) : /* @__PURE__ */ a(q, {
 		className: "h-8",
@@ -3068,10 +3075,14 @@ function Ui({ columns: t, data: n, loading: r, empty: s, rowId: c, search: l = !
 						className: "rounded-md px-2 py-1.5 text-sm text-muted-foreground hover:bg-card hover:text-foreground",
 						trigger: /* @__PURE__ */ o("span", {
 							className: "flex items-center gap-1",
-							children: [/* @__PURE__ */ a(ye, {
-								className: "size-3",
-								weight: "bold"
-							}), " Filter"]
+							children: [
+								/* @__PURE__ */ a(ye, {
+									className: "size-3",
+									weight: "bold"
+								}),
+								" ",
+								b.addFilter
+							]
 						}),
 						children: (e) => /* @__PURE__ */ a(Mi, {
 							columns: I,
@@ -3084,10 +3095,14 @@ function Ui({ columns: t, data: n, loading: r, empty: s, rowId: c, search: l = !
 						type: "button",
 						onClick: C.reset,
 						className: "ml-auto flex items-center gap-1 text-xs text-link hover:underline",
-						children: [/* @__PURE__ */ a(Ae, {
-							className: "size-3",
-							weight: "bold"
-						}), " Clear"]
+						children: [
+							/* @__PURE__ */ a(Ae, {
+								className: "size-3",
+								weight: "bold"
+							}),
+							" ",
+							b.clearFilters
+						]
 					})
 				]
 			}),
@@ -3166,28 +3181,23 @@ function Ui({ columns: t, data: n, loading: r, empty: s, rowId: c, search: l = !
 			}),
 			je && !r && N.length > 0 && /* @__PURE__ */ o("div", {
 				className: "flex items-center justify-between gap-4 border-t px-3 py-2 text-sm text-muted-foreground",
-				children: [/* @__PURE__ */ o("span", { children: [N.length, " row(s)"] }), /* @__PURE__ */ o("div", {
+				children: [/* @__PURE__ */ a("span", { children: b.rowCount(N.length) }), /* @__PURE__ */ o("div", {
 					className: "flex items-center gap-2",
 					children: [
-						/* @__PURE__ */ o("span", { children: [
-							"Page ",
-							Te + 1,
-							" of ",
-							Math.max(M.getPageCount(), 1)
-						] }),
+						/* @__PURE__ */ a("span", { children: b.pageOf(Te + 1, Math.max(M.getPageCount(), 1)) }),
 						/* @__PURE__ */ a(V, {
 							variant: "outline",
 							size: "sm",
 							onClick: () => M.previousPage(),
 							disabled: !M.getCanPreviousPage(),
-							children: "Previous"
+							children: b.previousPage
 						}),
 						/* @__PURE__ */ a(V, {
 							variant: "outline",
 							size: "sm",
 							onClick: () => M.nextPage(),
 							disabled: !M.getCanNextPage(),
-							children: "Next"
+							children: b.nextPage
 						})
 					]
 				})]

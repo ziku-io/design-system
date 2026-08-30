@@ -81,7 +81,13 @@ export interface UIStrings {
     hidden: (count: number) => string
     filters: string
     filter: string
+    /** The button that adds a chip: reads as "+ Filter". */
+    addFilter: string
     removeFilter: string
+    /** Puts the view back to its saved state. */
+    clearFilters: string
+    /** Empties a facet's ticked list, inside its panel. */
+    clearSelection: string
     /** Joins a column name to its condition: "Status is", "Name contains". */
     is: string
     contains: string
@@ -97,6 +103,11 @@ export interface UIStrings {
     group: string
     groupBy: string
     noGrouping: string
+    /** The paging bar under a table that has a `pageSize`. */
+    rowCount: (count: number) => string
+    pageOf: (page: number, total: number) => string
+    previousPage: string
+    nextPage: string
   }
   search: {
     placeholder: string
@@ -171,7 +182,10 @@ export const defaultStrings: UIStrings = {
     hidden: (count) => `${count} hidden`,
     filters: "Filters",
     filter: "Filter",
+    addFilter: "Filter",
     removeFilter: "Remove filter",
+    clearFilters: "Clear",
+    clearSelection: "Clear selection",
     is: "is",
     contains: "contains",
     findColumn: "Find a column…",
@@ -186,6 +200,10 @@ export const defaultStrings: UIStrings = {
     group: "Group",
     groupBy: "Group by",
     noGrouping: "No grouping",
+    rowCount: (count) => `${count} row(s)`,
+    pageOf: (page, total) => `Page ${page} of ${total}`,
+    previousPage: "Previous",
+    nextPage: "Next",
   },
   search: {
     placeholder: "Search…",

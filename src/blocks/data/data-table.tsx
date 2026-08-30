@@ -759,7 +759,7 @@ export function DataTable<T extends RowData>({
             className="rounded-md px-2 py-1.5 text-sm text-muted-foreground hover:bg-card hover:text-foreground"
             trigger={
               <span className="flex items-center gap-1">
-                <PlusIcon className="size-3" weight="bold" /> Filter
+                <PlusIcon className="size-3" weight="bold" /> {t.addFilter}
               </span>
             }
           >
@@ -780,7 +780,7 @@ export function DataTable<T extends RowData>({
               onClick={store.reset}
               className="ml-auto flex items-center gap-1 text-xs text-link hover:underline"
             >
-              <XIcon className="size-3" weight="bold" /> Clear
+              <XIcon className="size-3" weight="bold" /> {t.clearFilters}
             </button>
           )}
         </div>
@@ -892,18 +892,16 @@ export function DataTable<T extends RowData>({
 
       {paginated && !loading && filtered.length > 0 && (
         <div className="flex items-center justify-between gap-4 border-t px-3 py-2 text-sm text-muted-foreground">
-          <span>{filtered.length} row(s)</span>
+          <span>{t.rowCount(filtered.length)}</span>
           <div className="flex items-center gap-2">
-            <span>
-              Page {pageIndex + 1} of {Math.max(table.getPageCount(), 1)}
-            </span>
+            <span>{t.pageOf(pageIndex + 1, Math.max(table.getPageCount(), 1))}</span>
             <Button
               variant="outline"
               size="sm"
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
             >
-              Previous
+              {t.previousPage}
             </Button>
             <Button
               variant="outline"
@@ -911,7 +909,7 @@ export function DataTable<T extends RowData>({
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
             >
-              Next
+              {t.nextPage}
             </Button>
           </div>
         </div>
