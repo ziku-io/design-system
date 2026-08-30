@@ -3197,7 +3197,7 @@ function Vi({ brand: e, nav: t, currentPath: n, user: r, userMenu: s, onSignOut:
 								children: r.name
 							}), /* @__PURE__ */ a("span", {
 								className: "truncate text-xs text-muted-foreground",
-								children: r.email
+								children: r.role ?? r.email
 							})]
 						}),
 						/* @__PURE__ */ a(oe, { className: "ml-auto size-4" })

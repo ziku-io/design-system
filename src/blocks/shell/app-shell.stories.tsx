@@ -168,3 +168,17 @@ export const EmptyPage: StoryObj<typeof AppShell> = {
     ),
   },
 }
+
+/**
+ * The sidebar's second line is a job title rather than an address. The dropdown
+ * still shows the email, so the account is never ambiguous.
+ */
+export const WithRole: StoryObj<typeof AppShell> = {
+  args: {
+    brand,
+    nav,
+    currentPath: "/",
+    user: { ...user, role: "Sócia" },
+    children: <PageHeader title="Dashboard" />,
+  },
+}
