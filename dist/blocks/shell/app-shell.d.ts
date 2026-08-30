@@ -12,6 +12,11 @@ export interface NavGroup {
 export interface ShellUser {
     name: string;
     email: string;
+    /** What to show under the name in the sidebar instead of the address: a job
+     *  title, a team, a tenant. The dropdown still shows the email, because that
+     *  is the one place a user goes to check which account they are signed in as.
+     *  Without this an app that wants a role there has to lie in `email`. */
+    role?: string;
     avatarUrl?: string;
 }
 export interface AppShellProps {
