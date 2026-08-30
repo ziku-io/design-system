@@ -11,6 +11,8 @@ import {
 
 import { DataTable } from "./data-table"
 import type { DataTableColumn, DataTableView } from "./types"
+import { TrophyIcon, XCircleIcon } from "@phosphor-icons/react"
+
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { UIStringsProvider } from "@/lib/strings"
@@ -238,4 +240,49 @@ export const Translated: Story = {
       <DataTable columns={columns} data={deals} rowId={(d) => String(d.id)} presets={presets} />
     </UIStringsProvider>
   ),
+}
+
+/**
+ * Won and Lost are endings, not stages: `boardTile` renders them as compact
+ * drop targets so the four stages people actually work stay on screen, and so
+ * the irreversible drop does not look like the four reversible ones.
+ */
+export const BoardWithEndings: Story = {
+  render: function BoardEndingsStory() {
+    const [rows, setRows] = useState(deals.slice(0, 18))
+    const boardColumns: DataTableColumn<Deal>[] = columns.map((c) =>
+      c.key === "stage"
+        ? {
+            ...c,
+            onSet: (row, label) =>
+              setRows((rs) =>
+                rs.map((r) => (r.id === row.id ? { ...r, stage: label as Deal["stage"] } : r)),
+              ),
+            boardTile: (label: string) =>
+              label === "Won"
+                ? ({ icon: TrophyIcon, tone: "success" } as const)
+                : label === "Lost"
+                  ? ({ icon: XCircleIcon, tone: "danger" } as const)
+                  : undefined,
+          }
+        : c,
+    )
+    return (
+      <DataTable
+        columns={boardColumns}
+        data={rows}
+        rowId={(d) => String(d.id)}
+        defaultMode="board"
+        defaultGroup="stage"
+        boardSubtitle={(rs) => euros(rs.reduce((n, r) => n + r.value, 0))}
+        renderCard={(d) => (
+          <div className="rounded-md border bg-card p-3 text-sm shadow-xs">
+            <div className="font-medium">{d.name}</div>
+            <div className="text-muted-foreground">{d.company}</div>
+            <div className="mt-1 tabular-nums">{euros(d.value)}</div>
+          </div>
+        )}
+      />
+    )
+  },
 }

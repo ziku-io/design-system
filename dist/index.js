@@ -2502,8 +2502,21 @@ function Li({ name: t, icon: n, onIcon: r, onRename: s, rows: c, footer: l, onCl
 }
 //#endregion
 //#region src/blocks/data/kanban.tsx
-var Ri = "application/x-ziku-card";
-function zi({ columns: t, renderCard: n, itemKey: r, onDrop: i, canDrag: s, maxHeight: c, className: l }) {
+var Ri = "application/x-ziku-card", zi = {
+	success: {
+		idle: "border-success/60 bg-success-subtle text-success-fg",
+		over: "border-success bg-success-subtle text-success-fg"
+	},
+	danger: {
+		idle: "border-danger/60 bg-danger-subtle text-danger-fg",
+		over: "border-danger bg-danger-subtle text-danger-fg"
+	},
+	warning: {
+		idle: "border-warning/60 bg-warning-subtle text-warning-fg",
+		over: "border-warning bg-warning-subtle text-warning-fg"
+	}
+};
+function Bi({ columns: t, renderCard: n, itemKey: r, onDrop: i, canDrag: s, maxHeight: c, className: l }) {
 	let [u, d] = e.useState(null), [f, p] = e.useState(null), m = t.flatMap((e) => e.items), h = u !== null, g = (e) => f === e ? "over" : h ? "ready" : "idle", _ = (e) => ({
 		onDragOver: (t) => {
 			i && (t.preventDefault(), t.dataTransfer.dropEffect = "move", p(e));
@@ -2518,7 +2531,11 @@ function zi({ columns: t, renderCard: n, itemKey: r, onDrop: i, canDrag: s, maxH
 	});
 	return /* @__PURE__ */ a("div", {
 		className: B("flex items-start gap-4 overflow-x-auto pb-4", l),
-		children: t.map((e) => /* @__PURE__ */ o("div", {
+		children: t.map((e) => e.tile ? /* @__PURE__ */ a(Vi, {
+			col: e,
+			state: g(e.key),
+			drop: _(e.key)
+		}, e.key) : /* @__PURE__ */ o("div", {
 			..._(e.key),
 			style: { maxHeight: c },
 			className: B("flex w-64 shrink-0 flex-col rounded-md border-2 p-2 transition-colors", {
@@ -2558,9 +2575,34 @@ function zi({ columns: t, renderCard: n, itemKey: r, onDrop: i, canDrag: s, maxH
 		}, e.key))
 	});
 }
+function Vi({ col: e, state: t, drop: n }) {
+	let r = e.tile, i = zi[r.tone];
+	return /* @__PURE__ */ o("div", {
+		...n,
+		className: B("flex h-36 w-44 shrink-0 flex-col items-center justify-center gap-1 rounded-md border-2 p-3 text-center transition-colors", t === "over" ? B("border-solid", i.over) : B("border-dashed", i.idle)),
+		children: [
+			/* @__PURE__ */ a(r.icon, {
+				size: 22,
+				weight: "duotone"
+			}),
+			/* @__PURE__ */ a("span", {
+				className: "text-xs font-semibold tracking-wide uppercase",
+				children: e.title
+			}),
+			/* @__PURE__ */ a("span", {
+				className: "text-lg leading-none font-bold",
+				children: e.items.length
+			}),
+			e.subtitle && /* @__PURE__ */ a("span", {
+				className: "text-xs opacity-80",
+				children: e.subtitle
+			})
+		]
+	});
+}
 //#endregion
 //#region src/blocks/data/data-table.tsx
-var Bi = Je({
+var Hi = Je({
 	rowSortingFeature: qe,
 	sortedRowModel: Ue(),
 	columnFilteringFeature: Fe,
@@ -2577,7 +2619,7 @@ var Bi = Je({
 	rowPaginationFeature: Ke,
 	paginatedRowModel: He()
 });
-function Vi({ columns: t, data: n, loading: r, empty: s, rowId: c, search: l = !0, searchPlaceholder: u, toolbar: d, onRowClick: f, pageSize: p = 0, defaultSort: m, defaultHidden: h, defaultFilters: g, defaultGroup: _ = "", defaultMode: v = "table", renderCard: y, boardSubtitle: te, presets: ne = [], viewKey: re, onStateChange: ae, className: oe }) {
+function Ui({ columns: t, data: n, loading: r, empty: s, rowId: c, search: l = !0, searchPlaceholder: u, toolbar: d, onRowClick: f, pageSize: p = 0, defaultSort: m, defaultHidden: h, defaultFilters: g, defaultGroup: _ = "", defaultMode: v = "table", renderCard: y, boardSubtitle: te, presets: ne = [], viewKey: re, onStateChange: ae, className: oe }) {
 	let se = Y(), b = se.dataTable, x = se.common, le = e.useMemo(() => n ?? [], [n]), S = e.useMemo(() => Object.fromEntries(t.map((e) => [e.key, e])), [t]), ue = e.useMemo(() => ({
 		sorting: m ? [{
 			id: m.key,
@@ -2633,7 +2675,7 @@ function Vi({ columns: t, data: n, loading: r, empty: s, rowId: c, search: l = !
 		id: k,
 		desc: !1
 	}, ...E.sorting] : E.sorting, [k, E.sorting]), M = Ye({
-		features: Bi,
+		features: Hi,
 		data: le,
 		columns: be,
 		state: {
@@ -2807,7 +2849,8 @@ function Vi({ columns: t, data: n, loading: r, empty: s, rowId: c, search: l = !
 				key: t,
 				title: t,
 				items: n,
-				subtitle: te?.(n)
+				subtitle: te?.(n),
+				tile: z.boardTile?.(t)
 			};
 		});
 	}, [
@@ -2951,7 +2994,7 @@ function Vi({ columns: t, data: n, loading: r, empty: s, rowId: c, search: l = !
 				children: [
 					E.sorting.length > 0 && /* @__PURE__ */ a(Q, {
 						width: "w-88",
-						className: Ui,
+						className: Gi,
 						trigger: /* @__PURE__ */ o("span", {
 							className: "flex items-center gap-1.5",
 							children: [
@@ -2969,7 +3012,7 @@ function Vi({ columns: t, data: n, loading: r, empty: s, rowId: c, search: l = !
 						children: Re
 					}),
 					k && /* @__PURE__ */ a(Q, {
-						className: Ui,
+						className: Gi,
 						trigger: /* @__PURE__ */ o("span", {
 							className: "flex items-center gap-1.5",
 							children: [
@@ -2992,7 +3035,7 @@ function Vi({ columns: t, data: n, loading: r, empty: s, rowId: c, search: l = !
 						if (!t) return null;
 						let n = t.icon ?? he;
 						return /* @__PURE__ */ a(Q, {
-							className: hi(e.value) ? Wi : Ui,
+							className: hi(e.value) ? Ki : Gi,
 							trigger: /* @__PURE__ */ o("span", {
 								className: "flex items-center gap-1.5",
 								children: [
@@ -3056,7 +3099,7 @@ function Vi({ columns: t, data: n, loading: r, empty: s, rowId: c, search: l = !
 				children: s ?? x.noResults
 			}) : j ? /* @__PURE__ */ a("div", {
 				className: "p-3",
-				children: /* @__PURE__ */ a(zi, {
+				children: /* @__PURE__ */ a(Bi, {
 					columns: He,
 					itemKey: c,
 					renderCard: y,
@@ -3152,13 +3195,13 @@ function Vi({ columns: t, data: n, loading: r, empty: s, rowId: c, search: l = !
 		]
 	});
 }
-var Hi = "rounded-md border px-2 py-1.5 text-sm outline-none", Ui = `${Hi} border-ring/60 bg-accent font-medium text-foreground`, Wi = `${Hi} border-border bg-card text-muted-foreground`;
+var Wi = "rounded-md border px-2 py-1.5 text-sm outline-none", Gi = `${Wi} border-ring/60 bg-accent font-medium text-foreground`, Ki = `${Wi} border-border bg-card text-muted-foreground`;
 //#endregion
 //#region src/blocks/shell/app-shell.tsx
-function Gi(e) {
+function qi(e) {
 	return e.split(" ").map((e) => e[0]).slice(0, 2).join("").toUpperCase();
 }
-function Ki({ brand: e, nav: t, currentPath: n, user: r, userMenu: s, onSignOut: c, headerActions: l, headerContent: u, children: d }) {
+function Ji({ brand: e, nav: t, currentPath: n, user: r, userMenu: s, onSignOut: c, headerActions: l, headerContent: u, children: d }) {
 	let f = Y().shell;
 	return /* @__PURE__ */ o(er, { children: [/* @__PURE__ */ o(tr, {
 		collapsible: "icon",
@@ -3193,7 +3236,7 @@ function Ki({ brand: e, nav: t, currentPath: n, user: r, userMenu: s, onSignOut:
 								alt: r.name
 							}), /* @__PURE__ */ a(nt, {
 								className: "rounded-lg",
-								children: Gi(r.name)
+								children: qi(r.name)
 							})]
 						}),
 						/* @__PURE__ */ o("div", {
@@ -3256,20 +3299,20 @@ function Ki({ brand: e, nav: t, currentPath: n, user: r, userMenu: s, onSignOut:
 }
 //#endregion
 //#region src/blocks/modal/modal.tsx
-var qi = {
+var Yi = {
 	sm: "sm:max-w-sm",
 	md: "sm:max-w-lg",
 	lg: "sm:max-w-3xl",
 	xl: "sm:max-w-5xl"
 };
-function Ji({ open: e, onOpenChange: t, title: n, description: r, footer: i, size: s = "md", className: c, children: l }) {
+function Xi({ open: e, onOpenChange: t, title: n, description: r, footer: i, size: s = "md", className: c, children: l }) {
 	let u = Y().modal;
 	return /* @__PURE__ */ a(bt, {
 		open: e,
 		onOpenChange: t,
 		children: /* @__PURE__ */ o(Tt, {
 			showCloseButton: !1,
-			className: B("flex max-h-[92dvh] flex-col gap-0 p-0", qi[s], c),
+			className: B("flex max-h-[92dvh] flex-col gap-0 p-0", Yi[s], c),
 			children: [
 				/* @__PURE__ */ o("div", {
 					className: "flex shrink-0 items-start justify-between gap-4 border-b px-5 py-3.5",
@@ -3302,7 +3345,7 @@ function Ji({ open: e, onOpenChange: t, title: n, description: r, footer: i, siz
 }
 //#endregion
 //#region src/blocks/page/page-header.tsx
-function Yi({ title: e, description: t, actions: n, className: r, ...i }) {
+function Zi({ title: e, description: t, actions: n, className: r, ...i }) {
 	return /* @__PURE__ */ o("div", {
 		className: B("flex flex-wrap items-start justify-between gap-4", r),
 		...i,
@@ -3323,7 +3366,7 @@ function Yi({ title: e, description: t, actions: n, className: r, ...i }) {
 }
 //#endregion
 //#region src/blocks/page/empty-state.tsx
-function Xi({ icon: e, title: t, description: n, action: r, className: i, ...s }) {
+function Qi({ icon: e, title: t, description: n, action: r, className: i, ...s }) {
 	return /* @__PURE__ */ o("div", {
 		className: B("flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed p-12 text-center", i),
 		...s,
@@ -3348,4 +3391,4 @@ function Xi({ icon: e, title: t, description: n, action: r, className: i, ...s }
 	});
 }
 //#endregion
-export { Ze as Alert, $e as AlertDescription, Qe as AlertTitle, Ki as AppShell, Hr as AuthLayout, et as Avatar, rt as AvatarBadge, nt as AvatarFallback, it as AvatarGroup, at as AvatarGroupCount, tt as AvatarImage, st as Badge, ct as Breadcrumb, mt as BreadcrumbEllipsis, ut as BreadcrumbItem, dt as BreadcrumbLink, lt as BreadcrumbList, ft as BreadcrumbPage, pt as BreadcrumbSeparator, V as Button, H as Card, gt as CardAction, _t as CardContent, G as CardDescription, vt as CardFooter, U as CardHeader, W as CardTitle, yt as Checkbox, di as CommandMenu, Vi as DataTable, bt as Dialog, Ct as DialogClose, Tt as DialogContent, kt as DialogDescription, Dt as DialogFooter, Et as DialogHeader, wt as DialogOverlay, St as DialogPortal, Ot as DialogTitle, xt as DialogTrigger, At as DropdownMenu, It as DropdownMenuCheckboxItem, Nt as DropdownMenuContent, Pt as DropdownMenuGroup, Ft as DropdownMenuItem, zt as DropdownMenuLabel, jt as DropdownMenuPortal, Lt as DropdownMenuRadioGroup, Rt as DropdownMenuRadioItem, Bt as DropdownMenuSeparator, Vt as DropdownMenuShortcut, Ht as DropdownMenuSub, Wt as DropdownMenuSubContent, Ut as DropdownMenuSubTrigger, Mt as DropdownMenuTrigger, Xi as EmptyState, ti as ForgotPasswordForm, Kt as Form, Qt as FormControl, $t as FormDescription, K as FormField, Xt as FormItem, Zt as FormLabel, en as FormMessage, q as Input, zi as Kanban, Gt as Label, J as Link, Wr as LinkProvider, Zr as LoginForm, Ji as Modal, pi as NONE, Yi as PageHeader, tn as Pagination, nn as PaginationContent, cn as PaginationEllipsis, rn as PaginationItem, an as PaginationLink, sn as PaginationNext, on as PaginationPrevious, ln as Popover, fn as PopoverAnchor, dn as PopoverContent, hn as PopoverDescription, pn as PopoverHeader, mn as PopoverTitle, un as PopoverTrigger, gn as RadioGroup, _n as RadioGroupItem, $r as RegisterForm, fi as SearchTrigger, vn as Select, Sn as SelectContent, yn as SelectGroup, wn as SelectItem, Cn as SelectLabel, Dn as SelectScrollDownButton, En as SelectScrollUpButton, Tn as SelectSeparator, xn as SelectTrigger, bn as SelectValue, On as Separator, kn as Sheet, jn as SheetClose, Pn as SheetContent, Rn as SheetDescription, In as SheetFooter, Fn as SheetHeader, Ln as SheetTitle, An as SheetTrigger, tr as Sidebar, lr as SidebarContent, sr as SidebarFooter, ur as SidebarGroup, fr as SidebarGroupAction, pr as SidebarGroupContent, dr as SidebarGroupLabel, or as SidebarHeader, ar as SidebarInput, ir as SidebarInset, mr as SidebarMenu, vr as SidebarMenuAction, yr as SidebarMenuBadge, _r as SidebarMenuButton, hr as SidebarMenuItem, br as SidebarMenuSkeleton, xr as SidebarMenuSub, Cr as SidebarMenuSubButton, Sr as SidebarMenuSubItem, er as SidebarProvider, rr as SidebarRail, cr as SidebarSeparator, nr as SidebarTrigger, Vn as Skeleton, Dr as Switch, Or as Table, Ar as TableBody, Fr as TableCaption, Pr as TableCell, jr as TableFooter, Nr as TableHead, kr as TableHeader, Mr as TableRow, Ir as Tabs, Br as TabsContent, Rr as TabsList, zr as TabsTrigger, Vr as Textarea, Er as Toaster, Un as Tooltip, Gn as TooltipContent, Hn as TooltipProvider, Wn as TooltipTrigger, Yr as UIStringsProvider, wi as VIEW_ICON_NAMES, ot as badgeVariants, ht as buttonVariants, yi as chipLabel, B as cn, mi as compare, Bi as dataTableFeatures, Gr as defaultStrings, ei as forgotPasswordSchema, hi as isBlankFilter, gi as labelsOf, Xr as loginSchema, vi as named, _i as rank, Qr as registerSchema, xi as setStoragePrefix, Ci as storageKey, Si as storagePrefix, X as str, Lr as tabsListVariants, Ne as toast, Oi as useDataTableViews, Jt as useFormField, Bn as useIsMobile, $n as useSidebar, Y as useStrings, Tr as useTheme };
+export { Ze as Alert, $e as AlertDescription, Qe as AlertTitle, Ji as AppShell, Hr as AuthLayout, et as Avatar, rt as AvatarBadge, nt as AvatarFallback, it as AvatarGroup, at as AvatarGroupCount, tt as AvatarImage, st as Badge, ct as Breadcrumb, mt as BreadcrumbEllipsis, ut as BreadcrumbItem, dt as BreadcrumbLink, lt as BreadcrumbList, ft as BreadcrumbPage, pt as BreadcrumbSeparator, V as Button, H as Card, gt as CardAction, _t as CardContent, G as CardDescription, vt as CardFooter, U as CardHeader, W as CardTitle, yt as Checkbox, di as CommandMenu, Ui as DataTable, bt as Dialog, Ct as DialogClose, Tt as DialogContent, kt as DialogDescription, Dt as DialogFooter, Et as DialogHeader, wt as DialogOverlay, St as DialogPortal, Ot as DialogTitle, xt as DialogTrigger, At as DropdownMenu, It as DropdownMenuCheckboxItem, Nt as DropdownMenuContent, Pt as DropdownMenuGroup, Ft as DropdownMenuItem, zt as DropdownMenuLabel, jt as DropdownMenuPortal, Lt as DropdownMenuRadioGroup, Rt as DropdownMenuRadioItem, Bt as DropdownMenuSeparator, Vt as DropdownMenuShortcut, Ht as DropdownMenuSub, Wt as DropdownMenuSubContent, Ut as DropdownMenuSubTrigger, Mt as DropdownMenuTrigger, Qi as EmptyState, ti as ForgotPasswordForm, Kt as Form, Qt as FormControl, $t as FormDescription, K as FormField, Xt as FormItem, Zt as FormLabel, en as FormMessage, q as Input, Bi as Kanban, Gt as Label, J as Link, Wr as LinkProvider, Zr as LoginForm, Xi as Modal, pi as NONE, Zi as PageHeader, tn as Pagination, nn as PaginationContent, cn as PaginationEllipsis, rn as PaginationItem, an as PaginationLink, sn as PaginationNext, on as PaginationPrevious, ln as Popover, fn as PopoverAnchor, dn as PopoverContent, hn as PopoverDescription, pn as PopoverHeader, mn as PopoverTitle, un as PopoverTrigger, gn as RadioGroup, _n as RadioGroupItem, $r as RegisterForm, fi as SearchTrigger, vn as Select, Sn as SelectContent, yn as SelectGroup, wn as SelectItem, Cn as SelectLabel, Dn as SelectScrollDownButton, En as SelectScrollUpButton, Tn as SelectSeparator, xn as SelectTrigger, bn as SelectValue, On as Separator, kn as Sheet, jn as SheetClose, Pn as SheetContent, Rn as SheetDescription, In as SheetFooter, Fn as SheetHeader, Ln as SheetTitle, An as SheetTrigger, tr as Sidebar, lr as SidebarContent, sr as SidebarFooter, ur as SidebarGroup, fr as SidebarGroupAction, pr as SidebarGroupContent, dr as SidebarGroupLabel, or as SidebarHeader, ar as SidebarInput, ir as SidebarInset, mr as SidebarMenu, vr as SidebarMenuAction, yr as SidebarMenuBadge, _r as SidebarMenuButton, hr as SidebarMenuItem, br as SidebarMenuSkeleton, xr as SidebarMenuSub, Cr as SidebarMenuSubButton, Sr as SidebarMenuSubItem, er as SidebarProvider, rr as SidebarRail, cr as SidebarSeparator, nr as SidebarTrigger, Vn as Skeleton, Dr as Switch, Or as Table, Ar as TableBody, Fr as TableCaption, Pr as TableCell, jr as TableFooter, Nr as TableHead, kr as TableHeader, Mr as TableRow, Ir as Tabs, Br as TabsContent, Rr as TabsList, zr as TabsTrigger, Vr as Textarea, Er as Toaster, Un as Tooltip, Gn as TooltipContent, Hn as TooltipProvider, Wn as TooltipTrigger, Yr as UIStringsProvider, wi as VIEW_ICON_NAMES, ot as badgeVariants, ht as buttonVariants, yi as chipLabel, B as cn, mi as compare, Hi as dataTableFeatures, Gr as defaultStrings, ei as forgotPasswordSchema, hi as isBlankFilter, gi as labelsOf, Xr as loginSchema, vi as named, _i as rank, Qr as registerSchema, xi as setStoragePrefix, Ci as storageKey, Si as storagePrefix, X as str, Lr as tabsListVariants, Ne as toast, Oi as useDataTableViews, Jt as useFormField, Bn as useIsMobile, $n as useSidebar, Y as useStrings, Tr as useTheme };

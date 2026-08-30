@@ -7,6 +7,8 @@ import type {
   ColumnVisibilityState,
 } from "@tanstack/react-table"
 
+import type { KanbanTile } from "./kanban"
+
 /** Shown in place of an empty cell or an empty group. */
 export const NONE = "—"
 
@@ -51,6 +53,16 @@ export interface DataTableColumn<T> {
   onSet?: (row: T, label: string) => void
   /** Board only: cards returning false cannot be dragged. */
   canSet?: (row: T) => boolean
+  /**
+   * Board only, and only for the column being grouped by: which of this
+   * column's values are endings rather than stages.
+   *
+   * Return a tile for a label and that label becomes a compact drop target
+   * showing its count and subtitle instead of a full column of cards. Return
+   * nothing and it stays a column. See `KanbanTile` for why endings are worth
+   * distinguishing.
+   */
+  boardTile?: (label: string) => KanbanTile | undefined
 }
 
 /** Everything a view remembers. */
