@@ -1,4 +1,5 @@
 import * as React from "react"
+import type { Icon } from "@phosphor-icons/react"
 
 import { cn } from "@/lib/utils"
 
@@ -6,12 +7,52 @@ import { cn } from "@/lib/utils"
  *  (its URL) cannot be mistaken for a card. */
 const DRAG_TYPE = "application/x-ziku-card"
 
+/**
+ * A column that is an ending rather than a stage: Won, Lost, Archived.
+ *
+ * It renders as a compact drop target showing the count and the subtitle, and
+ * no cards. Two reasons, both learned from a real pipeline:
+ *
+ * - **Width.** A terminal column grows for the life of the install and nobody
+ *   scrolls three hundred won deals. At full width it pushes the stages people
+ *   actually work off the right edge of a laptop.
+ * - **The drop is often the irreversible one.** Dropping on Won can create a
+ *   record and move history onto it. A tile in a semantic tone is what says
+ *   "this target is different" before any confirmation appears; an identical
+ *   sixth column says nothing.
+ *
+ * A tone, not a class name: a caller passing raw classes could put any colour
+ * on a board, which is how a design system stops being one.
+ */
+export interface KanbanTile {
+  icon: Icon
+  tone: "success" | "danger" | "warning"
+}
+
 export interface KanbanColumn<T> {
   key: string
   title: string
   items: T[]
   /** Line under the title, e.g. the sum of the deals in it. */
   subtitle?: string
+  /** Render as an ending rather than a stage. See `KanbanTile`. */
+  tile?: KanbanTile
+}
+
+/** Per tone, per drag state. Tokens only: no tile invents a colour. */
+const TILE_TONES: Record<KanbanTile["tone"], { idle: string; over: string }> = {
+  success: {
+    idle: "border-success/60 bg-success-subtle text-success-fg",
+    over: "border-success bg-success-subtle text-success-fg",
+  },
+  danger: {
+    idle: "border-danger/60 bg-danger-subtle text-danger-fg",
+    over: "border-danger bg-danger-subtle text-danger-fg",
+  },
+  warning: {
+    idle: "border-warning/60 bg-warning-subtle text-warning-fg",
+    over: "border-warning bg-warning-subtle text-warning-fg",
+  },
 }
 
 export interface KanbanProps<T> {
@@ -74,7 +115,10 @@ export function Kanban<T>({
 
   return (
     <div className={cn("flex items-start gap-4 overflow-x-auto pb-4", className)}>
-      {columns.map((col) => (
+      {columns.map((col) =>
+        col.tile ? (
+          <Tile key={col.key} col={col} state={state(col.key)} drop={dropProps(col.key)} />
+        ) : (
         <div
           key={col.key}
           {...dropProps(col.key)}
@@ -139,7 +183,38 @@ export function Kanban<T>({
             })}
           </div>
         </div>
-      ))}
+        ),
+      )}
+    </div>
+  )
+}
+
+/** A terminal column: the count, the subtitle, and nowhere to scroll. */
+function Tile<T>({
+  col,
+  state,
+  drop,
+}: {
+  col: KanbanColumn<T>
+  state: "idle" | "ready" | "over"
+  drop: Record<string, unknown>
+}) {
+  const tile = col.tile!
+  const tone = TILE_TONES[tile.tone]
+  return (
+    <div
+      {...drop}
+      className={cn(
+        "flex h-36 w-44 shrink-0 flex-col items-center justify-center gap-1 rounded-md border-2 p-3 text-center transition-colors",
+        // Dashed while nothing is moving, so it reads as a target rather than
+        // as a column somebody forgot to fill.
+        state === "over" ? cn("border-solid", tone.over) : cn("border-dashed", tone.idle),
+      )}
+    >
+      <tile.icon size={22} weight="duotone" />
+      <span className="text-xs font-semibold tracking-wide uppercase">{col.title}</span>
+      <span className="text-lg leading-none font-bold">{col.items.length}</span>
+      {col.subtitle && <span className="text-xs opacity-80">{col.subtitle}</span>}
     </div>
   )
 }

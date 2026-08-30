@@ -524,7 +524,13 @@ export function DataTable<T extends RowData>({
       .sort(rank(groupCol))
       .map((key) => {
         const items = found.get(key) ?? []
-        return { key, title: key, items, subtitle: boardSubtitle?.(items) }
+        return {
+          key,
+          title: key,
+          items,
+          subtitle: boardSubtitle?.(items),
+          tile: groupCol.boardTile?.(key),
+        }
       })
   }, [board, groupCol, filtered, group, boardSubtitle])
 
