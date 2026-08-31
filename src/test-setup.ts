@@ -16,6 +16,20 @@ globalThis.ResizeObserver ??= class {
   disconnect() {}
 }
 
+// Never fires here: a jsdom layout has no scrolling, so a story with a paged
+// table renders its sentinel row and stops rather than looping on `more()`.
+globalThis.IntersectionObserver ??= class {
+  root = null
+  rootMargin = ""
+  thresholds = []
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+  takeRecords() {
+    return []
+  }
+} as unknown as typeof globalThis.IntersectionObserver
+
 if (!Element.prototype.hasPointerCapture) {
   Element.prototype.hasPointerCapture = () => false
   Element.prototype.setPointerCapture = () => {}

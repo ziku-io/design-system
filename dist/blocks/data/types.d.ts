@@ -31,6 +31,35 @@ export interface DataTableColumn<T> {
     sortable?: boolean;
     /** Extra classes on this column's cells (width, alignment, whitespace). */
     className?: string;
+    /**
+     * The API's name for this column, sent as `DataTableQuery.sort.key`.
+     *
+     * Under `paged` a column without one cannot be sorted at all: only part of
+     * the list is in the browser, so ordering it here would order the loaded
+     * rows and leave the rest of the list contradicting them. Ignored without
+     * `paged`, where every column sorts locally as before.
+     */
+    sortKey?: string;
+    /**
+     * The field this column's chip travels to the API as: the picked values go
+     * out under this name in `DataTableQuery.filters`.
+     *
+     * A facet without one keeps filtering in the browser, which under `paged`
+     * means the table pulls the whole list before it can answer.
+     */
+    filterKey?: string;
+    /**
+     * The stored value behind a facet: what the chip carries, what the group is
+     * built on, what goes to the API, and what `onSet` gets back.
+     *
+     * Without it the visible word is the stored value, which holds until the
+     * word is translated or renamed. With it the two are separate — the key is
+     * stored and transmitted, `facetLabel` supplies the word.
+     */
+    facetKey?: (row: T) => string;
+    /** The word for a key. Used on the chip, in the filter options, on a group
+     *  heading and on a board column. Defaults to the key itself. */
+    facetLabel?: (key: string) => string;
     /** Board only: makes cards draggable while grouped by this column. Called
      *  with the label of the column the card was dropped on. */
     onSet?: (row: T, label: string) => void;
@@ -86,5 +115,36 @@ export interface DataTableView {
 export declare const rank: <T>(col: DataTableColumn<T>) => (a: string, b: string) => number;
 /** A column the user is shown by name. */
 export declare const named: <T>(col: DataTableColumn<T>) => boolean;
+/** The word for one facet value: the column's label for the key, else the key. */
+export declare function facetText<T>(col: DataTableColumn<T> | undefined, key: string): string;
 /** What one chip reads: `Status: Active, Invited`, `Status: Active +2`, `Status`. */
 export declare function chipLabel<T>(col: DataTableColumn<T>, value: unknown): string;
+/**
+ * What a `paged` table asks the API for.
+ *
+ * State, not a URL: this library has no idea whether the consumer pages on a
+ * cursor or an offset, spells the sort `sort_by=name` or `sort=-name`, or
+ * packs its filters into one parameter. It hands over what the toolbar is set
+ * to and the page builds the request.
+ *
+ * `filters` is keyed by each column's `filterKey`, holding the picked
+ * `facetKey` values. A chip on a column without a `filterKey` is not in here:
+ * it is filtered in the browser instead.
+ */
+export interface DataTableQuery {
+    /** The search box. Debounced, so this is not every keystroke. */
+    q: string;
+    /** Absent when nothing is sorted, or when the sorted column has no `sortKey`. */
+    sort?: {
+        key: string;
+        dir: "asc" | "desc";
+    };
+    filters: Record<string, string[]>;
+}
+/**
+ * The toolbar as a query.
+ *
+ * Only the first sort is sent: the API takes one order, and a second one
+ * applied to the loaded page alone would contradict the rows still to come.
+ */
+export declare function toQuery<T>(columns: DataTableColumn<T>[], state: Pick<DataTableState, "globalFilter" | "sorting" | "columnFilters">): DataTableQuery;

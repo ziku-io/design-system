@@ -1,6 +1,6 @@
 import { RowData } from '@tanstack/react-table';
 import { CsvDecimal } from './csv';
-import { DataTableColumn, DataTableState, DataTableView } from './types';
+import { DataTableColumn, DataTableQuery, DataTableState, DataTableView } from './types';
 import { ViewsBackend } from './use-data-table-views';
 import * as React from "react";
 /** The feature set every DataTable registers. */
@@ -74,6 +74,28 @@ export interface DataTableProps<T extends RowData> {
     /** Where saved views live. Absent means this browser's localStorage alone,
      *  which is the default and needs no server. */
     viewsBackend?: ViewsBackend;
+    /**
+     * A list the API pages rather than one the browser holds.
+     *
+     * The table stops paginating and scrolls instead, loading the next page as
+     * the bottom comes into view, and hands the toolbar's state to `setQuery`
+     * whenever it changes — debounced on the search box. What that state becomes
+     * is the page's business: a cursor, an offset, `?sort_by=`, one packed
+     * `?filter=`, this library never builds a URL.
+     *
+     * Searching and sorting move to the API, and so do the chips on columns with
+     * a `filterKey`. Anything the API cannot do — a chip without one, a grouping,
+     * the board — needs rows that may not be loaded, so turning it on pulls the
+     * rest of the list first.
+     *
+     * Absent, everything stays in the browser exactly as before.
+     */
+    paged?: {
+        hasMore: boolean;
+        loadingMore: boolean;
+        more: () => void;
+        setQuery: (query: DataTableQuery) => void;
+    };
     /** Turns on "Export CSV". Absent means no export offered: a table of
      *  somebody's private records should not grow a download button because a
      *  library version did. See `CsvExport`. */
@@ -85,4 +107,4 @@ export interface DataTableProps<T extends RowData> {
  * and saved views — the Notion-style list every product needs. Built on
  * TanStack Table v9.
  */
-export declare function DataTable<T extends RowData>({ columns, data, loading, empty, rowId, search, searchPlaceholder, toolbar, onRowClick, pageSize, defaultSort, defaultHidden, defaultFilters, defaultGroup, defaultMode, renderCard, boardSubtitle, presets, viewKey, onStateChange, viewsBackend, csv, className, }: DataTableProps<T>): React.JSX.Element;
+export declare function DataTable<T extends RowData>({ columns, data, loading, empty, rowId, search, searchPlaceholder, toolbar, onRowClick, pageSize, defaultSort, defaultHidden, defaultFilters, defaultGroup, defaultMode, renderCard, boardSubtitle, presets, viewKey, onStateChange, viewsBackend, paged, csv, className, }: DataTableProps<T>): React.JSX.Element;
