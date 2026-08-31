@@ -92,8 +92,58 @@ The tabs across the top. "All" plus whatever the page pins through `presets`, pl
 
 - `viewKey` is the localStorage key. Without it nothing is saved.
 - `presets` are the page's own views; they can be renamed and reset but never deleted.
-- The `…` menu renames the view, changes its icon, and drills into each setting.
+- The `…` menu renames the view, changes its icon, drills into each setting, and exports the table when `csv` is set.
 - A view saved before a column existed is pruned on load, so renaming a column does not strand a filter that matches nothing.
+- A new view starts as a copy of the view on screen, filters and all, not as a copy of the defaults.
+
+#### Views on a server
+
+localStorage means a view cannot be shared, does not follow a person to a second
+machine, and goes with a cleared profile. Pass `viewsBackend` and it lives
+wherever the app puts it.
+
+<Canvas of={Data.ServerViews} />
+
+```tsx
+<DataTable
+  columns={columns}
+  data={deals}
+  viewKey="deals"
+  viewsBackend={{
+    list: () => api.get<SavedView[]>("/views?tableKey=deals"),
+    create: (view) => api.post<SavedView>("/views", { ...view, tableKey: "deals" }),
+    update: (id, patch) => api.patch(`/views/${id}`, patch),
+    remove: (id) => api.delete(`/views/${id}`),
+  }}
+/>
+```
+
+- The save form gains "Share with everyone". Unchecked by default: a view is one
+  person's until they say otherwise.
+- The browser's views and the server's live side by side. Only the server's are
+  pushed back, and their state on a debounce, because every character typed into
+  the search box is a change to the active view.
+- Views saved before the backend existed migrate up on first load, privately,
+  and are skipped if the server already has one by that name (the same person on
+  a second machine).
+- `canDelete: false` on a view hides its delete. The **server** enforces who may
+  delete what; this only keeps the UI from offering what would be refused.
+- If `list` rejects, the table draws with the browser's own views. A table that
+  will not render is worse than a table missing a view.
+
+#### Export
+
+`csv={{ filename: "deals", decimal: "," }}` puts "Export CSV" in the `…` menu.
+What comes out is what is on screen: the filters and sort in force, the visible
+columns in their visible order, and the flat row set even when grouping or the
+board is on.
+
+`decimal` is one choice, not two. Excel splits a CSV on the list separator its
+locale names, so a comma decimal ships with semicolon delimiters; setting them
+separately is how a file opens as garbage in the locale it was written for. The
+file carries a UTF-8 BOM, without which Excel on Windows mangles every accent,
+and a field starting `=`, `+`, `-` or `@` is prefixed with an apostrophe so a
+spreadsheet does not run somebody's text as a formula.
 
 ### Board
 
@@ -115,7 +165,11 @@ Pass `renderCard` and give the grouped column an `onSet`, and the layout toggle 
 />
 ```
 
-Drag and drop is native HTML5 — fine for desktop mouse use, no touch dragging.
+Drag and drop is native HTML5, which never fires on touch, so every movable card
+also carries a "move to" menu listing the other columns. One tap, or Tab and
+Enter, does what the drop does. That is what makes the board usable on a tablet
+and reachable from a keyboard; a DnD library is still the upgrade path, and what
+would justify it is reordering inside a column, which a menu cannot express.
 
 ### Pagination
 

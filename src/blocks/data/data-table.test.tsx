@@ -153,6 +153,60 @@ describe("Kanban", () => {
     expect(container.querySelectorAll('[draggable="true"]').length).toBe(0)
   })
 
+  // #92: HTML5 drag and drop never fires on touch, so the menu is the only way
+  // a card moves on a phone. These are the assertions that a board on a tablet
+  // is not a read-only picture.
+  it("moves a card through the menu, with no drag at all", async () => {
+    const onDrop = vi.fn()
+    render(
+      <Kanban
+        columns={columnsOf(deals)}
+        itemKey={(d) => String(d.id)}
+        renderCard={(d) => <span>{d.name}</span>}
+        onDrop={onDrop}
+      />,
+    )
+    // Alpha is in Lead. Open its menu from the keyboard, which is the same path
+    // a tap takes and the one jsdom can drive.
+    const card = screen.getByText("Alpha").parentElement!
+    fireEvent.keyDown(within(card).getByLabelText("Move to"), { key: "Enter" })
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Won" }))
+
+    expect(onDrop).toHaveBeenCalledTimes(1)
+    expect(onDrop.mock.calls[0][0]).toEqual(deals[0])
+    expect(onDrop.mock.calls[0][1]).toBe("Won")
+  })
+
+  it("does not offer the column the card is already in", async () => {
+    render(
+      <Kanban
+        columns={columnsOf(deals)}
+        itemKey={(d) => String(d.id)}
+        renderCard={(d) => <span>{d.name}</span>}
+        onDrop={() => {}}
+      />,
+    )
+    const card = screen.getByText("Alpha").parentElement!
+    fireEvent.keyDown(within(card).getByLabelText("Move to"), { key: "Enter" })
+    const items = await screen.findAllByRole("menuitem")
+    expect(items.map((i) => i.textContent)).toEqual(["Won"])
+  })
+
+  it("gives no move menu to a card that cannot be dragged", () => {
+    render(
+      <Kanban
+        columns={columnsOf(deals)}
+        itemKey={(d) => String(d.id)}
+        renderCard={(d) => <span>{d.name}</span>}
+        onDrop={() => {}}
+        canDrag={(d) => d.stage === "Won"}
+      />,
+    )
+    // Same rule as the drag: no permission to move it, no control that moves it.
+    expect(within(screen.getByText("Alpha").parentElement!).queryByLabelText("Move to")).toBeNull()
+    expect(screen.getAllByLabelText("Move to").length).toBe(2)
+  })
+
   it("respects canDrag", () => {
     const { container } = render(
       <Kanban

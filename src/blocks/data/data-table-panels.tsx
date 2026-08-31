@@ -367,6 +367,7 @@ export function NameForm({
   defaultValue,
   confirmLabel,
   onSubmit,
+  shareLabel,
 }: {
   trigger: React.ReactNode
   className?: string
@@ -374,7 +375,10 @@ export function NameForm({
   align?: "start" | "center" | "end"
   defaultValue: string
   confirmLabel: string
-  onSubmit: (name: string) => void
+  onSubmit: (name: string, shared: boolean) => void
+  /** Present → the form offers "everyone". Absent → there is nowhere to share
+   *  a view to, so asking would be offering something that cannot happen. */
+  shareLabel?: string
 }) {
   return (
     <PopoverPanel
@@ -385,18 +389,29 @@ export function NameForm({
     >
       {(close) => (
         <form
-          className="flex gap-1.5"
+          className="space-y-2"
           onSubmit={(e) => {
             e.preventDefault()
-            const name = String(new FormData(e.currentTarget).get("name") ?? "").trim()
-            if (name) onSubmit(name)
+            const form = new FormData(e.currentTarget)
+            const name = String(form.get("name") ?? "").trim()
+            if (name) onSubmit(name, form.get("shared") === "on")
             close()
           }}
         >
-          <Input name="name" className="h-8" required autoFocus defaultValue={defaultValue} />
-          <Button type="submit" size="sm" className="shrink-0">
-            {confirmLabel}
-          </Button>
+          <div className="flex gap-1.5">
+            <Input name="name" className="h-8" required autoFocus defaultValue={defaultValue} />
+            <Button type="submit" size="sm" className="shrink-0">
+              {confirmLabel}
+            </Button>
+          </div>
+          {/* Unchecked by default: a view is one person's until they say
+              otherwise, and the quiet option is the private one. */}
+          {shareLabel && (
+            <label className="flex items-center gap-2 text-sm text-muted-foreground">
+              <input type="checkbox" name="shared" className="accent-primary" />
+              {shareLabel}
+            </label>
+          )}
         </form>
       )}
     </PopoverPanel>

@@ -43,8 +43,19 @@ export interface KanbanProps<T> {
     className?: string;
 }
 /**
- * Board layout with native HTML5 drag and drop.
- * ponytail: no DnD library — fine for desktop mouse use; add one only if touch
- * dragging is needed.
+ * Board layout with native HTML5 drag and drop, and a menu for everyone the
+ * drag leaves out.
+ *
+ * ponytail: still no DnD library. HTML5 drag and drop does not fire on touch at
+ * all, so on a phone or a tablet the board was a view with no way to move a
+ * card, and a keyboard could not move one either. Rather than take on a DnD
+ * library and its pointer-event model, every movable card carries a "move to"
+ * menu listing the other columns: one tap, or Tab and Enter, and it does the
+ * same thing `onDrop` does. The library is still the upgrade path, and what
+ * would justify it is reordering inside a column, which a menu cannot express.
+ *
+ * The menu is always in the DOM so it is always reachable by keyboard. It is
+ * revealed on hover on a fine pointer and shown outright on a coarse one, where
+ * there is no hover to reveal it with.
  */
 export declare function Kanban<T>({ columns, renderCard, itemKey, onDrop, canDrag, maxHeight, className, }: KanbanProps<T>): React.JSX.Element;

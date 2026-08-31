@@ -57,14 +57,17 @@ export declare function ColumnToggles<T>({ columns, visibility, onToggle, }: {
     onToggle: (key: string, visible: boolean) => void;
 }): React.JSX.Element;
 /** Naming a view, in the popover its trigger opens. */
-export declare function NameForm({ trigger, className, title, align, defaultValue, confirmLabel, onSubmit, }: {
+export declare function NameForm({ trigger, className, title, align, defaultValue, confirmLabel, onSubmit, shareLabel, }: {
     trigger: React.ReactNode;
     className?: string;
     title?: string;
     align?: "start" | "center" | "end";
     defaultValue: string;
     confirmLabel: string;
-    onSubmit: (name: string) => void;
+    onSubmit: (name: string, shared: boolean) => void;
+    /** Present → the form offers "everyone". Absent → there is nowhere to share
+     *  a view to, so asking would be offering something that cannot happen. */
+    shareLabel?: string;
 }): React.JSX.Element;
 export interface SettingsRow {
     key: string;

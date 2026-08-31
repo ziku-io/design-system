@@ -19,6 +19,7 @@ import {
   useTable,
   type ColumnDef,
   type ExpandedState,
+  type Row,
   type RowData,
   type SortingState,
 } from "@tanstack/react-table"
@@ -27,6 +28,7 @@ import {
   CaretRightIcon,
   CaretUpIcon,
   DotsThreeIcon,
+  DownloadSimpleIcon,
   EyeIcon,
   FunnelIcon,
   FunnelSimpleIcon,
@@ -37,6 +39,7 @@ import {
   SquaresFourIcon,
   TableIcon,
   TrashIcon,
+  UsersIcon,
   XIcon,
 } from "@phosphor-icons/react"
 
@@ -52,6 +55,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
+import { downloadCsv, toCsv, type CsvDecimal } from "./csv"
 import { useStrings } from "@/lib/strings"
 
 import {
@@ -80,7 +84,7 @@ import {
   type DataTableView,
   type FilterValue,
 } from "./types"
-import { useDataTableViews } from "./use-data-table-views"
+import { useDataTableViews, type ViewsBackend } from "./use-data-table-views"
 
 /** The feature set every DataTable registers. */
 export const dataTableFeatures = tableFeatures({
@@ -102,6 +106,21 @@ export const dataTableFeatures = tableFeatures({
 })
 
 type Features = typeof dataTableFeatures
+
+/**
+ * What an export needs that the table cannot know.
+ *
+ * `filename` because "table.csv" tells nobody which table it was, and the page
+ * is the only thing that knows. `decimal` because the spreadsheet on the other
+ * end splits on the separator its locale names, and the library has no locale:
+ * an app that renders `1234,5` on screen exports `,` and gets semicolons with
+ * it, which is what makes the file open correctly in Excel pt-PT.
+ */
+export interface CsvExport {
+  filename: string
+  /** Default `"."`, the delimiter that follows it a comma. */
+  decimal?: CsvDecimal
+}
 
 export interface DataTableProps<T extends RowData> {
   columns: DataTableColumn<T>[]
@@ -136,6 +155,13 @@ export interface DataTableProps<T extends RowData> {
   /** Observe the active view's state, e.g. to mirror it into the URL.
    *  Filtering and sorting still happen in the browser. */
   onStateChange?: (state: DataTableState) => void
+  /** Where saved views live. Absent means this browser's localStorage alone,
+   *  which is the default and needs no server. */
+  viewsBackend?: ViewsBackend
+  /** Turns on "Export CSV". Absent means no export offered: a table of
+   *  somebody's private records should not grow a download button because a
+   *  library version did. See `CsvExport`. */
+  csv?: CsvExport
   className?: string
 }
 
@@ -165,6 +191,8 @@ export function DataTable<T extends RowData>({
   presets = [],
   viewKey,
   onStateChange,
+  viewsBackend,
+  csv,
   className,
 }: DataTableProps<T>) {
   const strings = useStrings()
@@ -220,7 +248,7 @@ export function DataTable<T extends RowData>({
     [byKey],
   )
 
-  const store = useDataTableViews(base, presets, viewKey, base)
+  const store = useDataTableViews(base, presets, viewKey, viewsBackend)
   const { views, active, isPreset, patch } = store
   const state = React.useMemo(() => prune(active.state), [active.state, prune])
 
@@ -338,6 +366,35 @@ export function DataTable<T extends RowData>({
   })
 
   const filtered = table.getFilteredRowModel().rows
+
+  /**
+   * The rows and columns on screen, as a file.
+   *
+   * The sorted model rather than `filtered`, so the file opens in the order the
+   * screen is in, and rather than `getRowModel()`, which is paginated and holds
+   * group parent rows when a grouping is on. Grouping and the board both export
+   * the flat set: a spreadsheet groups by itself, and the point of the export
+   * is the rows.
+   *
+   * Visible leaf columns in their visible order, minus the furniture ones with
+   * no header, which are checkboxes and row menus and export as blanks.
+   */
+  function exportCsv() {
+    if (!csv) return
+    const decimal = csv.decimal ?? "."
+    const cols = table
+      .getVisibleLeafColumns()
+      .map((c) => byKey[c.id])
+      .filter((c): c is DataTableColumn<T> => Boolean(c?.header))
+      .map((c) => ({
+        header: c.header,
+        // The same accessor the table sorts and filters on, never `render`,
+        // which returns a ReactNode and would export as "[object Object]".
+        value: (row: Row<Features, T>) => (c.value ? c.value(row.original) : row.getValue(c.key)),
+      }))
+    const rowsOut = table.getSortedRowModel().rows.filter((r) => !r.getIsGrouped())
+    downloadCsv(csv.filename, toCsv(rowsOut, cols, decimal))
+  }
 
   // A narrowed list can be shorter than the page the user is on.
   React.useEffect(() => {
@@ -556,6 +613,13 @@ export function DataTable<T extends RowData>({
             >
               <ViewIcon name={v.icon} className="size-4" />
               {v.name}
+              {/* Only somebody else's: a person does not need telling that
+                  their own shared view is theirs. */}
+              {v.shared && v.ownerName && !v.canDelete && (
+                <span title={t.sharedBy(v.ownerName)} aria-label={t.sharedBy(v.ownerName)}>
+                  <UsersIcon className="size-3.5 opacity-70" />
+                </span>
+              )}
             </button>
           ))}
           <NameForm
@@ -566,6 +630,7 @@ export function DataTable<T extends RowData>({
             defaultValue={t.newView}
             confirmLabel={t.createView}
             onSubmit={store.add}
+            shareLabel={store.sharable ? t.shareView : undefined}
           />
         </div>
 
@@ -666,7 +731,21 @@ export function DataTable<T extends RowData>({
                 onClose={close}
                 rows={settingsRows}
                 footer={
-                  !isPreset && (
+                  <>
+                    {csv && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          exportCsv()
+                          close()
+                        }}
+                        className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-accent"
+                      >
+                        <DownloadSimpleIcon className="size-4 text-muted-foreground" />
+                        {t.exportCsv}
+                      </button>
+                    )}
+                    {!isPreset && active.canDelete !== false && (
                     <button
                       type="button"
                       onClick={() => {
@@ -677,7 +756,8 @@ export function DataTable<T extends RowData>({
                     >
                       <TrashIcon className="size-4" /> {t.deleteView}
                     </button>
-                  )
+                    )}
+                  </>
                 }
               />
             )}

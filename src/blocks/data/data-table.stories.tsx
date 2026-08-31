@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import {
   BuildingsIcon,
   CircleDashedIcon,
@@ -10,7 +10,7 @@ import {
 } from "@phosphor-icons/react"
 
 import { DataTable } from "./data-table"
-import type { DataTableColumn, DataTableView } from "./types"
+import type { DataTableColumn, DataTableState, DataTableView, SavedView } from "./types"
 import { TrophyIcon, XCircleIcon } from "@phosphor-icons/react"
 
 import { Badge } from "@/components/ui/badge"
@@ -98,6 +98,16 @@ const presets: DataTableView[] = [
     state: { grouping: ["stage"] },
   },
 ]
+
+/** The shape a view's state has when nothing is set. */
+const EMPTY_STATE: DataTableState = {
+  sorting: [],
+  columnFilters: [],
+  globalFilter: "",
+  columnVisibility: {},
+  grouping: [],
+  mode: "table",
+}
 
 type Story = StoryObj<typeof DataTable<Deal>>
 
@@ -282,6 +292,83 @@ export const BoardWithEndings: Story = {
             <div className="mt-1 tabular-nums">{euros(d.value)}</div>
           </div>
         )}
+      />
+    )
+  },
+}
+
+/**
+ * Export CSV, in the overflow menu. Off unless the page passes `csv`: a table
+ * of somebody's records should not grow a download button because a library
+ * version did.
+ *
+ * `decimal: ","` is the pt-PT dialect, which writes `1234,5` and separates on
+ * semicolons, because that is what Excel reads in a locale that writes numbers
+ * that way. What comes out is the rows and columns on screen, filters and sort
+ * included.
+ */
+export const Exportable: Story = {
+  render: () => (
+    <DataTable
+      columns={columns}
+      data={deals}
+      rowId={(d) => String(d.id)}
+      csv={{ filename: "deals", decimal: "," }}
+    />
+  ),
+}
+
+/**
+ * Saved views on a server rather than in localStorage, so they can be shared
+ * and follow a person to a second machine. The backend here is an object in
+ * memory; a real one is HTTP.
+ *
+ * With a backend the save form offers "Share with everyone", somebody else's
+ * shared view is marked in the picker, and a view the server says this person
+ * may not delete offers no delete.
+ */
+export const ServerViews: Story = {
+  render: function ServerViewsStory() {
+    const [stored, setStored] = useState<SavedView[]>([
+      {
+        id: "s1",
+        name: "Ana's pipeline",
+        icon: "users",
+        state: { ...EMPTY_STATE, columnFilters: [{ id: "stage", value: ["Proposal"] }] },
+        shared: true,
+        ownerName: "Ana",
+        canDelete: false,
+      },
+    ])
+    const backend = useMemo(
+      () => ({
+        list: () => Promise.resolve(stored),
+        create: (view: Omit<SavedView, "id">) => {
+          const saved = { ...view, id: `s${Date.now()}`, canDelete: true }
+          setStored((s) => [...s, saved])
+          return Promise.resolve(saved)
+        },
+        update: (id: string, patch: Partial<Omit<SavedView, "id">>) => {
+          setStored((s) => s.map((v) => (v.id === id ? { ...v, ...patch } : v)))
+          return Promise.resolve()
+        },
+        remove: (id: string) => {
+          setStored((s) => s.filter((v) => v.id !== id))
+          return Promise.resolve()
+        },
+      }),
+      // The backend is held still on purpose: rebuilding it every render is
+      // what the hook's own ref guards against, and a story should not rely on
+      // that guard.
+      [],
+    )
+    return (
+      <DataTable
+        columns={columns}
+        data={deals}
+        rowId={(d) => String(d.id)}
+        viewKey="stories-deals"
+        viewsBackend={backend}
       />
     )
   },

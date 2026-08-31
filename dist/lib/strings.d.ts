@@ -103,6 +103,14 @@ export interface UIStrings {
         groupBy: string;
         /** The chip on the bar: `groupedBy("stage")` reads "Grouped by stage". */
         groupedBy: (column: string) => string;
+        /** The card menu on a board, for a pointer that cannot drag. */
+        moveCard: string;
+        /** The export action, offered only when the page passes `csv`. */
+        exportCsv: string;
+        /** The tickbox on the save form, shown only when views have a server. */
+        shareView: string;
+        /** Next to a shared view somebody else owns, in the picker. */
+        sharedBy: (owner: string) => string;
         noGrouping: string;
         /** The paging bar under a table that has a `pageSize`. */
         rowCount: (count: number) => string;
