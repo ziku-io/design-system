@@ -113,6 +113,8 @@ export interface UIStrings {
     /** Next to a shared view somebody else owns, in the picker. */
     sharedBy: (owner: string) => string
     noGrouping: string
+    /** Under the last row of a `paged` table while the next page is in flight. */
+    loadingMore: string
     /** The paging bar under a table that has a `pageSize`. */
     rowCount: (count: number) => string
     pageOf: (page: number, total: number) => string
@@ -215,6 +217,7 @@ export const defaultStrings: UIStrings = {
     shareView: "Share with everyone",
     sharedBy: (owner) => `Shared by ${owner}`,
     noGrouping: "No grouping",
+    loadingMore: "Loading more…",
     rowCount: (count) => `${count} row(s)`,
     pageOf: (page, total) => `Page ${page} of ${total}`,
     previousPage: "Previous",

@@ -48,6 +48,35 @@ export interface DataTableColumn<T> {
   sortable?: boolean
   /** Extra classes on this column's cells (width, alignment, whitespace). */
   className?: string
+  /**
+   * The API's name for this column, sent as `DataTableQuery.sort.key`.
+   *
+   * Under `paged` a column without one cannot be sorted at all: only part of
+   * the list is in the browser, so ordering it here would order the loaded
+   * rows and leave the rest of the list contradicting them. Ignored without
+   * `paged`, where every column sorts locally as before.
+   */
+  sortKey?: string
+  /**
+   * The field this column's chip travels to the API as: the picked values go
+   * out under this name in `DataTableQuery.filters`.
+   *
+   * A facet without one keeps filtering in the browser, which under `paged`
+   * means the table pulls the whole list before it can answer.
+   */
+  filterKey?: string
+  /**
+   * The stored value behind a facet: what the chip carries, what the group is
+   * built on, what goes to the API, and what `onSet` gets back.
+   *
+   * Without it the visible word is the stored value, which holds until the
+   * word is translated or renamed. With it the two are separate — the key is
+   * stored and transmitted, `facetLabel` supplies the word.
+   */
+  facetKey?: (row: T) => string
+  /** The word for a key. Used on the chip, in the filter options, on a group
+   *  heading and on a board column. Defaults to the key itself. */
+  facetLabel?: (key: string) => string
   /** Board only: makes cards draggable while grouped by this column. Called
    *  with the label of the column the card was dropped on. */
   onSet?: (row: T, label: string) => void
@@ -116,10 +145,61 @@ export const rank =
 /** A column the user is shown by name. */
 export const named = <T>(col: DataTableColumn<T>) => Boolean(col.header)
 
+/** The word for one facet value: the column's label for the key, else the key. */
+export function facetText<T>(col: DataTableColumn<T> | undefined, key: string): string {
+  return col?.facetLabel ? col.facetLabel(key) : key
+}
+
 /** What one chip reads: `Status: Active, Invited`, `Status: Active +2`, `Status`. */
 export function chipLabel<T>(col: DataTableColumn<T>, value: unknown): string {
   if (isBlankFilter(value)) return col.header
-  const labels = labelsOf(value)
+  const labels = labelsOf(value).map((v) => facetText(col, v))
   const shown = labels.slice(0, 2).join(", ")
   return `${col.header}: ${labels.length > 2 ? `${shown} +${labels.length - 2}` : shown}`
+}
+
+/**
+ * What a `paged` table asks the API for.
+ *
+ * State, not a URL: this library has no idea whether the consumer pages on a
+ * cursor or an offset, spells the sort `sort_by=name` or `sort=-name`, or
+ * packs its filters into one parameter. It hands over what the toolbar is set
+ * to and the page builds the request.
+ *
+ * `filters` is keyed by each column's `filterKey`, holding the picked
+ * `facetKey` values. A chip on a column without a `filterKey` is not in here:
+ * it is filtered in the browser instead.
+ */
+export interface DataTableQuery {
+  /** The search box. Debounced, so this is not every keystroke. */
+  q: string
+  /** Absent when nothing is sorted, or when the sorted column has no `sortKey`. */
+  sort?: { key: string; dir: "asc" | "desc" }
+  filters: Record<string, string[]>
+}
+
+/**
+ * The toolbar as a query.
+ *
+ * Only the first sort is sent: the API takes one order, and a second one
+ * applied to the loaded page alone would contradict the rows still to come.
+ */
+export function toQuery<T>(
+  columns: DataTableColumn<T>[],
+  state: Pick<DataTableState, "globalFilter" | "sorting" | "columnFilters">,
+): DataTableQuery {
+  const byKey = Object.fromEntries(columns.map((c) => [c.key, c]))
+  const first = state.sorting[0]
+  const sortKey = first ? byKey[first.id]?.sortKey : undefined
+  return {
+    q: state.globalFilter,
+    sort: sortKey ? { key: sortKey, dir: first.desc ? "desc" : "asc" } : undefined,
+    filters: Object.fromEntries(
+      state.columnFilters.flatMap((f) => {
+        const filterKey = byKey[f.id]?.filterKey
+        if (!filterKey || isBlankFilter(f.value)) return []
+        return [[filterKey, labelsOf(f.value)]]
+      }),
+    ),
+  }
 }

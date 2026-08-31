@@ -75,11 +75,14 @@ import {
   NONE,
   chipLabel,
   compare,
+  facetText,
   isBlankFilter,
   named,
   rank,
   str,
+  toQuery,
   type DataTableColumn,
+  type DataTableQuery,
   type DataTableState,
   type DataTableView,
   type FilterValue,
@@ -158,6 +161,28 @@ export interface DataTableProps<T extends RowData> {
   /** Where saved views live. Absent means this browser's localStorage alone,
    *  which is the default and needs no server. */
   viewsBackend?: ViewsBackend
+  /**
+   * A list the API pages rather than one the browser holds.
+   *
+   * The table stops paginating and scrolls instead, loading the next page as
+   * the bottom comes into view, and hands the toolbar's state to `setQuery`
+   * whenever it changes — debounced on the search box. What that state becomes
+   * is the page's business: a cursor, an offset, `?sort_by=`, one packed
+   * `?filter=`, this library never builds a URL.
+   *
+   * Searching and sorting move to the API, and so do the chips on columns with
+   * a `filterKey`. Anything the API cannot do — a chip without one, a grouping,
+   * the board — needs rows that may not be loaded, so turning it on pulls the
+   * rest of the list first.
+   *
+   * Absent, everything stays in the browser exactly as before.
+   */
+  paged?: {
+    hasMore: boolean
+    loadingMore: boolean
+    more: () => void
+    setQuery: (query: DataTableQuery) => void
+  }
   /** Turns on "Export CSV". Absent means no export offered: a table of
    *  somebody's private records should not grow a download button because a
    *  library version did. See `CsvExport`. */
@@ -192,6 +217,7 @@ export function DataTable<T extends RowData>({
   viewKey,
   onStateChange,
   viewsBackend,
+  paged,
   csv,
   className,
 }: DataTableProps<T>) {
@@ -199,6 +225,8 @@ export function DataTable<T extends RowData>({
   const t = strings.dataTable
   const common = strings.common
   const rows = React.useMemo(() => data ?? [], [data])
+  // Whether the list lives on the API. Named for what it means at each use.
+  const server = Boolean(paged)
   const byKey = React.useMemo(
     () => Object.fromEntries(columns.map((c) => [c.key, c])) as Record<string, DataTableColumn<T>>,
     [columns],
@@ -272,14 +300,22 @@ export function DataTable<T extends RowData>({
       columns.map((col) => ({
         id: col.key,
         header: col.header,
+        // `facetKey` first: with one, the value the table sorts, groups and
+        // filters on is the stored key, and the word comes from `facetLabel`.
         accessorFn: (row: T) => {
-          const v = col.value
-            ? col.value(row)
-            : (row as unknown as Record<string, unknown>)[col.key]
+          const v = col.facetKey
+            ? col.facetKey(row)
+            : col.value
+              ? col.value(row)
+              : (row as unknown as Record<string, unknown>)[col.key]
           return v == null || v === "" ? undefined : (v as string | number)
         },
-        cell: (ctx) => (col.render ? col.render(ctx.row.original) : str(ctx.getValue()) || NONE),
-        enableSorting: col.sortable !== false,
+        cell: (ctx) =>
+          col.render ? col.render(ctx.row.original) : facetText(col, str(ctx.getValue())) || NONE,
+        // Server-side, only the columns the API knows how to sort by are
+        // clickable: the browser holds part of the list, so ordering it here
+        // would order the loaded rows and nothing else.
+        enableSorting: col.sortable !== false && (!server || Boolean(col.sortKey)),
         enableGlobalFilter: col.sortable !== false,
         enableGrouping: Boolean(col.facet),
         // Furniture is not the user's to hide: without the row menu the row
@@ -299,7 +335,7 @@ export function DataTable<T extends RowData>({
             : cell.toLowerCase().includes(String(value).toLowerCase())
         },
       })),
-    [columns],
+    [columns, server],
   )
 
   const [expanded, setExpanded] = React.useState<ExpandedState>(true)
@@ -308,8 +344,18 @@ export function DataTable<T extends RowData>({
   const facets = columns.filter((c) => c.facet)
   const boardable = Boolean(renderCard && facets.length && rowId)
   const board = state.mode === "board" && boardable
-  // Grouping and the board show the whole set at once.
-  const paginated = pageSize > 0 && !group && !board
+  // Grouping and the board show the whole set at once, and a paged list
+  // scrolls: its next page arrives at the bottom, not behind a page number.
+  const paginated = pageSize > 0 && !group && !board && !server
+
+  // Chips the API cannot apply (a column with no `filterKey`) still filter
+  // here, and so do grouping and the board — all three need rows that may not
+  // be loaded yet, so turning any of them on pulls the rest of the list.
+  const localFilters = React.useMemo(
+    () => state.columnFilters.filter((f) => !isBlankFilter(f.value) && !byKey[f.id]?.filterKey),
+    [state.columnFilters, byKey],
+  )
+  const needsAll = server && (localFilters.length > 0 || state.grouping.length > 0 || board)
 
   // Grouping sorts by the grouped column first, so the groups come out in the
   // column's fixed `order` rather than the order rows happened to arrive in;
@@ -328,8 +374,11 @@ export function DataTable<T extends RowData>({
     columns: defs,
     state: {
       sorting,
-      columnFilters: state.columnFilters,
-      globalFilter: state.globalFilter,
+      // The API already searched and filtered what it sent. Doing it again over
+      // the loaded rows would hide the ones it matched on a column this table
+      // does not show, or on a stored value the chip spells differently.
+      columnFilters: server ? localFilters : state.columnFilters,
+      globalFilter: server ? "" : state.globalFilter,
       columnVisibility: state.columnVisibility,
       grouping: state.grouping,
       expanded,
@@ -357,6 +406,10 @@ export function DataTable<T extends RowData>({
           : u
       setPageIndex(next.pageIndex)
     },
+    // Rows arrive in the order the API was asked for; re-sorting them here
+    // would only reorder the loaded page. Grouping is the exception: it loads
+    // every page anyway, and only a local sort puts the groups in `order`.
+    manualSorting: server && !group,
     globalFilterFn: (row, _id, value) => {
       const q = String(value).toLowerCase()
       if (!q) return true
@@ -400,6 +453,54 @@ export function DataTable<T extends RowData>({
   React.useEffect(() => {
     setPageIndex(0)
   }, [state.columnFilters, state.globalFilter, state.grouping])
+
+  // ── What the API is asked for ──
+  // Serialised so the effect compares it by content: the object is rebuilt on
+  // every render and would otherwise refetch the list on every render too.
+  const q = useDebounced(state.globalFilter, SEARCH_DEBOUNCE_MS)
+  const query = JSON.stringify(toQuery(columns, { ...state, globalFilter: q }))
+  // Through a ref, so the query is what decides. A page that writes `paged`
+  // inline hands over a new `setQuery` on every render, and an effect that
+  // depended on the callback would ask the API again on every render — which,
+  // for a page that stores what it is handed, never stops.
+  const setQuery = React.useRef(paged?.setQuery)
+  React.useEffect(() => {
+    setQuery.current = paged?.setQuery
+  })
+  React.useEffect(() => {
+    setQuery.current?.(JSON.parse(query) as DataTableQuery)
+  }, [query])
+
+  // ── Infinite scroll ──
+  const sentinelRef = React.useRef<HTMLTableRowElement>(null)
+  const more = paged?.more
+  const hasMore = paged?.hasMore ?? false
+  const loadingMore = paged?.loadingMore ?? false
+
+  React.useEffect(() => {
+    const node = sentinelRef.current
+    // Re-created after each page: if the sentinel is still on screen the fresh
+    // observer fires again, so a short viewport keeps filling itself.
+    if (!node || !more || !hasMore || loadingMore) return
+    // The viewport is the root, not the scroll box: a page that constrains the
+    // table's height gets the same answer either way, and one that does not
+    // would have its whole list "in view" of a box that never scrolls.
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) more()
+      },
+      { rootMargin: "200px" },
+    )
+    io.observe(node)
+    return () => io.disconnect()
+  }, [more, hasMore, loadingMore])
+
+  // The board, a grouped table and a chip the API cannot apply all need rows
+  // that may not be loaded — so they take every page, one after the other.
+  React.useEffect(() => {
+    if (needsAll && hasMore && !loadingMore) more?.()
+  }, [needsAll, hasMore, loadingMore, more])
+
   const chips = state.columnFilters
   const hiddenCount = Object.values(state.columnVisibility).filter((v) => v === false).length
   const dirty =
@@ -413,21 +514,37 @@ export function DataTable<T extends RowData>({
   const filterable = columns.filter(
     (c) => named(c) && c.sortable !== false && !chips.some((f) => f.id === c.key),
   )
-  const sortable = columns.filter((c) => named(c) && c.sortable !== false)
+  /** Columns the table can order by — server-side, the ones the API knows. */
+  const sortable = columns.filter(
+    (c) => named(c) && c.sortable !== false && (!server || Boolean(c.sortKey)),
+  )
 
   const addFilter = (key: string) =>
     patch({
       columnFilters: [...chips, { id: key, value: byKey[key]?.facet ? [] : "" }],
     })
   const removeFilter = (key: string) => patch({ columnFilters: chips.filter((f) => f.id !== key) })
+  const setChipValue = (key: string, value: FilterValue) =>
+    patch({ columnFilters: chips.map((f) => (f.id === key ? { ...f, value } : f)) })
 
-  /** The values a facet chip offers, with counts. */
+  /**
+   * The values a facet chip offers, with counts.
+   *
+   * A filter the API applies is picked from the column's fixed list where it
+   * has one: the loaded rows are only part of the list, so building the options
+   * out of them — or counting them — would be wrong.
+   */
   function filterOptions(col: DataTableColumn<T>) {
     if (!col.facet) return []
+    const remote = server && Boolean(col.filterKey)
+    if (remote && col.order) return col.order.map((v) => ({ value: v, label: facetText(col, v) }))
     return [...(table.getColumn(col.key)?.getFacetedUniqueValues()?.entries() ?? [])]
       .filter(([v]) => v != null && v !== "")
       .sort((a, b) => rank(col)(str(a[0]), str(b[0])))
-      .map(([v, count]) => ({ value: str(v), label: `${str(v)} (${count})` }))
+      .map(([v, count]) => ({
+        value: str(v),
+        label: remote ? facetText(col, str(v)) : `${facetText(col, str(v))} (${count})`,
+      }))
   }
 
   const setLayout = (mode: "table" | "board") =>
@@ -570,6 +687,9 @@ export function DataTable<T extends RowData>({
   ]
 
   const groupCol = group ? byKey[group] : null
+  /** A group's heading: the column's word for the stored key, or `NONE`. */
+  const groupLabel = (key: string) =>
+    key && key !== NONE ? facetText(groupCol ?? undefined, key) : NONE
   const boardColumns = React.useMemo(() => {
     if (!board || !groupCol) return []
     const found = new Map<string, T[]>()
@@ -583,12 +703,14 @@ export function DataTable<T extends RowData>({
         const items = found.get(key) ?? []
         return {
           key,
-          title: key,
+          title: groupLabel(key),
           items,
           subtitle: boardSubtitle?.(items),
           tile: groupCol.boardTile?.(key),
         }
       })
+    // `groupLabel` is derived from `groupCol`, which is already a dependency.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [board, groupCol, filtered, group, boardSubtitle])
 
   const visibleCount = table.getVisibleLeafColumns().length
@@ -746,16 +868,16 @@ export function DataTable<T extends RowData>({
                       </button>
                     )}
                     {!isPreset && active.canDelete !== false && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        store.remove()
-                        close()
-                      }}
-                      className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-danger-fg hover:bg-danger/10"
-                    >
-                      <TrashIcon className="size-4" /> {t.deleteView}
-                    </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          store.remove()
+                          close()
+                        }}
+                        className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-danger-fg hover:bg-danger/10"
+                      >
+                        <TrashIcon className="size-4" /> {t.deleteView}
+                      </button>
                     )}
                   </>
                 }
@@ -824,7 +946,11 @@ export function DataTable<T extends RowData>({
                     col={col}
                     options={filterOptions(col)}
                     value={(f.value ?? (col.facet ? [] : "")) as FilterValue}
-                    onChange={(v) => table.getColumn(f.id)?.setFilterValue(v)}
+                    // Straight into the view, not through the table: under
+                    // `paged` the table only holds the chips it applies
+                    // locally, and setting a value through it would drop the
+                    // ones the API is applying.
+                    onChange={(v) => setChipValue(f.id, v)}
                     onRemove={() => {
                       removeFilter(f.id)
                       close()
@@ -944,7 +1070,7 @@ export function DataTable<T extends RowData>({
                         ) : (
                           <CaretRightIcon className="size-3" weight="bold" />
                         )}
-                        {str(row.getValue(group)) || NONE}
+                        {groupLabel(str(row.getValue(group)))}
                         <span className="rounded-full bg-card px-1.5 py-0.5 text-[0.65rem] font-normal">
                           {row.subRows.length}
                         </span>
@@ -964,6 +1090,17 @@ export function DataTable<T extends RowData>({
                     ))}
                   </TableRow>
                 ),
+              )}
+              {/* The last row of the list: coming into view loads the next page. */}
+              {hasMore && (
+                <TableRow ref={sentinelRef} className="hover:bg-transparent">
+                  <TableCell
+                    colSpan={visibleCount}
+                    className="text-center text-xs text-muted-foreground"
+                  >
+                    {loadingMore ? t.loadingMore : null}
+                  </TableCell>
+                </TableRow>
               )}
             </TableBody>
           </Table>
@@ -1002,3 +1139,16 @@ export function DataTable<T extends RowData>({
 const CHIP = "rounded-md border px-2 py-1.5 text-sm outline-none"
 const CHIP_ON = `${CHIP} border-ring/60 bg-accent font-medium text-foreground`
 const CHIP_OFF = `${CHIP} border-border bg-card text-muted-foreground`
+
+/** How long the search box waits before it becomes a request. */
+const SEARCH_DEBOUNCE_MS = 300
+
+/** The search box fires on every keystroke; the API should not. */
+function useDebounced(value: string, ms: number) {
+  const [held, setHeld] = React.useState(value)
+  React.useEffect(() => {
+    const timer = setTimeout(() => setHeld(value), ms)
+    return () => clearTimeout(timer)
+  }, [value, ms])
+  return held
+}

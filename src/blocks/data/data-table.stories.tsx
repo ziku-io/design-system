@@ -10,7 +10,13 @@ import {
 } from "@phosphor-icons/react"
 
 import { DataTable } from "./data-table"
-import type { DataTableColumn, DataTableState, DataTableView, SavedView } from "./types"
+import type {
+  DataTableColumn,
+  DataTableQuery,
+  DataTableState,
+  DataTableView,
+  SavedView,
+} from "./types"
 import { TrophyIcon, XCircleIcon } from "@phosphor-icons/react"
 
 import { Badge } from "@/components/ui/badge"
@@ -55,6 +61,27 @@ const deals: Deal[] = Array.from({ length: 42 }, (_, i) => ({
 }))
 
 const euros = (n: number) => `€${n.toLocaleString("en-GB")}`
+
+/** What the API stores against what a person reads, the split `facetKey` and
+ *  `facetLabel` exist for. */
+const STAGE_KEYS = STAGES.map((s) => s.toLowerCase())
+const STAGE_LABELS: Record<string, string> = Object.fromEntries(
+  STAGES.map((s) => [s.toLowerCase(), s]),
+)
+
+/** One consumer's dialect: a keyset cursor, `sort_by`, one packed `filter`.
+ *  The table produces the state; this produces the URL. */
+function toRequest(q: DataTableQuery): string {
+  const parts = [
+    q.q && `q=${encodeURIComponent(q.q)}`,
+    q.sort && `sort_by=${q.sort.dir === "desc" ? "-" : ""}${q.sort.key}`,
+    Object.keys(q.filters).length &&
+      `filter=${Object.entries(q.filters)
+        .map(([field, values]) => `${field}:${values.join(",")}`)
+        .join(";")}`,
+  ].filter(Boolean)
+  return `GET /deals?${[...parts, "limit=8"].join("&")}`
+}
 
 const columns: DataTableColumn<Deal>[] = [
   { key: "name", header: "Deal", icon: UserIcon, className: "font-medium" },
@@ -370,6 +397,93 @@ export const ServerViews: Story = {
         viewKey="stories-deals"
         viewsBackend={backend}
       />
+    )
+  },
+}
+
+/**
+ * A list the API pages, sorts, searches and filters.
+ *
+ * `paged` hands the toolbar's state to `setQuery` — debounced on the search
+ * box — and the page turns that into whatever its API speaks; here a keyset
+ * cursor, a `sort_by` and one packed `filter`, none of which the table knows
+ * about. Rows arrive in the order they were asked for and the table leaves
+ * them in it.
+ *
+ * The stage column also shows the key/label split: `facetKey` stores and
+ * transmits `won`, `facetLabel` renders "Won". Only "Stage" can be sorted,
+ * because it is the only column with a `sortKey`.
+ */
+export const Paged: Story = {
+  render: function PagedStory() {
+    const PAGE = 8
+    const [query, setQuery] = useState<DataTableQuery>({ q: "", filters: {} })
+    const [limit, setLimit] = useState(PAGE)
+    const [request, setRequest] = useState("")
+
+    const pagedColumns: DataTableColumn<Deal>[] = [
+      { key: "name", header: "Deal", icon: UserIcon, className: "font-medium" },
+      { key: "company", header: "Company", icon: BuildingsIcon, facet: true },
+      {
+        key: "stage",
+        header: "Stage",
+        icon: CircleDashedIcon,
+        facet: true,
+        sortKey: "stage",
+        filterKey: "stage",
+        order: STAGE_KEYS,
+        facetKey: (r) => r.stage.toLowerCase(),
+        facetLabel: (key) => STAGE_LABELS[key] ?? key,
+        render: (r) => (
+          <Badge
+            variant={r.stage === "Won" ? "default" : r.stage === "Lost" ? "outline" : "secondary"}
+          >
+            {r.stage}
+          </Badge>
+        ),
+      },
+      {
+        key: "value",
+        header: "Value",
+        icon: CurrencyEurIcon,
+        value: (r) => r.value,
+        render: (r) => euros(r.value),
+        className: "text-right tabular-nums",
+      },
+    ]
+
+    // Stands in for the API: matches the query, then cuts the page off.
+    const matched = deals.filter((d) => {
+      const stages = query.filters.stage
+      if (stages?.length && !stages.includes(d.stage.toLowerCase())) return false
+      return !query.q || d.name.toLowerCase().includes(query.q.toLowerCase())
+    })
+    const sorted = query.sort
+      ? [...matched].sort(
+          (a, b) => a.stage.localeCompare(b.stage) * (query.sort!.dir === "desc" ? -1 : 1),
+        )
+      : matched
+
+    return (
+      <div className="grid gap-2">
+        <code className="rounded-md border bg-muted/50 px-3 py-2 text-xs">{request}</code>
+        <DataTable
+          columns={pagedColumns}
+          data={sorted.slice(0, limit)}
+          rowId={(d) => String(d.id)}
+          searchPlaceholder="Search deals…"
+          paged={{
+            hasMore: limit < sorted.length,
+            loadingMore: false,
+            more: () => setLimit((n) => n + PAGE),
+            setQuery: (q) => {
+              setQuery(q)
+              setLimit(PAGE)
+              setRequest(toRequest(q))
+            },
+          }}
+        />
+      </div>
     )
   },
 }

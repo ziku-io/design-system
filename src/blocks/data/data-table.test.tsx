@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { cleanup, fireEvent, render, screen, within } from "@testing-library/react"
+import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react"
 
 import { DataTable } from "./data-table"
 import { Kanban } from "./kanban"
-import { chipLabel, isBlankFilter, rank, type DataTableColumn } from "./types"
+import { chipLabel, isBlankFilter, rank, type DataTableColumn, type DataTableQuery } from "./types"
 
 afterEach(cleanup)
 
@@ -222,5 +222,234 @@ describe("Kanban", () => {
     for (const el of draggable) {
       expect(within(el as HTMLElement).queryByText("Alpha")).toBeNull()
     }
+  })
+})
+
+// ── Server-driven lists ───────────────────────────────────────────────
+interface Task {
+  id: number
+  title: string
+  status: "todo" | "done"
+}
+const tasks: Task[] = [
+  { id: 1, title: "Write", status: "todo" },
+  { id: 2, title: "Ship", status: "done" },
+  { id: 3, title: "Rest", status: "done" },
+]
+const LABELS: Record<string, string> = { todo: "To do", done: "Done" }
+const keyed: DataTableColumn<Task>[] = [
+  { key: "title", header: "Task", sortKey: "title" },
+  {
+    key: "status",
+    header: "Status",
+    facet: true,
+    order: ["todo", "done"],
+    sortKey: "status",
+    filterKey: "status",
+    facetKey: (r) => r.status,
+    facetLabel: (key) => LABELS[key] ?? key,
+  },
+]
+
+/** A `paged` prop whose calls the test can read. */
+function pagedProp(over: { hasMore?: boolean; loadingMore?: boolean } = {}) {
+  return {
+    hasMore: false,
+    loadingMore: false,
+    ...over,
+    more: vi.fn(),
+    setQuery: vi.fn(),
+  }
+}
+const lastQuery = (paged: ReturnType<typeof pagedProp>): DataTableQuery =>
+  paged.setQuery.mock.calls.at(-1)?.[0]
+
+describe("facetKey and facetLabel", () => {
+  it("shows the label on the chip and never the key", () => {
+    render(
+      <DataTable
+        columns={keyed}
+        data={tasks}
+        defaultFilters={[{ id: "status", value: ["done"] }]}
+      />,
+    )
+    expect(screen.getByText("Status: Done")).toBeTruthy()
+    expect(screen.queryByText("Status: done")).toBeNull()
+  })
+
+  it("heads a group with the label, and filters on the key", () => {
+    render(
+      <DataTable
+        columns={keyed}
+        data={tasks}
+        defaultGroup="status"
+        defaultFilters={[{ id: "status", value: ["done"] }]}
+      />,
+    )
+    // The stored key filtered the rows, the word is what is on screen.
+    expect(screen.getByText("Ship")).toBeTruthy()
+    expect(screen.queryByText("Write")).toBeNull()
+    expect(screen.getAllByText("Done").length).toBeGreaterThan(0)
+    expect(screen.queryByText("done")).toBeNull()
+  })
+
+  it("sends the key to the API, not the word", () => {
+    const paged = pagedProp()
+    render(
+      <DataTable
+        columns={keyed}
+        data={tasks}
+        paged={paged}
+        defaultFilters={[{ id: "status", value: ["done"] }]}
+      />,
+    )
+    expect(lastQuery(paged)).toEqual({ q: "", sort: undefined, filters: { status: ["done"] } })
+  })
+
+  it("hands the board the key it stores and the word it renders", () => {
+    const onSet = vi.fn()
+    const columnsWithSet = keyed.map((c) => (c.key === "status" ? { ...c, onSet } : c))
+    render(
+      <DataTable
+        columns={columnsWithSet}
+        data={tasks}
+        rowId={(r) => String(r.id)}
+        defaultMode="board"
+        defaultGroup="status"
+        renderCard={(r) => <span>{r.title}</span>}
+      />,
+    )
+    // Column headings read as words…
+    expect(screen.getByText("To do")).toBeTruthy()
+    const card = screen.getByText("Write").parentElement!
+    fireEvent.keyDown(within(card).getByLabelText("Move to"), { key: "Enter" })
+    fireEvent.click(screen.getByRole("menuitem", { name: "Done" }))
+    // …and what comes back is the key the API stores.
+    expect(onSet.mock.calls[0][1]).toBe("done")
+  })
+
+  it("leaves a column with neither exactly as it was", () => {
+    render(<DataTable columns={columns} data={deals} defaultGroup="stage" />)
+    expect(screen.getAllByText("Won").length).toBeGreaterThan(0)
+    expect(screen.getByText("Alpha")).toBeTruthy()
+  })
+})
+
+describe("paged", () => {
+  it("does not sort by a column the API cannot sort by", () => {
+    const noSortKey: DataTableColumn<Task>[] = [
+      { key: "title", header: "Task" },
+      { key: "status", header: "Status", sortKey: "status" },
+    ]
+    const paged = pagedProp()
+    render(<DataTable columns={noSortKey} data={tasks} paged={paged} />)
+
+    fireEvent.click(screen.getByText("Task"))
+    expect(lastQuery(paged).sort).toBeUndefined()
+    // The rows are still in the order the API sent them.
+    const before = screen.getAllByRole("cell").map((c) => c.textContent)
+    fireEvent.click(screen.getByText("Status"))
+    expect(lastQuery(paged).sort).toEqual({ key: "status", dir: "asc" })
+    // Sorting is the API's job: the loaded page is not reordered here.
+    expect(screen.getAllByRole("cell").map((c) => c.textContent)).toEqual(before)
+  })
+
+  it("sorts locally, as ever, without paged", () => {
+    render(<DataTable columns={keyed} data={tasks} />)
+    fireEvent.click(screen.getByText("Task"))
+    const titles = screen
+      .getAllByRole("row")
+      .slice(1)
+      .map((r) => r.firstElementChild?.textContent)
+    expect(titles).toEqual(["Rest", "Ship", "Write"])
+  })
+
+  it("keeps a chip without a filterKey in the browser, and takes every page", () => {
+    const local: DataTableColumn<Task>[] = [
+      { key: "title", header: "Task", sortKey: "title" },
+      { key: "status", header: "Status", facet: true, sortKey: "status" },
+    ]
+    const paged = pagedProp({ hasMore: true })
+    render(
+      <DataTable
+        columns={local}
+        data={tasks}
+        paged={paged}
+        defaultFilters={[{ id: "status", value: ["done"] }]}
+      />,
+    )
+    // Nothing the API can apply…
+    expect(lastQuery(paged).filters).toEqual({})
+    // …so the rows are narrowed here, over a list it now has to load in full.
+    expect(screen.queryByText("Write")).toBeNull()
+    expect(screen.getByText("Ship")).toBeTruthy()
+    expect(paged.more).toHaveBeenCalled()
+  })
+
+  it("takes every page to group", () => {
+    const paged = pagedProp({ hasMore: true })
+    render(<DataTable columns={keyed} data={tasks} paged={paged} defaultGroup="status" />)
+    expect(paged.more).toHaveBeenCalled()
+  })
+
+  it("asks for nothing more when it can answer from the API", () => {
+    const paged = pagedProp({ hasMore: true })
+    render(
+      <DataTable
+        columns={keyed}
+        data={tasks}
+        paged={paged}
+        defaultFilters={[{ id: "status", value: ["done"] }]}
+      />,
+    )
+    expect(paged.more).not.toHaveBeenCalled()
+  })
+})
+
+describe("the search box", () => {
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  function typeSearch(text: string) {
+    fireEvent.click(screen.getByLabelText("Search"))
+    fireEvent.change(screen.getByPlaceholderText("Search…"), { target: { value: text } })
+  }
+
+  it("waits before it becomes a request", () => {
+    const paged = pagedProp()
+    render(<DataTable columns={keyed} data={tasks} paged={paged} />)
+    expect(paged.setQuery).toHaveBeenCalledTimes(1) // the empty query, on mount
+
+    // The panel is opened before the clock is faked: Radix schedules its own
+    // work on mount, and none of it is what this test is measuring.
+    fireEvent.click(screen.getByLabelText("Search"))
+    const input = screen.getByPlaceholderText("Search…")
+    vi.useFakeTimers()
+
+    act(() => {
+      fireEvent.change(input, { target: { value: "s" } })
+    })
+    act(() => {
+      fireEvent.change(input, { target: { value: "sh" } })
+    })
+    act(() => {
+      vi.advanceTimersByTime(299)
+    })
+    // Two keystrokes, no request yet.
+    expect(paged.setQuery).toHaveBeenCalledTimes(1)
+
+    act(() => {
+      vi.advanceTimersByTime(1)
+    })
+    expect(paged.setQuery).toHaveBeenCalledTimes(2)
+    expect(lastQuery(paged)).toEqual({ q: "sh", sort: undefined, filters: {} })
+  })
+
+  it("still narrows the rows itself when the list is not paged", () => {
+    render(<DataTable columns={keyed} data={tasks} />)
+    typeSearch("ship")
+    expect(screen.getByText("Ship")).toBeTruthy()
+    expect(screen.queryByText("Write")).toBeNull()
   })
 })
