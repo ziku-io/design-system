@@ -1,5 +1,7 @@
 import { RowData } from '@tanstack/react-table';
+import { CsvDecimal } from './csv';
 import { DataTableColumn, DataTableState, DataTableView } from './types';
+import { ViewsBackend } from './use-data-table-views';
 import * as React from "react";
 /** The feature set every DataTable registers. */
 export declare const dataTableFeatures: {
@@ -19,6 +21,20 @@ export declare const dataTableFeatures: {
     rowPaginationFeature: import('@tanstack/react-table').TableFeature;
     paginatedRowModel: (table: import('@tanstack/react-table').Table<any, any>) => () => import('@tanstack/react-table').RowModel<any, any>;
 };
+/**
+ * What an export needs that the table cannot know.
+ *
+ * `filename` because "table.csv" tells nobody which table it was, and the page
+ * is the only thing that knows. `decimal` because the spreadsheet on the other
+ * end splits on the separator its locale names, and the library has no locale:
+ * an app that renders `1234,5` on screen exports `,` and gets semicolons with
+ * it, which is what makes the file open correctly in Excel pt-PT.
+ */
+export interface CsvExport {
+    filename: string;
+    /** Default `"."`, the delimiter that follows it a comma. */
+    decimal?: CsvDecimal;
+}
 export interface DataTableProps<T extends RowData> {
     columns: DataTableColumn<T>[];
     data: T[] | null | undefined;
@@ -55,6 +71,13 @@ export interface DataTableProps<T extends RowData> {
     /** Observe the active view's state, e.g. to mirror it into the URL.
      *  Filtering and sorting still happen in the browser. */
     onStateChange?: (state: DataTableState) => void;
+    /** Where saved views live. Absent means this browser's localStorage alone,
+     *  which is the default and needs no server. */
+    viewsBackend?: ViewsBackend;
+    /** Turns on "Export CSV". Absent means no export offered: a table of
+     *  somebody's private records should not grow a download button because a
+     *  library version did. See `CsvExport`. */
+    csv?: CsvExport;
     className?: string;
 }
 /**
@@ -62,4 +85,4 @@ export interface DataTableProps<T extends RowData> {
  * and saved views — the Notion-style list every product needs. Built on
  * TanStack Table v9.
  */
-export declare function DataTable<T extends RowData>({ columns, data, loading, empty, rowId, search, searchPlaceholder, toolbar, onRowClick, pageSize, defaultSort, defaultHidden, defaultFilters, defaultGroup, defaultMode, renderCard, boardSubtitle, presets, viewKey, onStateChange, className, }: DataTableProps<T>): React.JSX.Element;
+export declare function DataTable<T extends RowData>({ columns, data, loading, empty, rowId, search, searchPlaceholder, toolbar, onRowClick, pageSize, defaultSort, defaultHidden, defaultFilters, defaultGroup, defaultMode, renderCard, boardSubtitle, presets, viewKey, onStateChange, viewsBackend, csv, className, }: DataTableProps<T>): React.JSX.Element;

@@ -1,6 +1,13 @@
 import * as React from "react"
-import type { Icon } from "@phosphor-icons/react"
+import { ArrowsOutCardinalIcon, type Icon } from "@phosphor-icons/react"
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { useStrings } from "@/lib/strings"
 import { cn } from "@/lib/utils"
 
 /** What the drag carries, under our own type so a link's own `text/plain`
@@ -69,9 +76,20 @@ export interface KanbanProps<T> {
 }
 
 /**
- * Board layout with native HTML5 drag and drop.
- * ponytail: no DnD library — fine for desktop mouse use; add one only if touch
- * dragging is needed.
+ * Board layout with native HTML5 drag and drop, and a menu for everyone the
+ * drag leaves out.
+ *
+ * ponytail: still no DnD library. HTML5 drag and drop does not fire on touch at
+ * all, so on a phone or a tablet the board was a view with no way to move a
+ * card, and a keyboard could not move one either. Rather than take on a DnD
+ * library and its pointer-event model, every movable card carries a "move to"
+ * menu listing the other columns: one tap, or Tab and Enter, and it does the
+ * same thing `onDrop` does. The library is still the upgrade path, and what
+ * would justify it is reordering inside a column, which a menu cannot express.
+ *
+ * The menu is always in the DOM so it is always reachable by keyboard. It is
+ * revealed on hover on a fine pointer and shown outright on a coarse one, where
+ * there is no hover to reveal it with.
  */
 export function Kanban<T>({
   columns,
@@ -171,13 +189,20 @@ export function Kanban<T>({
                     setOverCol(null)
                   }}
                   className={cn(
-                    "transition-opacity",
+                    "group/card relative transition-opacity",
                     draggable ? "cursor-grab active:cursor-grabbing" : "cursor-default",
                     // The card left behind: a faint outline of where it was.
                     dragKey === id && "opacity-30",
                   )}
                 >
                   {renderCard(item)}
+                  {draggable && (
+                    <MoveMenu
+                      columns={columns}
+                      from={col.key}
+                      onPick={(to) => onDrop?.(item, to)}
+                    />
+                  )}
                 </div>
               )
             })}
@@ -186,6 +211,61 @@ export function Kanban<T>({
         ),
       )}
     </div>
+  )
+}
+
+/**
+ * The card's own way to move without a drag.
+ *
+ * Absolutely positioned rather than handed to `renderCard`, because the card's
+ * markup belongs to the caller and threading a control through it would make
+ * every board rebuild its own. It sits over the top right corner, which is the
+ * one place a card of any shape has room.
+ *
+ * The column a card is already in is left out rather than disabled: "move to
+ * where it is" is not an action, and a disabled row in a menu of three reads as
+ * a bug.
+ */
+function MoveMenu<T>({
+  columns,
+  from,
+  onPick,
+}: {
+  columns: KanbanColumn<T>[]
+  from: string
+  onPick: (columnKey: string) => void
+}) {
+  const t = useStrings().dataTable
+  const targets = columns.filter((c) => c.key !== from)
+  if (targets.length === 0) return null
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        aria-label={t.moveCard}
+        title={t.moveCard}
+        // `pointer-coarse` is the whole point: a touch device has no hover to
+        // reveal this with, and it is the device that cannot drag at all.
+        className={cn(
+          "absolute top-1 right-1 rounded-sm p-1 text-muted-foreground opacity-0 transition-opacity",
+          "hover:bg-accent hover:text-foreground focus-visible:opacity-100 focus-visible:outline-2",
+          "group-hover/card:opacity-100 data-[state=open]:opacity-100 pointer-coarse:opacity-100",
+        )}
+        // The trigger sits inside a draggable card: without this, pressing it
+        // starts a drag on a mouse and the menu never opens.
+        draggable={false}
+        onDragStart={(e) => e.preventDefault()}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <ArrowsOutCardinalIcon size={14} />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        {targets.map((c) => (
+          <DropdownMenuItem key={c.key} onSelect={() => onPick(c.key)}>
+            {c.title}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
 

@@ -32,6 +32,7 @@ export * from './blocks/search/command-menu';
 export * from './blocks/data/data-table';
 export * from './blocks/data/types';
 export * from './blocks/data/kanban';
+export * from './blocks/data/csv';
 export { useDataTableViews, VIEW_ICON_NAMES } from './blocks/data/use-data-table-views';
 export * from './blocks/shell/app-shell';
 export * from './blocks/modal/modal';

@@ -61,6 +61,19 @@ export interface SavedView {
     name: string;
     icon: string;
     state: DataTableState;
+    /**
+     * Set only on a view that lives on a server rather than in this browser.
+     * `true` means everybody working on this table sees it, `false` means it
+     * follows one person between their machines. Absent means neither: the view
+     * is in this browser's localStorage and goes when the profile does.
+     */
+    shared?: boolean;
+    /** Who a shared view belongs to, so the picker can say whose it is. */
+    ownerName?: string;
+    /** False on somebody else's shared view. The server decides this, and the
+     *  server enforces it: this only keeps the UI from offering what would be
+     *  refused. */
+    canDelete?: boolean;
 }
 /** A view the page pins next to "All" — its state is a patch on the defaults. */
 export interface DataTableView {
