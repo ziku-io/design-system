@@ -46,6 +46,29 @@ so there is nothing to translate. The exceptions are the two shadcn writes into
 `dialog.tsx` ("Close", the footer's "Close" button) — leave them, `Modal` is
 what apps use and it goes through the dictionary.
 
+**Every primitive has to survive 320px.** An app should not have to override a
+library class to make a screen work on a phone. Three rules follow from that,
+and each one is already load-bearing somewhere:
+
+- A floating surface caps against the viewport, not just its own width.
+  `PopoverContent` carries `max-w-[calc(100vw-2rem)]` and
+  `max-h-(--radix-popover-content-available-height)`, which is what lets
+  `DataTable` keep asking for `w-88` (352px, wider than a small phone) without
+  the panel leaving the screen. Dropdown and Select already had the pattern.
+- A surface that can hold arbitrary content caps its height in `dvh` and
+  scrolls. Without it a tall dialog centres itself and puts its own header
+  above the top of the screen, out of reach: measured at -481px on a 478px
+  viewport before `DialogContent` got `max-h-[calc(100dvh-2rem)]`.
+- A row of unknown length wraps or scrolls. `PaginationContent` wraps,
+  `TabsList` scrolls inside `max-w-full`. Both are set by the consumer's data,
+  so neither can be assumed short.
+
+`SidebarInset` needs its `min-w-0`. It is a flex child, so it defaults to
+`min-width: auto` and a wide table inside it stretches the row rather than
+scrolling: the inset claimed the full 983px next to a 256px sidebar instead of
+the 727px left over. This one bites at desktop width, not on a phone, because
+the sidebar is a `Sheet` below `md`.
+
 **Dark is the default.** No class on `<html>` renders dark; `.light` opts out;
 `.dark` also works so next-themes behaves. Tokens live on `:root, .dark` and are
 overridden by `.light`. Never define a colour only inside one of those blocks.

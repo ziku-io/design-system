@@ -333,7 +333,7 @@ function Ot({ className: e, children: t, showCloseButton: n = !0, ...r }) {
 		"data-slot": "dialog-portal",
 		children: [/* @__PURE__ */ a(Dt, {}), /* @__PURE__ */ o(l.Content, {
 			"data-slot": "dialog-content",
-			className: B("fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border bg-background p-6 shadow-lg duration-200 outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 sm:max-w-lg", e),
+			className: B("fixed top-[50%] left-[50%] z-50 grid max-h-[calc(100dvh-2rem)] w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 overflow-y-auto rounded-lg border bg-background p-6 shadow-lg duration-200 outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 sm:max-w-lg", e),
 			...r,
 			children: [t, n && /* @__PURE__ */ o(l.Close, {
 				"data-slot": "dialog-close",
@@ -598,7 +598,7 @@ function an({ className: e, ...t }) {
 function on({ className: e, ...t }) {
 	return /* @__PURE__ */ a("ul", {
 		"data-slot": "pagination-content",
-		className: B("flex flex-row items-center gap-1", e),
+		className: B("flex flex-row flex-wrap items-center justify-center gap-1", e),
 		...t
 	});
 }
@@ -675,7 +675,7 @@ function mn({ className: e, align: t = "center", sideOffset: n = 4, ...r }) {
 		"data-slot": "popover-content",
 		align: t,
 		sideOffset: n,
-		className: B("z-50 w-72 origin-(--radix-popover-content-transform-origin) rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-hidden data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95", e),
+		className: B("z-50 max-h-(--radix-popover-content-available-height) w-72 max-w-[calc(100vw-2rem)] origin-(--radix-popover-content-transform-origin) overflow-y-auto rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-hidden data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95", e),
 		...r
 	}) });
 }
@@ -865,7 +865,7 @@ function In({ className: e, ...t }) {
 function Ln({ className: e, children: t, side: n = "right", showCloseButton: r = !0, ...i }) {
 	return /* @__PURE__ */ o(Fn, { children: [/* @__PURE__ */ a(In, {}), /* @__PURE__ */ o(l.Content, {
 		"data-slot": "sheet-content",
-		className: B("fixed z-50 flex flex-col gap-4 bg-background shadow-lg transition ease-in-out data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:animate-in data-[state=open]:duration-500", n === "right" && "inset-y-0 right-0 h-full w-3/4 border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm", n === "left" && "inset-y-0 left-0 h-full w-3/4 border-r data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sm", n === "top" && "inset-x-0 top-0 h-auto border-b data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top", n === "bottom" && "inset-x-0 bottom-0 h-auto border-t data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom", e),
+		className: B("fixed z-50 flex flex-col gap-4 bg-background shadow-lg transition ease-in-out data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:animate-in data-[state=open]:duration-500", n === "right" && "inset-y-0 right-0 h-full w-3/4 border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm", n === "left" && "inset-y-0 left-0 h-full w-3/4 border-r data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sm", n === "top" && "inset-x-0 top-0 h-auto max-h-dvh overflow-y-auto border-b data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top", n === "bottom" && "inset-x-0 bottom-0 h-auto max-h-dvh overflow-y-auto border-t data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom", e),
 		...i,
 		children: [t, r && /* @__PURE__ */ o(l.Close, {
 			className: "absolute top-4 right-4 rounded-xs opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none data-[state=open]:bg-secondary",
@@ -1096,7 +1096,7 @@ function or({ className: e, ...t }) {
 function sr({ className: e, ...t }) {
 	return /* @__PURE__ */ a("main", {
 		"data-slot": "sidebar-inset",
-		className: B("relative flex w-full flex-1 flex-col bg-background", "md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2", e),
+		className: B("relative flex w-full min-w-0 flex-1 flex-col bg-background", "md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2", e),
 		...t
 	});
 }
@@ -1414,7 +1414,7 @@ function zr({ className: e, orientation: t = "horizontal", ...n }) {
 		...n
 	});
 }
-var Br = t("group/tabs-list inline-flex w-fit items-center justify-center rounded-lg p-[3px] text-muted-foreground group-data-[orientation=horizontal]/tabs:h-9 group-data-[orientation=vertical]/tabs:h-fit group-data-[orientation=vertical]/tabs:flex-col data-[variant=line]:rounded-none", {
+var Br = t("group/tabs-list inline-flex w-fit max-w-full items-center justify-center overflow-x-auto rounded-lg p-[3px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden text-muted-foreground group-data-[orientation=horizontal]/tabs:h-9 group-data-[orientation=vertical]/tabs:h-fit group-data-[orientation=vertical]/tabs:flex-col data-[variant=line]:rounded-none", {
 	variants: { variant: {
 		default: "bg-muted",
 		line: "gap-1 bg-transparent"
@@ -3527,7 +3527,7 @@ function la({ brand: e, nav: t, currentPath: n, user: r, userMenu: s, onSignOut:
 			})
 		]
 	}), /* @__PURE__ */ a("div", {
-		className: "flex flex-1 flex-col gap-6 p-6",
+		className: "flex flex-1 flex-col gap-6 p-4 md:p-6",
 		children: d
 	})] })] });
 }
@@ -3602,7 +3602,7 @@ function fa({ title: e, description: t, actions: n, className: r, ...i }) {
 //#region src/blocks/page/empty-state.tsx
 function pa({ icon: e, title: t, description: n, action: r, className: i, ...s }) {
 	return /* @__PURE__ */ o("div", {
-		className: B("flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed p-12 text-center", i),
+		className: B("flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed p-8 text-center sm:p-12", i),
 		...s,
 		children: [
 			e && /* @__PURE__ */ a("div", {
