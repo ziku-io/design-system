@@ -117,7 +117,13 @@ export function Kanban<T>({
       e.dataTransfer.dropEffect = "move"
       setOverCol(key)
     },
-    onDragLeave: () => setOverCol(null),
+    // A `dragleave` also fires when the pointer crosses onto a card inside
+    // this column. Clearing on those flickers the highlight the whole way
+    // down a populated column, so only a leave that really left counts.
+    onDragLeave: (e: React.DragEvent<HTMLDivElement>) => {
+      if (e.currentTarget.contains(e.relatedTarget as Node | null)) return
+      setOverCol(null)
+    },
     onDrop: (e: React.DragEvent<HTMLDivElement>) => {
       if (!onDrop) return
       e.preventDefault()
@@ -191,6 +197,9 @@ export function Kanban<T>({
                   className={cn(
                     "group/card relative transition-opacity",
                     draggable ? "cursor-grab active:cursor-grabbing" : "cursor-default",
+                    // Without this a drag selects the card's own title text and
+                    // drags a blue smear along with it.
+                    dragging && "select-none",
                     // The card left behind: a faint outline of where it was.
                     dragKey === id && "opacity-30",
                   )}

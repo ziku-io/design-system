@@ -6,7 +6,8 @@ import { Tooltip as TooltipPrimitive } from "radix-ui"
 import { cn } from "@/lib/utils"
 
 function TooltipProvider({
-  delayDuration = 0,
+  // Long enough that crossing a toolbar does not fire every tooltip on the way.
+  delayDuration = 400,
   ...props
 }: React.ComponentProps<typeof TooltipPrimitive.Provider>) {
   return (
@@ -18,8 +19,9 @@ function TooltipProvider({
   )
 }
 
-// Self-provides so a bare <Tooltip> works anywhere. Nesting providers is safe;
-// an outer TooltipProvider (e.g. SidebarProvider's) still controls shared delay.
+// Self-provides so a bare <Tooltip> works anywhere. The nested provider is the
+// nearest one, so it wins over an outer TooltipProvider: a tooltip that needs a
+// different delay passes `delayDuration` to this <Tooltip> itself.
 function Tooltip({ ...props }: React.ComponentProps<typeof TooltipPrimitive.Root>) {
   return (
     <TooltipProvider>

@@ -8,6 +8,10 @@
 /* Palette follows GitHub Primer. Hex values are Primer's own tokens. */
 :root,
 .dark {
+  /* Tells the UA to render its own chrome dark: scrollbars, autofill, the caret
+     and the date/colour pickers. Without it they render light on a #0d1117 page. */
+  color-scheme: dark;
+
   --background: #0d1117; /* bgColor-default */
   --foreground: #f0f6fc; /* fgColor-default */
   --card: #151b23; /* bgColor-muted */
@@ -83,6 +87,8 @@
 }
 
 .light {
+  color-scheme: light;
+
   --background: #ffffff;
   --foreground: #1f2328;
   --card: #ffffff;
@@ -245,8 +251,26 @@
 [data-slot="button"][data-variant="outline"]:hover {
   background-color: var(--accent);
 }
+/* The field background above wins over any utility, so the hover has to live here too */
+[data-slot="select-trigger"]:not([disabled]):hover {
+  background-color: var(--accent);
+}
 /* Links are blue even though the primary action color is green */
 [data-slot="button"][data-variant="link"],
 [data-slot="badge"][data-variant="link"] {
   color: var(--link);
+}
+
+/* Unlayered for the same reason as the block above, plus one of its own: an
+   !important inside a layer loses to an !important outside one, and sonner
+   injects its slide-in unlayered. In @layer base this would not win against it. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

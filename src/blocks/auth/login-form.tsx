@@ -57,6 +57,25 @@ export function LoginForm({
     defaultValues: { email: "", password: "" },
   })
   const busy = form.formState.isSubmitting
+  const errorId = React.useId()
+
+  // A failed sign-in is announced by the Alert, but focus stays on the button
+  // and the page looks like it did nothing. The password is the field to send
+  // it to: an app that can tell which credential was wrong does not say so.
+  React.useEffect(() => {
+    if (error) form.setFocus("password")
+  }, [error, form])
+
+  // The two ways an app reports the same failure: it catches its own rejection
+  // and passes `error`, or it lets the promise reject and tells us directly.
+  const submit = async (values: LoginValues) => {
+    try {
+      await onSubmit(values)
+    } catch (e) {
+      form.setFocus("password")
+      throw e
+    }
+  }
 
   return (
     <Card>
@@ -66,9 +85,9 @@ export function LoginForm({
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-5" noValidate>
+          <form onSubmit={form.handleSubmit(submit)} className="grid gap-5" noValidate>
             {error && (
-              <Alert variant="danger">
+              <Alert variant="danger" id={errorId}>
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
@@ -106,7 +125,13 @@ export function LoginForm({
                       </Link>
                     )}
                   </div>
-                  <FormControl>
+                  {/* A server error is about this field, so it points here.
+                   *  While one is showing it replaces `FormControl`'s own
+                   *  description id: the Alert is the message to read. */}
+                  <FormControl
+                    aria-invalid={error ? true : undefined}
+                    aria-describedby={error ? errorId : undefined}
+                  >
                     <Input type="password" autoComplete="current-password" {...field} />
                   </FormControl>
                   <FormMessage />

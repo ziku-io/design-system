@@ -6,6 +6,10 @@ Browse it at **https://ziku-io.github.io/design-system/**
 
 Pin a tag; the package ships prebuilt, so there is no build step on install.
 
+React 19 or later is required. The components take `ref` as a plain prop
+instead of going through `forwardRef`, which React 18 drops silently: every
+`asChild` trigger would lose its ref and the menus it opens would do nothing.
+
 ```jsonc
 "@ziku/ui": "github:ziku-io/design-system#v0.1.0"
 ```

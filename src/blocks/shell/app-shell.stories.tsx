@@ -182,3 +182,48 @@ export const WithRole: StoryObj<typeof AppShell> = {
     children: <PageHeader title="Dashboard" />,
   },
 }
+
+/**
+ * A breadcrumb long enough to fill the bar. The header content wrapper is
+ * `min-w-0`, so it truncates instead of pushing the actions past the right
+ * edge, and the skip link (Tab from the top of the page) still lands on
+ * `<main>`.
+ */
+export const LongBreadcrumb: StoryObj<typeof AppShell> = {
+  args: {
+    brand,
+    nav,
+    user,
+    currentPath: "/projects",
+    headerContent: (
+      <Breadcrumb>
+        <BreadcrumbList className="flex-nowrap">
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/clients">Clients</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem className="min-w-0">
+            <BreadcrumbLink href="/clients/1" className="truncate">
+              Sociedade de Consultoria e Gestão de Participações Sociais
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Documents</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+    ),
+    headerActions: (
+      <>
+        <Button variant="ghost" size="icon-sm" aria-label="Notifications">
+          <BellIcon />
+        </Button>
+        <Button>
+          <PlusIcon /> New document
+        </Button>
+      </>
+    ),
+    children: <PageHeader title="Documents" />,
+  },
+}

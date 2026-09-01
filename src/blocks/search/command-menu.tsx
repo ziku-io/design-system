@@ -107,18 +107,16 @@ export function CommandMenu({
 
 export interface SearchTriggerProps extends React.ComponentProps<"button"> {
   placeholder?: string
-  /** Hint shown on the right. Set to null to hide it. */
+  /** Hint shown on the right. Omitted takes the dictionary's; null hides it. */
   shortcut?: string | null
 }
 
 /** The search field in the app header. Looks like an input, behaves like a button. */
-export function SearchTrigger({
-  placeholder,
-  shortcut = "⌘K",
-  className,
-  ...props
-}: SearchTriggerProps) {
+export function SearchTrigger({ placeholder, shortcut, className, ...props }: SearchTriggerProps) {
   const t = useStrings().search
+  // Not a default parameter: the key is a word the app gets to change, and the
+  // prop still has to be able to say "no hint at all".
+  const hint = shortcut === undefined ? t.shortcut : shortcut
   return (
     <button
       type="button"
@@ -132,9 +130,9 @@ export function SearchTrigger({
     >
       <MagnifyingGlassIcon className="size-4 shrink-0" />
       <span className="flex-1 text-left">{placeholder ?? t.placeholder}</span>
-      {shortcut && (
+      {hint && (
         <kbd className="pointer-events-none hidden h-5 items-center gap-1 rounded border border-border px-1.5 font-sans text-[10px] font-medium sm:inline-flex">
-          {shortcut}
+          {hint}
         </kbd>
       )}
     </button>

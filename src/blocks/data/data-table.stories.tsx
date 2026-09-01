@@ -226,6 +226,33 @@ export const Empty: Story = {
   render: () => <DataTable columns={columns} data={[]} empty="No deals yet." />,
 }
 
+/** Filtered down to nothing, which is not the same as having nothing: the page's
+ *  `empty` slot is for an empty list, and this state gets a way back out. */
+export const EmptyAfterFiltering: Story = {
+  render: () => (
+    <DataTable
+      columns={columns}
+      data={deals}
+      rowId={(d) => String(d.id)}
+      empty="No deals yet."
+      defaultFilters={[{ id: "company", value: ["Nothing named this"] }]}
+    />
+  ),
+}
+
+/** Rows the consumer can open. The row is focusable and answers Enter and Space,
+ *  so the list works without a pointer. */
+export const ClickableRows: Story = {
+  render: () => (
+    <DataTable
+      columns={columns}
+      data={deals.slice(0, 6)}
+      rowId={(d) => String(d.id)}
+      onRowClick={() => {}}
+    />
+  ),
+}
+
 /** The toolbar, the view settings and every panel behind them, in Portuguese.
  *  The table itself is unchanged: only the dictionary is. */
 export const Translated: Story = {
