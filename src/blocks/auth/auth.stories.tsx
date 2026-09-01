@@ -47,6 +47,26 @@ export const LoginWithError: StoryObj = {
     </AuthLayout>
   ),
 }
+
+/** What a wrong password actually looks like: submit, the app comes back with a
+ *  message, and focus lands back on the password field, which points at the
+ *  alert through `aria-describedby`. */
+function FailingLoginDemo() {
+  const [error, setError] = useState<string | null>(null)
+  return (
+    <AuthLayout logo={Logo}>
+      <LoginForm
+        error={error}
+        onSubmit={async () => {
+          setError(null)
+          await wait(600)
+          setError("Invalid email or password.")
+        }}
+      />
+    </AuthLayout>
+  )
+}
+export const LoginRejected: StoryObj = { render: () => <FailingLoginDemo /> }
 export const Register: StoryObj = {
   render: () => (
     <AuthLayout logo={Logo} footer={Footer}>

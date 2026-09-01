@@ -180,13 +180,26 @@ export function AppShell({
         )}
       </Sidebar>
       <SidebarInset>
+        {/* First thing a keyboard reaches, hidden until it is focused: without
+         *  it every page starts with the whole sidebar nav. Anchors at the
+         *  <main> below. */}
+        <a
+          href="#content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-background focus:px-3 focus:py-2 focus:text-sm focus:outline-2 focus:outline-ring"
+        >
+          {t.skipToContent}
+        </a>
         <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
           <SidebarTrigger className="-ml-1" />
           <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
-          <div className="flex flex-1 items-center gap-2">{headerContent}</div>
+          {/* min-w-0: a flex child defaults to min-width:auto, so a long
+           *  breadcrumb here pushes `headerActions` off the right edge. */}
+          <div className="flex min-w-0 flex-1 items-center gap-2">{headerContent}</div>
           {headerActions && <div className="flex items-center gap-2">{headerActions}</div>}
         </header>
-        <div className="flex flex-1 flex-col gap-6 p-4 md:p-6">{children}</div>
+        <main id="content" className="flex flex-1 flex-col gap-6 p-4 md:p-6">
+          {children}
+        </main>
       </SidebarInset>
     </SidebarProvider>
   )

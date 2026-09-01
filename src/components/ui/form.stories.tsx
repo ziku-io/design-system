@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
+import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -21,11 +22,15 @@ const schema = z.object({
   username: z.string().min(3, "At least 3 characters"),
 })
 
-function Demo() {
+function Demo({ error }: { error?: string } = {}) {
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: { username: "" },
   })
+  const { setError } = form
+  useEffect(() => {
+    if (error) setError("username", { message: error })
+  }, [error, setError])
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(() => undefined)} className="grid w-72 gap-4" noValidate>
@@ -49,3 +54,7 @@ function Demo() {
   )
 }
 export const Default: StoryObj = { render: () => <Demo /> }
+
+/** After a failed submit. FormMessage is role="alert", so it is announced while
+ *  focus is still on the submit button. */
+export const WithError: StoryObj = { render: () => <Demo error="At least 3 characters" /> }

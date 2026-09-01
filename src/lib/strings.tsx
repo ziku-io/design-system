@@ -62,6 +62,8 @@ export interface UIStrings {
   }
   shell: {
     signOut: string
+    /** The first thing a keyboard user reaches, jumping the sidebar nav. */
+    skipToContent: string
   }
   dataTable: {
     /** The view every table starts on. */
@@ -84,6 +86,8 @@ export interface UIStrings {
     /** The button that adds a chip: reads as "+ Filter". */
     addFilter: string
     removeFilter: string
+    /** The X on a chip: `removeFilterFor("Stage")` reads "Remove Stage filter". */
+    removeFilterFor: (column: string) => string
     /** Puts the view back to its saved state. */
     clearFilters: string
     /** Empties a facet's ticked list, inside its panel. */
@@ -100,6 +104,8 @@ export interface UIStrings {
     addSort: string
     removeSort: string
     removeSorting: string
+    /** The bar's sorting chip once more than one column is ordering the list. */
+    sortCount: (count: number) => string
     group: string
     groupBy: string
     /** The chip on the bar: `groupedBy("stage")` reads "Grouped by stage". */
@@ -115,6 +121,14 @@ export interface UIStrings {
     noGrouping: string
     /** Under the last row of a `paged` table while the next page is in flight. */
     loadingMore: string
+    /** Instead of the `empty` slot when conditions are on and nothing matched:
+     *  "there is no data" and "your filters are too narrow" are not the same
+     *  state, and only the second one has a way out. */
+    noMatches: string
+    /** That way out, next to `noMatches`. */
+    clearAllFilters: string
+    /** Under the view name field when the name was blank or only spaces. */
+    viewNameRequired: string
     /** The paging bar under a table that has a `pageSize`. */
     rowCount: (count: number) => string
     pageOf: (page: number, total: number) => string
@@ -124,11 +138,24 @@ export interface UIStrings {
   search: {
     placeholder: string
     empty: string
+    /** The hint in `SearchTrigger`'s kbd. The key is the platform's, so an app
+     *  on Windows overrides it with "Ctrl K". */
+    shortcut: string
   }
   modal: {
     close: string
   }
 }
+
+/**
+ * A count as the reader's own locale writes it: 12,000 rather than 12000.
+ *
+ * The runtime's locale, because the library has none of its own — the same
+ * reason there are no plural rules here. An app whose language groups
+ * differently overrides the string.
+ */
+const numbers = new Intl.NumberFormat()
+const num = (value: number) => numbers.format(value)
 
 /** English. What a consumer gets when it wraps nothing. */
 export const defaultStrings: UIStrings = {
@@ -176,6 +203,7 @@ export const defaultStrings: UIStrings = {
   },
   shell: {
     signOut: "Sign out",
+    skipToContent: "Skip to content",
   },
   dataTable: {
     allView: "All",
@@ -191,11 +219,12 @@ export const defaultStrings: UIStrings = {
     table: "Table",
     board: "Board",
     visibleColumns: "Visible columns",
-    hidden: (count) => `${count} hidden`,
+    hidden: (count) => `${num(count)} hidden`,
     filters: "Filters",
     filter: "Filter",
     addFilter: "Filter",
     removeFilter: "Remove filter",
+    removeFilterFor: (column) => `Remove ${column} filter`,
     clearFilters: "Clear",
     clearSelection: "Clear selection",
     is: "is",
@@ -209,6 +238,7 @@ export const defaultStrings: UIStrings = {
     addSort: "Add sort",
     removeSort: "Remove",
     removeSorting: "Remove sorting",
+    sortCount: (count) => `${num(count)} sorts`,
     group: "Group",
     groupBy: "Group by",
     groupedBy: (column) => `Grouped by ${column}`,
@@ -218,14 +248,20 @@ export const defaultStrings: UIStrings = {
     sharedBy: (owner) => `Shared by ${owner}`,
     noGrouping: "No grouping",
     loadingMore: "Loading more…",
-    rowCount: (count) => `${count} row(s)`,
-    pageOf: (page, total) => `Page ${page} of ${total}`,
+    noMatches: "Nothing matches these conditions.",
+    clearAllFilters: "Clear filters",
+    viewNameRequired: "Give the view a name.",
+    rowCount: (count) => (count === 1 ? "1 row" : `${num(count)} rows`),
+    pageOf: (page, total) => `Page ${num(page)} of ${num(total)}`,
     previousPage: "Previous",
     nextPage: "Next",
   },
   search: {
     placeholder: "Search…",
     empty: "No results found.",
+    // A non-breaking space: the pair is one key, and a narrow header was
+    // wrapping the K onto its own line under the command symbol.
+    shortcut: "⌘\u00A0K",
   },
   modal: {
     close: "Close",

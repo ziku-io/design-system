@@ -79,9 +79,16 @@ export const Default: Story = {
   },
 }
 
-/** Opened, so the list is visible in docs. */
+/** Opened, so the list is visible in docs. The trigger is rendered with it
+ *  because the palette itself is a portal: on its own the story leaves the
+ *  story root empty, which is what "rendered nothing" means to the smoke test. */
 export const Open: Story = {
-  render: () => <CommandMenu groups={groups} open onOpenChange={() => {}} disableShortcut />,
+  render: () => (
+    <div className="w-80">
+      <SearchTrigger />
+      <CommandMenu groups={groups} open onOpenChange={() => {}} disableShortcut />
+    </div>
+  ),
 }
 
 export const Trigger: Story = {

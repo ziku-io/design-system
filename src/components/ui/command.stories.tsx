@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import { CalendarIcon, GearIcon, SmileyIcon, UserIcon } from "@phosphor-icons/react"
 import {
   Command,
+  CommandDialog,
   CommandEmpty,
   CommandGroup,
   CommandInput,
@@ -52,5 +53,32 @@ export const Inline: StoryObj<typeof Command> = {
         </CommandGroup>
       </CommandList>
     </Command>
+  ),
+}
+
+/** In a dialog. The sr-only title and description live inside the dialog, so
+ *  they exist only while the palette is open. */
+export const InDialog: StoryObj<typeof CommandDialog> = {
+  render: () => (
+    // The dialog renders into a portal, so the story needs a node of its own
+    // for the smoke test to find: a story that returns only a portal reads as
+    // a story that rendered nothing.
+    <>
+      <p className="text-muted-foreground text-sm">The palette is open below.</p>
+      <CommandDialog defaultOpen>
+        <CommandInput placeholder="Type a command or search…" />
+        <CommandList>
+          <CommandEmpty>No results found.</CommandEmpty>
+          <CommandGroup heading="Suggestions">
+            <CommandItem>
+              <CalendarIcon /> Calendar
+            </CommandItem>
+            <CommandItem>
+              <GearIcon /> Settings <CommandShortcut>⌘,</CommandShortcut>
+            </CommandItem>
+          </CommandGroup>
+        </CommandList>
+      </CommandDialog>
+    </>
   ),
 }

@@ -388,33 +388,83 @@ export function NameForm({
       trigger={<span title={title}>{trigger}</span>}
     >
       {(close) => (
-        <form
-          className="space-y-2"
-          onSubmit={(e) => {
-            e.preventDefault()
-            const form = new FormData(e.currentTarget)
-            const name = String(form.get("name") ?? "").trim()
-            if (name) onSubmit(name, form.get("shared") === "on")
-            close()
-          }}
-        >
-          <div className="flex gap-1.5">
-            <Input name="name" className="h-8" required autoFocus defaultValue={defaultValue} />
-            <Button type="submit" size="sm" className="shrink-0">
-              {confirmLabel}
-            </Button>
-          </div>
-          {/* Unchecked by default: a view is one person's until they say
-              otherwise, and the quiet option is the private one. */}
-          {shareLabel && (
-            <label className="flex items-center gap-2 text-sm text-muted-foreground">
-              <input type="checkbox" name="shared" className="accent-primary" />
-              {shareLabel}
-            </label>
-          )}
-        </form>
+        <NameFields
+          defaultValue={defaultValue}
+          confirmLabel={confirmLabel}
+          shareLabel={shareLabel}
+          onSubmit={onSubmit}
+          close={close}
+        />
       )}
     </PopoverPanel>
+  )
+}
+
+/** Its own component so the invalid state can be a hook, rather than state
+ *  belonging to whichever popover happens to be rendering the form. */
+function NameFields({
+  defaultValue,
+  confirmLabel,
+  shareLabel,
+  onSubmit,
+  close,
+}: {
+  defaultValue: string
+  confirmLabel: string
+  shareLabel?: string
+  onSubmit: (name: string, shared: boolean) => void
+  close: () => void
+}) {
+  const { dataTable: t } = useStrings()
+  const [invalid, setInvalid] = React.useState(false)
+  const errorId = React.useId()
+  return (
+    <form
+      className="space-y-2"
+      onSubmit={(e) => {
+        e.preventDefault()
+        const form = new FormData(e.currentTarget)
+        const name = String(form.get("name") ?? "").trim()
+        // `required` is happy with a space, so the blank name arrives here. It
+        // used to fall through to `close()`: the popover shut, no view was
+        // created and nothing said why.
+        if (!name) {
+          setInvalid(true)
+          return
+        }
+        onSubmit(name, form.get("shared") === "on")
+        close()
+      }}
+    >
+      <div className="flex gap-1.5">
+        <Input
+          name="name"
+          className="h-8"
+          required
+          autoFocus
+          defaultValue={defaultValue}
+          aria-invalid={invalid || undefined}
+          aria-describedby={invalid ? errorId : undefined}
+          onChange={() => setInvalid(false)}
+        />
+        <Button type="submit" size="sm" className="shrink-0">
+          {confirmLabel}
+        </Button>
+      </div>
+      {invalid && (
+        <p id={errorId} role="alert" className="text-xs text-danger-fg">
+          {t.viewNameRequired}
+        </p>
+      )}
+      {/* Unchecked by default: a view is one person's until they say
+          otherwise, and the quiet option is the private one. */}
+      {shareLabel && (
+        <label className="flex items-center gap-2 text-sm text-muted-foreground">
+          <input type="checkbox" name="shared" className="accent-primary" />
+          {shareLabel}
+        </label>
+      )}
+    </form>
   )
 }
 

@@ -453,3 +453,86 @@ describe("the search box", () => {
     expect(screen.queryByText("Write")).toBeNull()
   })
 })
+
+// ── Keyboard and semantics ────────────────────────────────────────────
+describe("a11y", () => {
+  it("sorts from a button in the header, and says which way", () => {
+    render(<DataTable columns={columns} data={deals} />)
+    const header = screen.getByRole("button", { name: "Deal" })
+    expect(header.tagName).toBe("BUTTON")
+    expect(header.closest("th")?.getAttribute("aria-sort")).toBe("none")
+
+    fireEvent.click(header)
+    expect(header.closest("th")?.getAttribute("aria-sort")).toBe("ascending")
+    fireEvent.click(header)
+    expect(header.closest("th")?.getAttribute("aria-sort")).toBe("descending")
+  })
+
+  it("leaves aria-sort off a column that cannot be sorted", () => {
+    const fixed: DataTableColumn<Deal>[] = [{ key: "name", header: "Deal", sortable: false }]
+    render(<DataTable columns={fixed} data={deals} />)
+    expect(screen.getByText("Deal").closest("th")?.hasAttribute("aria-sort")).toBe(false)
+  })
+
+  it("collapses a group from its own button", () => {
+    render(<DataTable columns={columns} data={deals} defaultGroup="stage" />)
+    const toggle = screen.getByRole("button", { name: /Won/ })
+    expect(toggle.getAttribute("aria-expanded")).toBe("true")
+
+    fireEvent.click(toggle)
+    expect(screen.getByRole("button", { name: /Won/ }).getAttribute("aria-expanded")).toBe("false")
+    // The rows under it are gone; the heading stays.
+    expect(screen.queryByText("Beta")).toBeNull()
+  })
+
+  it("opens a row from the keyboard", () => {
+    const onRowClick = vi.fn()
+    render(<DataTable columns={columns} data={deals} onRowClick={onRowClick} />)
+    const row = screen.getByText("Alpha").closest("tr")!
+    expect(row.getAttribute("tabindex")).toBe("0")
+    expect(row.getAttribute("role")).toBe("button")
+
+    fireEvent.keyDown(row, { key: "Enter" })
+    fireEvent.keyDown(row, { key: " " })
+    expect(onRowClick).toHaveBeenCalledTimes(2)
+    expect(onRowClick.mock.calls[0][0]).toEqual(deals[0])
+  })
+
+  it("leaves a row alone when there is nothing to open", () => {
+    render(<DataTable columns={columns} data={deals} />)
+    const row = screen.getByText("Alpha").closest("tr")!
+    expect(row.hasAttribute("tabindex")).toBe(false)
+    expect(row.hasAttribute("role")).toBe(false)
+  })
+
+  it("offers a way out when the search, not the data, emptied the table", () => {
+    render(<DataTable columns={columns} data={deals} empty="Nothing here." />)
+    fireEvent.click(screen.getByLabelText("Search"))
+    fireEvent.change(screen.getByPlaceholderText("Search…"), { target: { value: "zzz" } })
+
+    // The page's own empty copy is for an empty list, not for this.
+    expect(screen.queryByText("Nothing here.")).toBeNull()
+    fireEvent.click(screen.getByRole("button", { name: "Clear filters" }))
+    expect(screen.getByText("Alpha")).toBeTruthy()
+  })
+
+  it("skeletons the columns that are coming, not five bars", () => {
+    render(<DataTable columns={columns} data={[]} loading />)
+    // The header is already there, so the real table lands without moving.
+    expect(screen.getByText("Deal")).toBeTruthy()
+    expect(screen.getByText("Stage")).toBeTruthy()
+  })
+
+  it("keeps the view form open, and says why, when the name is blank", () => {
+    render(<DataTable columns={columns} data={deals} />)
+    fireEvent.click(screen.getByTitle("Save the current filters as a new view"))
+
+    const input = screen.getByRole("textbox")
+    fireEvent.change(input, { target: { value: "   " } })
+    fireEvent.click(screen.getByRole("button", { name: "Create" }))
+
+    expect(screen.getByRole("alert").textContent).toBe("Give the view a name.")
+    // Still open, and still holding what was typed.
+    expect(screen.getByRole("textbox")).toBeTruthy()
+  })
+})

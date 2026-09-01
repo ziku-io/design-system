@@ -132,6 +132,10 @@ function FormMessage({ className, ...props }: React.ComponentProps<"p">) {
     <p
       data-slot="form-message"
       id={formMessageId}
+      // A validation error appears after the submit, while focus is still on the
+      // submit button. aria-describedby is only read when the field is focused,
+      // so without a live region nothing is announced.
+      role={error ? "alert" : undefined}
       className={cn("text-sm text-danger-fg", className)}
       {...props}
     >

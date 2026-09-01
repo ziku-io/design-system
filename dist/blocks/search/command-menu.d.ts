@@ -33,7 +33,7 @@ export interface CommandMenuProps {
 export declare function CommandMenu({ groups, open, onOpenChange, placeholder, emptyMessage, onQueryChange, disableShortcut, }: CommandMenuProps): React.JSX.Element;
 export interface SearchTriggerProps extends React.ComponentProps<"button"> {
     placeholder?: string;
-    /** Hint shown on the right. Set to null to hide it. */
+    /** Hint shown on the right. Omitted takes the dictionary's; null hides it. */
     shortcut?: string | null;
 }
 /** The search field in the app header. Looks like an input, behaves like a button. */

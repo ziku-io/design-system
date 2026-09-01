@@ -510,6 +510,16 @@ export function DataTable<T extends RowData>({
     state.sorting.length > 0 ||
     hiddenCount > 0
 
+  /**
+   * Whether the conditions emptied the table rather than the list being empty.
+   *
+   * A list that never had a row is the page's `empty` slot, even with a sort or
+   * a hidden column set — the consumer's copy is not something a stray default
+   * gets to replace. Server-side the API did the filtering, so an empty answer
+   * to a set condition is this state and not that one.
+   */
+  const narrowedToNothing = dirty && (rows.length > 0 || server)
+
   /** Columns a condition can be built on: named, sortable, not already a chip. */
   const filterable = columns.filter(
     (c) => named(c) && c.sortable !== false && !chips.some((f) => f.id === c.key),
@@ -602,7 +612,7 @@ export function DataTable<T extends RowData>({
             <button
               type="button"
               onClick={() => removeFilter(f.id)}
-              aria-label={`Remove ${col.header}`}
+              aria-label={t.removeFilterFor(col.header)}
               className="shrink-0 rounded-md p-1 text-muted-foreground hover:bg-danger/10 hover:text-danger-fg"
             >
               <XIcon className="size-3" weight="bold" />
@@ -901,7 +911,7 @@ export function DataTable<T extends RowData>({
                   <SortAscendingIcon className="size-3.5" weight="bold" />
                   {state.sorting.length === 1
                     ? `${byKey[state.sorting[0].id]?.header ?? state.sorting[0].id} ${state.sorting[0].desc ? "↓" : "↑"}`
-                    : `${state.sorting.length} sorts`}
+                    : t.sortCount(state.sorting.length)}
                   <CaretDownIcon className="size-2.5 opacity-60" weight="bold" />
                 </span>
               }
@@ -993,14 +1003,52 @@ export function DataTable<T extends RowData>({
       )}
 
       {loading ? (
-        <div className="grid gap-2 p-4">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} className="h-8 w-full" />
-          ))}
+        // The columns that are about to arrive, not five bars: a skeleton of a
+        // different shape moves the whole page when the real table lands.
+        <div className="overflow-auto" role="status" aria-live="polite" aria-busy="true">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted/50 hover:bg-muted/50">
+                {table.getVisibleLeafColumns().map((c) => (
+                  <TableHead key={c.id} className={cn("whitespace-nowrap", byKey[c.id]?.className)}>
+                    {byKey[c.id]?.header}
+                  </TableHead>
+                ))}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {Array.from({ length: 5 }).map((_, i) => (
+                <TableRow key={i} className="hover:bg-transparent">
+                  {table.getVisibleLeafColumns().map((c) => (
+                    <TableCell key={c.id} className={byKey[c.id]?.className}>
+                      <Skeleton className="h-4 w-full" />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       ) : filtered.length === 0 ? (
-        <div className="p-12 text-center text-sm text-muted-foreground">
-          {empty ?? common.noResults}
+        <div
+          role="status"
+          aria-live="polite"
+          className="p-12 text-center text-sm text-muted-foreground"
+        >
+          {/* An empty list and a filter that matched nothing are different
+              states: the second one is the user's own doing and needs a way
+              back out, so the page's `empty` slot is not the answer to it. */}
+          {narrowedToNothing ? (
+            <div className="flex flex-col items-center gap-3">
+              <span>{t.noMatches}</span>
+              <Button variant="outline" size="sm" onClick={store.reset}>
+                <XIcon className="size-3.5" weight="bold" />
+                {t.clearAllFilters}
+              </Button>
+            </div>
+          ) : (
+            (empty ?? common.noResults)
+          )}
         </div>
       ) : board ? (
         <div className="p-3">
@@ -1028,27 +1076,50 @@ export function DataTable<T extends RowData>({
                         : dir === "desc"
                           ? CaretDownIcon
                           : SortAscendingIcon
+                    const label = (
+                      <>
+                        {Ic && <Ic className="size-3.5" weight="bold" />}
+                        <table.FlexRender header={h} />
+                      </>
+                    )
                     return (
                       <TableHead
                         key={h.id}
-                        onClick={h.column.getToggleSortingHandler()}
-                        className={cn(
-                          "whitespace-nowrap",
-                          h.column.getCanSort() &&
-                            "cursor-pointer select-none hover:text-foreground",
-                          col?.className,
-                        )}
+                        // The order a screen reader reports. "none" only on a
+                        // column that can be sorted: on the rest the attribute
+                        // would claim the column is sortable and unsorted.
+                        aria-sort={
+                          dir === "asc"
+                            ? "ascending"
+                            : dir === "desc"
+                              ? "descending"
+                              : h.column.getCanSort()
+                                ? "none"
+                                : undefined
+                        }
+                        className={cn("whitespace-nowrap", col?.className)}
                       >
-                        <span className="inline-flex items-center gap-1.5">
-                          {Ic && <Ic className="size-3.5" weight="bold" />}
-                          <table.FlexRender header={h} />
-                          {h.column.getCanSort() && (
+                        {h.column.getCanSort() ? (
+                          // A real button, so the header is in the tab order and
+                          // Enter and Space sort. A `<th>` with an onClick is
+                          // reachable by pointer only.
+                          <button
+                            type="button"
+                            onClick={h.column.getToggleSortingHandler()}
+                            className={cn(
+                              "inline-flex items-center gap-1.5 rounded-sm outline-none select-none",
+                              "hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50",
+                            )}
+                          >
+                            {label}
                             <Sort
                               className={cn("size-3", dir ? "text-foreground" : "opacity-40")}
                               weight="bold"
                             />
-                          )}
-                        </span>
+                          </button>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5">{label}</span>
+                        )}
                       </TableHead>
                     )
                   })}
@@ -1061,10 +1132,14 @@ export function DataTable<T extends RowData>({
                   <TableRow key={row.id} className="hover:bg-transparent">
                     <TableHead
                       colSpan={visibleCount}
-                      onClick={row.getToggleExpandedHandler()}
-                      className="cursor-pointer bg-muted/50 text-xs font-semibold tracking-wide uppercase"
+                      className="bg-muted/50 text-xs font-semibold tracking-wide uppercase"
                     >
-                      <span className="inline-flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={row.getToggleExpandedHandler()}
+                        aria-expanded={row.getIsExpanded()}
+                        className="inline-flex items-center gap-1.5 rounded-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                      >
                         {row.getIsExpanded() ? (
                           <CaretDownIcon className="size-3" weight="bold" />
                         ) : (
@@ -1074,14 +1149,36 @@ export function DataTable<T extends RowData>({
                         <span className="rounded-full bg-card px-1.5 py-0.5 text-[0.65rem] font-normal">
                           {row.subRows.length}
                         </span>
-                      </span>
+                      </button>
                     </TableHead>
                   </TableRow>
                 ) : (
                   <TableRow
                     key={row.id}
+                    // ponytail: a focusable row with a button role, which is the
+                    // cheapest thing that opens from the keyboard. The ceiling
+                    // is that the row stops reading as a row and still cannot be
+                    // Cmd-clicked into a new tab; the upgrade path is a link in
+                    // the first cell, rendered by the consumer, and `onRowClick`
+                    // left to the pointer.
+                    role={onRowClick ? "button" : undefined}
+                    tabIndex={onRowClick ? 0 : undefined}
                     onClick={onRowClick ? () => onRowClick(row.original) : undefined}
-                    className={onRowClick ? "cursor-pointer" : undefined}
+                    onKeyDown={
+                      onRowClick
+                        ? (e) => {
+                            if (e.key !== "Enter" && e.key !== " ") return
+                            // Space scrolls the page otherwise.
+                            e.preventDefault()
+                            onRowClick(row.original)
+                          }
+                        : undefined
+                    }
+                    className={
+                      onRowClick
+                        ? "cursor-pointer outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                        : undefined
+                    }
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id} className={byKey[cell.column.id]?.className}>
@@ -1096,6 +1193,8 @@ export function DataTable<T extends RowData>({
                 <TableRow ref={sentinelRef} className="hover:bg-transparent">
                   <TableCell
                     colSpan={visibleCount}
+                    role="status"
+                    aria-live="polite"
                     className="text-center text-xs text-muted-foreground"
                   >
                     {loadingMore ? t.loadingMore : null}
@@ -1109,7 +1208,9 @@ export function DataTable<T extends RowData>({
 
       {paginated && !loading && filtered.length > 0 && (
         <div className="flex items-center justify-between gap-4 border-t px-3 py-2 text-sm text-muted-foreground">
-          <span>{t.rowCount(filtered.length)}</span>
+          <span role="status" aria-live="polite">
+            {t.rowCount(filtered.length)}
+          </span>
           <div className="flex items-center gap-2">
             <span>{t.pageOf(pageIndex + 1, Math.max(table.getPageCount(), 1))}</span>
             <Button

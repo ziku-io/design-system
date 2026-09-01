@@ -52,7 +52,7 @@ const EXPRESSION = /\{[^{}]*\}/g
 
 function withoutExpressions(text: string): string {
   let out = text
-  for (let before = ""; before !== out; ) {
+  for (let before = ""; before !== out;) {
     before = out
     out = out.replace(EXPRESSION, " ")
   }
@@ -75,6 +75,46 @@ const CODE = /[[\]="'`;\\|&$():]/
 /** A comment is not rendered, so it is not a literal. */
 const COMMENTS = /\/\*[\s\S]*?\*\/|\/\/[^\n]*/g
 
+/**
+ * Attributes a person hears or reads. Text reaches the user through these too,
+ * and the scan above only ever looked between the tags: `aria-label={`Remove
+ * ${col.header}`}` shipped English to every screen reader for a release.
+ *
+ * The value is a literal when it is quoted or a backtick string. An expression
+ * is the block reading its dictionary, which is the whole point.
+ */
+const SPOKEN =
+  /\b(?:aria-label|aria-placeholder|title|placeholder|alt)\s*=\s*(?:"([^"]*)"|'([^']*)'|\{`([^`]*)`\})/g
+
+/** Every backtick string, so the words around an interpolation are seen. */
+const TEMPLATE = /`(?:[^`\\]|\\.)*`/g
+const INTERPOLATION = /\$\{[^{}]*\}/g
+
+function withoutInterpolations(text: string): string {
+  let out = text
+  for (let before = ""; before !== out;) {
+    before = out
+    out = out.replace(INTERPOLATION, " ")
+  }
+  return out
+}
+
+/**
+ * A word in a template literal, ignoring the class lists that make up most of
+ * them. A Tailwind class carries a `-`, a `:`, a `/` or a digit; a word a user
+ * reads does not.
+ *
+ * ponytail: a token shape, not a parser, so a class list of bare utilities
+ * (`flex items-center` is fine, `flex block` is not) would be reported. The
+ * upgrade path is walking the TypeScript AST and only reading the templates
+ * that sit in JSX. Until one trips it, this is two lines.
+ */
+const PROSE = /(?:^|\s)\p{L}{2,}(?=\s|$)/u
+
+function templateProse(literal: string): string {
+  return withoutInterpolations(literal.slice(1, -1))
+}
+
 describe("blocks", () => {
   const files = sources(BLOCKS)
 
@@ -95,6 +135,33 @@ describe("blocks", () => {
         // `>` of an arrow function, rather than at the end of a tag.
         if (/[{}]/.test(trimmed) || CODE.test(trimmed)) continue
         if (WORD.test(trimmed)) found.push(trimmed)
+      }
+      expect(found).toEqual([])
+    },
+  )
+
+  it.each(files.map((f) => [f.slice(BLOCKS.length + 1), f]))(
+    "%s puts no literal in an attribute a user reads",
+    (_name, file) => {
+      const src = readFileSync(file, "utf8").replace(COMMENTS, "")
+      const found: string[] = []
+      for (const [, quoted, single, template] of src.matchAll(SPOKEN)) {
+        const text =
+          template === undefined ? (quoted ?? single ?? "") : templateProse(`\`${template}\``)
+        if (WORD.test(text)) found.push(text.trim())
+      }
+      expect(found).toEqual([])
+    },
+  )
+
+  it.each(files.map((f) => [f.slice(BLOCKS.length + 1), f]))(
+    "%s wraps no sentence around an interpolation",
+    (_name, file) => {
+      const src = readFileSync(file, "utf8").replace(COMMENTS, "")
+      const found: string[] = []
+      for (const [literal] of src.matchAll(TEMPLATE)) {
+        const text = templateProse(literal)
+        if (PROSE.test(text)) found.push(text.trim())
       }
       expect(found).toEqual([])
     },

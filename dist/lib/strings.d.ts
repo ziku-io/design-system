@@ -61,6 +61,8 @@ export interface UIStrings {
     };
     shell: {
         signOut: string;
+        /** The first thing a keyboard user reaches, jumping the sidebar nav. */
+        skipToContent: string;
     };
     dataTable: {
         /** The view every table starts on. */
@@ -83,6 +85,8 @@ export interface UIStrings {
         /** The button that adds a chip: reads as "+ Filter". */
         addFilter: string;
         removeFilter: string;
+        /** The X on a chip: `removeFilterFor("Stage")` reads "Remove Stage filter". */
+        removeFilterFor: (column: string) => string;
         /** Puts the view back to its saved state. */
         clearFilters: string;
         /** Empties a facet's ticked list, inside its panel. */
@@ -99,6 +103,8 @@ export interface UIStrings {
         addSort: string;
         removeSort: string;
         removeSorting: string;
+        /** The bar's sorting chip once more than one column is ordering the list. */
+        sortCount: (count: number) => string;
         group: string;
         groupBy: string;
         /** The chip on the bar: `groupedBy("stage")` reads "Grouped by stage". */
@@ -114,6 +120,14 @@ export interface UIStrings {
         noGrouping: string;
         /** Under the last row of a `paged` table while the next page is in flight. */
         loadingMore: string;
+        /** Instead of the `empty` slot when conditions are on and nothing matched:
+         *  "there is no data" and "your filters are too narrow" are not the same
+         *  state, and only the second one has a way out. */
+        noMatches: string;
+        /** That way out, next to `noMatches`. */
+        clearAllFilters: string;
+        /** Under the view name field when the name was blank or only spaces. */
+        viewNameRequired: string;
         /** The paging bar under a table that has a `pageSize`. */
         rowCount: (count: number) => string;
         pageOf: (page: number, total: number) => string;
@@ -123,6 +137,9 @@ export interface UIStrings {
     search: {
         placeholder: string;
         empty: string;
+        /** The hint in `SearchTrigger`'s kbd. The key is the platform's, so an app
+         *  on Windows overrides it with "Ctrl K". */
+        shortcut: string;
     };
     modal: {
         close: string;
