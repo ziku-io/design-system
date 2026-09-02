@@ -20,6 +20,22 @@ export interface CommandMenuItem {
   id: string
   label: string
   icon?: Icon
+  /**
+   * The second line, for what tells two identical labels apart.
+   *
+   * A palette searching more than one kind of thing will return rows whose
+   * labels collide: three tasks all called "Redigir NDA" are three different
+   * tasks, and the label alone cannot say which. Put the thing that
+   * distinguishes them here, usually what the row belongs to.
+   */
+  description?: string
+  /**
+   * Right-aligned identifier, set in mono: a reference, a number, an id.
+   *
+   * Separate from `shortcut` because it is not one. `shortcut` is letter-spaced
+   * for "⌘P", which is exactly wrong for a code read one character at a time.
+   */
+  meta?: string
   /** Rendered right-aligned, e.g. "⌘P" */
   shortcut?: string
   /** Extra words to match on that aren't shown */
@@ -86,14 +102,33 @@ export function CommandMenu({
               {group.items.map((item) => (
                 <CommandItem
                   key={item.id}
-                  value={`${item.label} ${item.keywords?.join(" ") ?? ""}`}
+                  // Everything shown is matchable. cmdk filters on this string,
+                  // so a reference or a client name that the eye can see in the
+                  // row has to narrow the list when it is typed.
+                  value={[item.label, item.description, item.meta, ...(item.keywords ?? [])]
+                    .filter(Boolean)
+                    .join(" ")}
                   onSelect={() => {
                     item.onSelect?.()
                     setOpen(false)
                   }}
                 >
                   {item.icon && <item.icon />}
-                  <span>{item.label}</span>
+                  {/* min-w-0 so a long description truncates instead of pushing
+                      the meta off the row. */}
+                  <span className="flex min-w-0 flex-col">
+                    <span className="truncate">{item.label}</span>
+                    {item.description && (
+                      <span className="truncate text-xs text-muted-foreground">
+                        {item.description}
+                      </span>
+                    )}
+                  </span>
+                  {item.meta && (
+                    <span className="ml-auto shrink-0 font-mono text-xs tabular-nums text-muted-foreground">
+                      {item.meta}
+                    </span>
+                  )}
                   {item.shortcut && <CommandShortcut>{item.shortcut}</CommandShortcut>}
                 </CommandItem>
               ))}
