@@ -23,6 +23,7 @@ import {
   type RowData,
   type SortingState,
 } from "@tanstack/react-table"
+import { useVirtualizer } from "@tanstack/react-virtual"
 import {
   CaretDownIcon,
   CaretRightIcon,
@@ -368,6 +369,11 @@ export function DataTable<T extends RowData>({
   // Chips the API cannot apply (a column with no `filterKey`) still filter
   // here, and so do grouping and the board — all three need rows that may not
   // be loaded yet, so turning any of them on pulls the rest of the list.
+  //
+  // Pulling the whole list is now a fetch cost and not a rendering one: the
+  // body is windowed above `WINDOW_THRESHOLD`, so the rows that arrive do not
+  // all end up in the DOM. A consumer capping its queries to keep this
+  // survivable can stop.
   const localFilters = React.useMemo(
     () => state.columnFilters.filter((f) => !isBlankFilter(f.value) && !byKey[f.id]?.filterKey),
     [state.columnFilters, byKey],
@@ -499,9 +505,12 @@ export function DataTable<T extends RowData>({
     // Re-created after each page: if the sentinel is still on screen the fresh
     // observer fires again, so a short viewport keeps filling itself.
     if (!node || !more || !hasMore || loadingMore) return
-    // The viewport is the root, not the scroll box: a page that constrains the
-    // table's height gets the same answer either way, and one that does not
-    // would have its whole list "in view" of a box that never scrolls.
+    // The viewport is the root, not the scroll box: an observer against the
+    // viewport still accounts for a clipping ancestor, so it gives the same
+    // answer whether the height is constrained by the page or — since the body
+    // was windowed — by the table's own box. Rooting it at the box would break
+    // the other case, where nothing constrains the height and the whole list is
+    // "in view" of something that never scrolls.
     const io = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) more()
@@ -741,6 +750,62 @@ export function DataTable<T extends RowData>({
   }, [board, groupCol, filtered, group, boardSubtitle])
 
   const visibleCount = table.getVisibleLeafColumns().length
+
+  // ── Windowing ──
+  //
+  // A table rendered every row it held, and `paged` mode appended each new page
+  // to the ones already in the DOM. Ten thousand rows of a dozen cells is a
+  // hundred and twenty thousand elements, which is why one consumer capped its
+  // queries at 2000 rows — a cap that existed to protect this component rather
+  // than to serve the product.
+  //
+  // Group headers are rows in this model too, so a grouped table windows on the
+  // same path. The board does not: `Kanban` is columns of cards, not rows, and
+  // it is bounded by how many cards fit a column a person can read.
+  const bodyRows = table.getRowModel().rows
+  const windowed = bodyRows.length > WINDOW_THRESHOLD
+  const scrollRef = React.useRef<HTMLDivElement>(null)
+  const virtualizer = useVirtualizer({
+    count: bodyRows.length,
+    enabled: windowed,
+    getScrollElement: () => scrollRef.current,
+    estimateSize: () => ROW_ESTIMATE,
+    overscan: OVERSCAN,
+    initialRect: { width: 0, height: WINDOW_ESTIMATE },
+    // A measured height of zero means the row has not been laid out, not that
+    // it is invisible. Believing it collapses the total size, which widens the
+    // window, which mounts more rows that also measure zero.
+    measureElement: (element) => element.getBoundingClientRect().height || ROW_ESTIMATE,
+    // Same reading of a zero, for the scrollport: it has not been laid out, not
+    // that nothing fits. an environment without layout — jsdom, and the first frame
+    // in a browser — would otherwise render an empty body, and a consumer's
+    // test of a long table would find no rows at all. A real box that is
+    // genuinely zero high is `display: none`, which has nothing to window.
+    observeElementRect: (instance, report) => {
+      const element = instance.scrollElement
+      if (!element) return
+      const measure = () => {
+        const rect = element.getBoundingClientRect()
+        report({ width: rect.width, height: rect.height || WINDOW_ESTIMATE })
+      }
+      measure()
+      const observer = new ResizeObserver(measure)
+      observer.observe(element)
+      return () => observer.disconnect()
+    },
+  })
+  const window_ = virtualizer.getVirtualItems()
+  const shown = windowed
+    ? window_.map((item) => ({ row: bodyRows[item.index], index: item.index }))
+    : bodyRows.map((row, index) => ({ row, index }))
+  // Two spacer rows rather than absolute positioning: a `<tr>` taken out of
+  // flow stops sizing the columns, and the whole grid then collapses to the
+  // width of whatever the window happens to hold.
+  const padTop = windowed && window_.length > 0 ? window_[0].start : 0
+  const padBottom =
+    windowed && window_.length > 0
+      ? virtualizer.getTotalSize() - window_[window_.length - 1].end
+      : 0
 
   return (
     <div className={cn("overflow-hidden rounded-md border bg-card", className)}>
@@ -1079,10 +1144,17 @@ export function DataTable<T extends RowData>({
         </div>
       ) : (
         <div className="overflow-auto">
-          <Table>
+          <Table
+            containerRef={scrollRef}
+            containerClassName={cn(windowed && `${WINDOW_HEIGHT} overflow-y-auto`)}
+            // The list, not the window: a screen reader that counted the
+            // mounted rows would tell a reader of ten thousand rows that there
+            // are thirty. The header is row 1, so the body starts at 2.
+            aria-rowcount={bodyRows.length + 1}
+          >
             <TableHeader>
               {table.getHeaderGroups().map((hg) => (
-                <TableRow key={hg.id} className="bg-muted/50">
+                <TableRow key={hg.id} aria-rowindex={1} className="bg-muted/50">
                   {hg.headers.map((h) => {
                     const col = byKey[h.column.id]
                     const dir = h.column.getIsSorted()
@@ -1114,7 +1186,17 @@ export function DataTable<T extends RowData>({
                                 ? "none"
                                 : undefined
                         }
-                        className={cn("whitespace-nowrap", col?.className)}
+                        className={cn(
+                          "whitespace-nowrap",
+                          // Sticky on the cells, not the row: `position:
+                          // sticky` on a `<tr>` does nothing in WebKit and
+                          // Chromium. The colour is what `bg-muted/50` renders
+                          // as over the card — a sticky header has to be
+                          // opaque, or the rows scroll through it.
+                          windowed &&
+                            "sticky top-0 z-10 bg-[color-mix(in_oklab,var(--muted)_50%,var(--card))]",
+                          col?.className,
+                        )}
                       >
                         {h.column.getCanSort() ? (
                           // A real button, so the header is in the tab order and
@@ -1144,9 +1226,20 @@ export function DataTable<T extends RowData>({
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows.map((row) =>
+              {padTop > 0 && (
+                <TableRow aria-hidden className="hover:bg-transparent">
+                  <TableCell colSpan={visibleCount} className="p-0" style={{ height: padTop }} />
+                </TableRow>
+              )}
+              {shown.map(({ row, index }) =>
                 row.getIsGrouped() ? (
-                  <TableRow key={row.id} className="hover:bg-transparent">
+                  <TableRow
+                    key={row.id}
+                    ref={windowed ? virtualizer.measureElement : undefined}
+                    data-index={index}
+                    aria-rowindex={index + 2}
+                    className="hover:bg-transparent"
+                  >
                     <TableHead
                       colSpan={visibleCount}
                       className="bg-muted/50 text-xs font-semibold tracking-wide uppercase"
@@ -1172,6 +1265,11 @@ export function DataTable<T extends RowData>({
                 ) : (
                   <TableRow
                     key={row.id}
+                    // Measured rather than assumed: `ROW_ESTIMATE` is only the
+                    // first frame, and a consumer's cell can be two lines tall.
+                    ref={windowed ? virtualizer.measureElement : undefined}
+                    data-index={index}
+                    aria-rowindex={index + 2}
                     // ponytail: a focusable row with a button role, which is the
                     // cheapest thing that opens from the keyboard. The ceiling
                     // is that the row stops reading as a row and still cannot be
@@ -1204,6 +1302,11 @@ export function DataTable<T extends RowData>({
                     ))}
                   </TableRow>
                 ),
+              )}
+              {padBottom > 0 && (
+                <TableRow aria-hidden className="hover:bg-transparent">
+                  <TableCell colSpan={visibleCount} className="p-0" style={{ height: padBottom }} />
+                </TableRow>
               )}
               {/* The last row of the list: coming into view loads the next page. */}
               {hasMore && (
@@ -1252,6 +1355,31 @@ export function DataTable<T extends RowData>({
     </div>
   )
 }
+
+/**
+ * Above this many rows the body is windowed.
+ *
+ * Under it, nothing changes: no height cap, no sticky header, the page scrolls
+ * the way it always did. A hundred rows of a dozen cells is a DOM a browser
+ * does not notice, and a cap on a short list is a scrollbar nobody asked for.
+ */
+const WINDOW_THRESHOLD = 100
+
+/** A row of default cells: `p-2` twice plus a line and a border. Only the first
+ *  frame uses it — every rendered row is measured after that. */
+const ROW_ESTIMATE = 37
+
+/** Rows kept mounted past each edge. Twelve is about a screen at this height,
+ *  which is what keeps a flung scroll from showing a blank band. */
+const OVERSCAN = 12
+
+/** What the scrollport is assumed to be until it has been measured. */
+const WINDOW_ESTIMATE = 640
+
+/** The box a windowed table scrolls inside. The block owns this, not the page:
+ *  windowing needs a scrollport, and a consumer that had to supply one would be
+ *  back to knowing about the implementation. */
+const WINDOW_HEIGHT = "max-h-[70dvh]"
 
 // A condition on the bar: highlighted once it holds a value, plain while empty.
 const CHIP = "rounded-md border px-2 py-1.5 text-sm outline-none"

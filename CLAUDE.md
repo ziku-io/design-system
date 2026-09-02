@@ -172,6 +172,20 @@ src/lib/             cn, Link/LinkProvider, UIStrings, Phosphor icon aliases
 src/styles/          globals.css — GitHub Primer tokens
 ```
 
+**A `DataTable` body over 100 rows is windowed** (`@tanstack/react-virtual`).
+Two spacer `<tr>`s hold the scroll height rather than absolute positioning,
+because a row taken out of flow stops sizing the columns and the grid collapses
+to whatever the window holds. The scrollport is `Table`'s own container, via
+`containerRef`/`containerClassName` — not an outer wrapper, or the sticky header
+sticks to nothing. Sticky lives on the `<th>`s: `position: sticky` on a `<tr>`
+does nothing in WebKit or Chromium.
+
+Both the row measurement and the scrollport measurement read a zero as "not laid
+out yet" and fall back to an estimate. Without that, jsdom — which has no layout
+at all — renders an empty body, and every consumer test of a long table finds no
+rows. `aria-rowcount` and `aria-rowindex` report the whole list, so a screen
+reader is not told there are thirty rows.
+
 **TanStack Table is v9**, which has a different API from v8: `useTable` with
 explicitly registered `tableFeatures`, not `useReactTable` with `getXRowModel`
 options. The package ships skills docs under
