@@ -536,3 +536,62 @@ describe("a11y", () => {
     expect(screen.getByRole("textbox")).toBeTruthy()
   })
 })
+
+describe("DataTable windowing", () => {
+  const many = Array.from({ length: 10_000 }, (_, i) => ({
+    id: i,
+    name: `Deal ${i}`,
+    stage: i % 2 ? "Won" : "Lead",
+  }))
+
+  it("mounts a window, not ten thousand rows", () => {
+    render(<DataTable columns={columns} data={many} />)
+    const table = screen.getByRole("table")
+    const rows = table.querySelectorAll("tbody tr")
+    // jsdom reports a zero-height scrollport, so the window here is the
+    // overscan. The assertion that matters is the order of magnitude.
+    expect(rows.length).toBeLessThan(200)
+    expect(rows.length).toBeGreaterThan(0)
+  })
+
+  it("tells a screen reader the full total, not the window", () => {
+    render(<DataTable columns={columns} data={many} />)
+    // The header is row 1, so 10,000 rows is a count of 10,001.
+    expect(screen.getByRole("table").getAttribute("aria-rowcount")).toBe("10001")
+  })
+
+  it("leaves a short list alone: every row, no height cap", () => {
+    const { container } = render(<DataTable columns={columns} data={deals} />)
+    expect(screen.getByRole("table").querySelectorAll("tbody tr")).toHaveLength(deals.length)
+    expect(container.querySelector('[data-slot="table-container"]')?.className).not.toContain(
+      "max-h-",
+    )
+  })
+})
+
+describe("DataTable windowing and paging together", () => {
+  // The page after this one still arrives through the sentinel row, which sits
+  // below the bottom spacer: an IntersectionObserver against the viewport
+  // accounts for the clipping scroll box, so it fires when the list really has
+  // been scrolled to its end. jsdom has no layout, so that path is exercised by
+  // the `PagedLarge` story rather than here.
+  const many = Array.from({ length: 400 }, (_, i) => ({
+    id: i,
+    name: `Deal ${i}`,
+    stage: i % 2 ? "Won" : "Lead",
+  }))
+
+  it("does not ask for the next page while the window is nowhere near the end", () => {
+    const more = vi.fn()
+    render(
+      <DataTable
+        columns={columns}
+        data={many}
+        paged={{ hasMore: true, loadingMore: false, more, setQuery: () => {} }}
+      />,
+    )
+    // The end-of-window trigger must not read as "the list is exhausted" on
+    // mount, or a windowed table pulls every page the moment it renders.
+    expect(more).not.toHaveBeenCalled()
+  })
+})

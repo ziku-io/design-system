@@ -139,6 +139,16 @@ const EMPTY_STATE: DataTableState = {
 type Story = StoryObj<typeof DataTable<Deal>>
 
 /** Chips, sorting, grouping and column visibility, with three saved views. */
+/** Enough rows to cross the windowing threshold several hundred times over. */
+const manyDeals: Deal[] = Array.from({ length: 10_000 }, (_, i) => ({
+  id: i + 1,
+  name: `Deal ${String(i + 1).padStart(5, "0")}`,
+  company: COMPANIES[i % COMPANIES.length],
+  owner: OWNERS[i % OWNERS.length],
+  stage: STAGES[i % STAGES.length],
+  value: (i % 9) * 2500 + 1500,
+}))
+
 export const Default: Story = {
   render: () => (
     <DataTable
@@ -511,6 +521,53 @@ export const Paged: Story = {
           }}
         />
       </div>
+    )
+  },
+}
+
+/**
+ * Ten thousand rows. Past a hundred the body is windowed: the DOM holds the
+ * visible rows plus an overscan, the header sticks, and the table scrolls
+ * inside its own box rather than growing the page. Scroll it, then sort a
+ * column — the work is the same at ten thousand rows as at ten.
+ */
+export const Large: Story = {
+  render: () => (
+    <DataTable
+      columns={columns}
+      data={manyDeals}
+      rowId={(d) => String(d.id)}
+      searchPlaceholder="Search deals…"
+    />
+  ),
+}
+
+/**
+ * Windowing and infinite scroll together, which is the pairing that used to be
+ * worst: `paged` appended every page to the DOM and never dropped one, so the
+ * fifth page cost five times the first. Scroll to the bottom of the box and the
+ * next page loads — the sentinel row lives below the bottom spacer, so it comes
+ * into view only when the list really has been scrolled to its end.
+ */
+export const PagedLarge: Story = {
+  render: function PagedLargeStory() {
+    const PAGE = 250
+    const [limit, setLimit] = useState(PAGE)
+    return (
+      <DataTable
+        columns={columns}
+        data={manyDeals.slice(0, limit)}
+        rowId={(d) => String(d.id)}
+        searchPlaceholder="Search deals…"
+        paged={{
+          hasMore: limit < manyDeals.length,
+          loadingMore: false,
+          more: () => setLimit((n) => Math.min(n + PAGE, manyDeals.length)),
+          // The rows are already here, so nothing has to be re-requested; the
+          // table filters and sorts what it has been given.
+          setQuery: () => {},
+        }}
+      />
     )
   },
 }

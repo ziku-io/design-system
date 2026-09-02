@@ -4,9 +4,30 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
-function Table({ className, ...props }: React.ComponentProps<"table">) {
+function Table({
+  className,
+  containerClassName,
+  containerRef,
+  ...props
+}: React.ComponentProps<"table"> & {
+  /**
+   * Classes on the scroll box around the table, not on the table.
+   *
+   * A caller that caps the height here — a windowed body, a panel that must
+   * not grow the page — needs this element and not the `<table>`: it is the
+   * scrollport, so it is what `position: sticky` measures against and what a
+   * virtualizer has to watch. Passing the cap to an outer wrapper instead
+   * leaves this box unscrolled, and the sticky header then sticks to nothing.
+   */
+  containerClassName?: string
+  containerRef?: React.Ref<HTMLDivElement>
+}) {
   return (
-    <div data-slot="table-container" className="relative w-full overflow-x-auto">
+    <div
+      ref={containerRef}
+      data-slot="table-container"
+      className={cn("relative w-full overflow-x-auto", containerClassName)}
+    >
       <table
         data-slot="table"
         className={cn("w-full caption-bottom text-sm", className)}
