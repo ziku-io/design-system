@@ -1,6 +1,6 @@
 {
   "name": "@ziku/ui",
-  "version": "0.16.0",
+  "version": "0.17.0",
   "description": "Ziku design system: shadcn-based React components, pages and flows",
   "type": "module",
   "license": "UNLICENSED",

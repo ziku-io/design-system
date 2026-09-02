@@ -5,6 +5,22 @@ export interface CommandMenuItem {
     id: string;
     label: string;
     icon?: Icon;
+    /**
+     * The second line, for what tells two identical labels apart.
+     *
+     * A palette searching more than one kind of thing will return rows whose
+     * labels collide: three tasks all called "Redigir NDA" are three different
+     * tasks, and the label alone cannot say which. Put the thing that
+     * distinguishes them here, usually what the row belongs to.
+     */
+    description?: string;
+    /**
+     * Right-aligned identifier, set in mono: a reference, a number, an id.
+     *
+     * Separate from `shortcut` because it is not one. `shortcut` is letter-spaced
+     * for "⌘P", which is exactly wrong for a code read one character at a time.
+     */
+    meta?: string;
     /** Rendered right-aligned, e.g. "⌘P" */
     shortcut?: string;
     /** Extra words to match on that aren't shown */

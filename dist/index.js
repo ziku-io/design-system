@@ -2079,13 +2079,31 @@ function Di({ groups: t, open: n, onOpenChange: r, placeholder: i, emptyMessage:
 		}), /* @__PURE__ */ o(xi, { children: [/* @__PURE__ */ a(Si, { children: s ?? u.empty }), t.map((t, n) => /* @__PURE__ */ o(e.Fragment, { children: [n > 0 && /* @__PURE__ */ a(wi, {}), /* @__PURE__ */ a(Ci, {
 			heading: t.heading,
 			children: t.items.map((e) => /* @__PURE__ */ o(Ti, {
-				value: `${e.label} ${e.keywords?.join(" ") ?? ""}`,
+				value: [
+					e.label,
+					e.description,
+					e.meta,
+					...e.keywords ?? []
+				].filter(Boolean).join(" "),
 				onSelect: () => {
 					e.onSelect?.(), m(!1);
 				},
 				children: [
 					e.icon && /* @__PURE__ */ a(e.icon, {}),
-					/* @__PURE__ */ a("span", { children: e.label }),
+					/* @__PURE__ */ o("span", {
+						className: "flex min-w-0 flex-col",
+						children: [/* @__PURE__ */ a("span", {
+							className: "truncate",
+							children: e.label
+						}), e.description && /* @__PURE__ */ a("span", {
+							className: "truncate text-xs text-muted-foreground",
+							children: e.description
+						})]
+					}),
+					e.meta && /* @__PURE__ */ a("span", {
+						className: "ml-auto shrink-0 font-mono text-xs tabular-nums text-muted-foreground",
+						children: e.meta
+					}),
 					e.shortcut && /* @__PURE__ */ a(Ei, { children: e.shortcut })
 				]
 			}, e.id))
