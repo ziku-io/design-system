@@ -2,6 +2,10 @@ import * as React from "react";
 export interface ChipOption {
     value: string;
     label: string;
+    /** Classes for this value's badge. A set whose members carry a colour — a
+     *  service line, a stage, a tag — is read by shape before it is read by word,
+     *  and one grey badge per value throws that away. */
+    className?: string;
 }
 export interface ChipPickerProps {
     options: ChipOption[];

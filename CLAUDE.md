@@ -80,6 +80,14 @@ theme and zoom stores (`useThemePreference`, `useZoom`) and `antiFlashScript`,
 the import-free string a consumer's build inlines into `index.html`. Both keys
 go through `storageKey()`. Nothing in the library may hardcode an app's name.
 
+**Three fields share two variants.** `Input`, `Textarea` and `SelectTrigger`
+each take `variant="ghost" | "cell"`, and all three read the same strings from
+`src/lib/field-variants.ts`. They sit next to each other on one form, so a
+`ghost` that means one thing on the text field and another on the select is
+worse than no variant at all. The unlayered `--field` fill in `globals.css` is
+keyed to `[data-variant="default"]` for the same reason — a tinted or borderless
+field must not have the box's background painted back under it.
+
 **Dark is the default.** No class on `<html>` renders dark; `.light` opts out;
 `.dark` also works so next-themes behaves. Tokens live on `:root, .dark` and are
 overridden by `.light`. Never define a colour only inside one of those blocks.
