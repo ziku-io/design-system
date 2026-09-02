@@ -147,14 +147,26 @@ export function useDataTableViews(
   presets: DataTableView[],
   viewKey: string | undefined,
   backend?: ViewsBackend,
+  /**
+   * Which view to open on, when the caller knows: a view id out of a URL.
+   *
+   * Honoured once, and only while the person has not picked a view themselves,
+   * so a link opens where it points and stops steering the moment somebody
+   * clicks a tab. A view that arrives later from the backend is still caught,
+   * which is the whole reason this is not just an argument to `load`.
+   */
+  openOn?: string,
 ): UseDataTableViews {
   // The built-in view's name comes from the dictionary, but only on first load:
   // it is stored alongside the user's own views and renaming it is allowed, so
   // re-reading it on every render would undo a rename.
   const allLabel = useStrings().dataTable.allView
-  const [{ views, activeId }, setStore] = React.useState(() =>
-    load(viewKey, base, presets, allLabel),
-  )
+  const [{ views, activeId }, setStore] = React.useState(() => {
+    const loaded = load(viewKey, base, presets, allLabel)
+    return openOn && loaded.views.some((v) => v.id === openOn)
+      ? { ...loaded, activeId: openOn }
+      : loaded
+  })
   const [loaded, setLoaded] = React.useState(!backend)
   const active = views.find((v) => v.id === activeId) ?? views[0]
 
@@ -162,6 +174,19 @@ export function useDataTableViews(
   // would otherwise re-run the mount effect forever.
   const api = React.useRef(backend)
   api.current = backend
+
+  // A view named by the caller may be one of the backend's, which are not here
+  // yet on the first render. `chosen` closes the door as soon as the person
+  // picks a tab: a link decides where a table opens, never where it stays.
+  const chosen = React.useRef(false)
+  React.useEffect(() => {
+    if (!openOn || chosen.current) return
+    setStore((s) =>
+      s.activeId === openOn || !s.views.some((v) => v.id === openOn)
+        ? s
+        : { ...s, activeId: openOn },
+    )
+  }, [openOn, views])
 
   // Only this browser's views are written here. A remote view in localStorage
   // would come back as a duplicate on the next mount, once from storage and
@@ -286,7 +311,10 @@ export function useDataTableViews(
     sharable: Boolean(backend),
     isPreset: active.id === "default" || presets.some((p) => p.id === active.id),
     patch,
-    select: (id) => setStore((s) => ({ ...s, activeId: id })),
+    select: (id) => {
+      chosen.current = true
+      setStore((s) => ({ ...s, activeId: id }))
+    },
     add: (name, shared) =>
       setStore((s) => {
         const from = s.views.find((v) => v.id === s.activeId) ?? s.views[0]

@@ -12,6 +12,7 @@ import {
   SidebarHeader,
   SidebarInset,
   SidebarMenu,
+  SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
@@ -34,6 +35,15 @@ export interface NavItem {
   title: string
   href: string
   icon?: Icon
+  /**
+   * A count or a dot after the label: unread tickets, items awaiting triage.
+   *
+   * A number is drawn as a pill and read out after the item's name, so the nav
+   * says "Requests, 3" rather than "Requests (3)" — both apps were building
+   * that string into `title` themselves, which puts the count inside the link's
+   * name and leaves nothing to style. Anything else is rendered as given.
+   */
+  badge?: React.ReactNode
 }
 export interface NavGroup {
   label?: string
@@ -91,6 +101,20 @@ export function AppShell({
   const t = useStrings().shell
   return (
     <SidebarProvider>
+      {/* Before the sidebar, because that is the whole point of it.
+       *
+       *  It used to sit inside `SidebarInset`, which is after every nav item in
+       *  DOM order: a keyboard user reached it having already tabbed past the
+       *  thing it was offering to skip. One app noticed and rendered a second
+       *  skip link of its own in front of the shell; the other did not, and its
+       *  users tab the nav on every page load. A link that has to be
+       *  reimplemented to work is a bug here, not a preference there. */}
+      <a
+        href="#content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-background focus:px-3 focus:py-2 focus:text-sm focus:outline-2 focus:outline-ring"
+      >
+        {t.skipToContent}
+      </a>
       <Sidebar collapsible="icon">
         <SidebarHeader>
           <SidebarMenu>
@@ -119,6 +143,14 @@ export function AppShell({
                           <span>{item.title}</span>
                         </Link>
                       </SidebarMenuButton>
+                      {/* Outside the link, so the count is not part of the
+                       *  link's name, and after it in DOM order, so it is read
+                       *  after it. Hidden with the labels when the sidebar
+                       *  collapses to icons, which is `SidebarMenuBadge`'s
+                       *  own behaviour. */}
+                      {item.badge !== undefined && item.badge !== null && (
+                        <SidebarMenuBadge>{item.badge}</SidebarMenuBadge>
+                      )}
                     </SidebarMenuItem>
                   ))}
                 </SidebarMenu>
@@ -180,15 +212,6 @@ export function AppShell({
         )}
       </Sidebar>
       <SidebarInset>
-        {/* First thing a keyboard reaches, hidden until it is focused: without
-         *  it every page starts with the whole sidebar nav. Anchors at the
-         *  <main> below. */}
-        <a
-          href="#content"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-background focus:px-3 focus:py-2 focus:text-sm focus:outline-2 focus:outline-ring"
-        >
-          {t.skipToContent}
-        </a>
         <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
           <SidebarTrigger className="-ml-1" />
           <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
@@ -197,7 +220,14 @@ export function AppShell({
           <div className="flex min-w-0 flex-1 items-center gap-2">{headerContent}</div>
           {headerActions && <div className="flex items-center gap-2">{headerActions}</div>}
         </header>
-        <main id="content" className="flex flex-1 flex-col gap-6 p-4 md:p-6">
+        {/* `tabIndex={-1}`: an anchor moves focus only to something focusable,
+         *  so without it the skip link scrolls and leaves the focus where it
+         *  was, which is back in the nav. */}
+        <main
+          id="content"
+          tabIndex={-1}
+          className="flex flex-1 flex-col gap-6 p-4 md:p-6 outline-none"
+        >
           {children}
         </main>
       </SidebarInset>

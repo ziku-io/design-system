@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import { PlusIcon, TrayIcon } from "@phosphor-icons/react"
 import { PageHeader } from "./page-header"
 import { EmptyState } from "./empty-state"
+import { ErrorState } from "./error-state"
 import { Button } from "@/components/ui/button"
 
 const meta: Meta = {
@@ -36,4 +37,16 @@ export const Empty: StoryObj = {
       action={<Button variant="outline">Refresh</Button>}
     />
   ),
+}
+
+/** A read that failed. Not the empty state: "you have none" and "we could not
+ *  fetch yours" are opposite sentences and used to look identical. */
+export const Failed: StoryObj = {
+  render: () => <ErrorState onRetry={() => {}} />,
+}
+
+/** The band a `DataTable` puts in its `empty` slot, where the toolbar and the
+ *  column headers are still on screen around it. */
+export const FailedInline: StoryObj = {
+  render: () => <ErrorState variant="alert" onRetry={() => {}} />,
 }

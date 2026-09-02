@@ -173,6 +173,22 @@ would justify it is reordering inside a column, which a menu cannot express.
 
 ### Pagination
 
-`pageSize` adds a pager. Grouping and the board always show the whole set, so the pager steps aside while either is on. Everything is filtered and sorted in the browser; a server-driven list is not wired up yet — `onStateChange` gives you the active view's state if you want to mirror it into the URL.
+`pageSize` adds a pager. Grouping and the board always show the whole set, so the pager steps aside while either is on. Everything is filtered and sorted in the browser; a server-driven list goes through `paged`.
+
+### A list in the address bar
+
+`onStateChange(state, viewId)` reports the active view's state and the id of the view it belongs to; `view` opens the table on a saved view by that id. The two together are what makes a filtered list a link: the state reproduces the list, the id re-selects the tab it came from.
+
+```tsx
+<DataTable
+  columns={columns}
+  data={clients}
+  viewKey="clients"
+  view={params.get("view") ?? undefined}
+  onStateChange={(state, viewId) => write(state, viewId)}
+/>
+```
+
+`view` is honoured once, and only while nobody has picked a view themselves: a link decides where a table opens, never where it stays. An id naming no view is ignored rather than refused, because a link outlives the view it was made from and the useful answer then is the table's own opening view.
 
 For a table that is not a list of records — a summary, a spec sheet — use the raw `Table` components instead.

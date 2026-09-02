@@ -21,6 +21,9 @@ export interface UIStrings {
         noResults: string;
         all: string;
         none: string;
+        /** What `ErrorState` says when the caller gives it no title. */
+        loadFailed: string;
+        retry: string;
     };
     auth: {
         /** Login */

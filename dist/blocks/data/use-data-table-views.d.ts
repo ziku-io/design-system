@@ -65,4 +65,13 @@ export interface UseDataTableViews {
  * something to migrate: a workflow somebody built before the server existed
  * should not be the price of the server arriving.
  */
-export declare function useDataTableViews(base: DataTableState, presets: DataTableView[], viewKey: string | undefined, backend?: ViewsBackend): UseDataTableViews;
+export declare function useDataTableViews(base: DataTableState, presets: DataTableView[], viewKey: string | undefined, backend?: ViewsBackend, 
+/**
+ * Which view to open on, when the caller knows: a view id out of a URL.
+ *
+ * Honoured once, and only while the person has not picked a view themselves,
+ * so a link opens where it points and stops steering the moment somebody
+ * clicks a tab. A view that arrives later from the backend is still caught,
+ * which is the whole reason this is not just an argument to `load`.
+ */
+openOn?: string): UseDataTableViews;

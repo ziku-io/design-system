@@ -4,6 +4,15 @@ export interface NavItem {
     title: string;
     href: string;
     icon?: Icon;
+    /**
+     * A count or a dot after the label: unread tickets, items awaiting triage.
+     *
+     * A number is drawn as a pill and read out after the item's name, so the nav
+     * says "Requests, 3" rather than "Requests (3)" — both apps were building
+     * that string into `title` themselves, which puts the count inside the link's
+     * name and leaves nothing to style. Anything else is rendered as given.
+     */
+    badge?: React.ReactNode;
 }
 export interface NavGroup {
     label?: string;

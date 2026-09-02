@@ -22,6 +22,9 @@ export interface UIStrings {
     noResults: string
     all: string
     none: string
+    /** What `ErrorState` says when the caller gives it no title. */
+    loadFailed: string
+    retry: string
   }
   auth: {
     /** Login */
@@ -168,6 +171,8 @@ export const defaultStrings: UIStrings = {
     noResults: "No results.",
     all: "All",
     none: "None",
+    loadFailed: "This did not load.",
+    retry: "Try again",
   },
   auth: {
     loginTitle: "Welcome back",

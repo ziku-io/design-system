@@ -68,9 +68,25 @@ export interface DataTableProps<T extends RowData> {
     presets?: DataTableView[];
     /** localStorage key for saved views. Without it, nothing is persisted. */
     viewKey?: string;
-    /** Observe the active view's state, e.g. to mirror it into the URL.
-     *  Filtering and sorting still happen in the browser. */
-    onStateChange?: (state: DataTableState) => void;
+    /**
+     * Observe the active view's state, e.g. to mirror it into the URL.
+     * Filtering and sorting still happen in the browser.
+     *
+     * The second argument is the id of the view that state belongs to, which is
+     * what a caller needs to put a saved view in a link: the state alone
+     * reproduces the list, and the id is what re-selects the tab it came from.
+     * Pass it back as `view` and the table opens on it.
+     */
+    onStateChange?: (state: DataTableState, viewId: string) => void;
+    /**
+     * Which saved view to open on: the id `onStateChange` reported, usually out
+     * of a URL. Honoured once, and only until somebody picks a view themselves.
+     *
+     * An id that names no view is ignored rather than refused: a link can outlive
+     * the view it was made from, and the useful answer then is the table's own
+     * opening view rather than an error.
+     */
+    view?: string;
     /** Where saved views live. Absent means this browser's localStorage alone,
      *  which is the default and needs no server. */
     viewsBackend?: ViewsBackend;
@@ -107,4 +123,4 @@ export interface DataTableProps<T extends RowData> {
  * and saved views — the Notion-style list every product needs. Built on
  * TanStack Table v9.
  */
-export declare function DataTable<T extends RowData>({ columns, data, loading, empty, rowId, search, searchPlaceholder, toolbar, onRowClick, pageSize, defaultSort, defaultHidden, defaultFilters, defaultGroup, defaultMode, renderCard, boardSubtitle, presets, viewKey, onStateChange, viewsBackend, paged, csv, className, }: DataTableProps<T>): React.JSX.Element;
+export declare function DataTable<T extends RowData>({ columns, data, loading, empty, rowId, search, searchPlaceholder, toolbar, onRowClick, pageSize, defaultSort, defaultHidden, defaultFilters, defaultGroup, defaultMode, renderCard, boardSubtitle, presets, viewKey, onStateChange, view, viewsBackend, paged, csv, className, }: DataTableProps<T>): React.JSX.Element;
