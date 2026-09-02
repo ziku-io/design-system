@@ -19,10 +19,21 @@ declare function SidebarProvider({ defaultOpen, open: openProp, onOpenChange: se
     open?: boolean;
     onOpenChange?: (open: boolean) => void;
 }): React.JSX.Element;
-declare function Sidebar({ side, variant, collapsible, className, children, ...props }: React.ComponentProps<"div"> & {
+declare function Sidebar({ side, variant, collapsible, className, rootClassName, children, ...props }: React.ComponentProps<"div"> & {
     side?: "left" | "right";
     variant?: "sidebar" | "floating" | "inset";
     collapsible?: "offcanvas" | "icon" | "none";
+    /**
+     * Classes on the outer element, which holds both the fixed pane and the
+     * spacer that reserves its column. `className` reaches only the pane, so
+     * `print:hidden` there leaves the spacer behind as an empty gutter — which is
+     * why a consumer was hiding this with `!important` on our `data-slot`
+     * attributes instead, and why a restructure here used to break its printing.
+     *
+     * ponytail: desktop only. Below `md` the sidebar is a `Sheet`, which is not
+     * on the page unless the user opened it, so print has nothing to hide.
+     */
+    rootClassName?: string;
 }): React.JSX.Element;
 declare function SidebarTrigger({ className, onClick, ...props }: React.ComponentProps<typeof Button>): React.JSX.Element;
 declare function SidebarRail({ className, ...props }: React.ComponentProps<"button">): React.JSX.Element;

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import {
   BellIcon,
+  CaretDownIcon,
   ChartBarIcon,
   CreditCardIcon,
   GearIcon,
@@ -14,7 +15,12 @@ import { PageHeader } from "@/blocks/page/page-header"
 import { EmptyState } from "@/blocks/page/empty-state"
 import { Button } from "@/components/ui/button"
 import { CommandMenu, SearchTrigger } from "@/blocks/search/command-menu"
-import { DropdownMenuItem } from "@/components/ui/dropdown-menu"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -227,5 +233,42 @@ export const LongBreadcrumb: StoryObj<typeof AppShell> = {
       </>
     ),
     children: <PageHeader title="Documents" />,
+  },
+}
+
+/**
+ * The seams. `classNames` reaches the three regions a page has reasons to
+ * change — here the header is tinted and the sidebar carries `print:hidden`,
+ * neither of which used to be possible without a `!important` selector on this
+ * library's `data-slot` attributes. `sidebarHeader` is the slot above the nav
+ * that is not inside the brand's link, so a dropdown can live in it. `bleed`
+ * drops `main`'s gutter for a page that runs to the edges.
+ */
+export const Seams: StoryObj<typeof AppShell> = {
+  args: {
+    brand,
+    nav,
+    user,
+    currentPath: "/",
+    bleed: true,
+    classNames: { sidebar: "print:hidden", header: "bg-muted/40 print:hidden" },
+    sidebarHeader: (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size="sm" className="w-full justify-between">
+            Northwind <CaretDownIcon />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start">
+          <DropdownMenuItem>Northwind</DropdownMenuItem>
+          <DropdownMenuItem>Contoso</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    ),
+    children: (
+      <div className="flex h-40 items-center justify-center bg-muted text-sm text-muted-foreground">
+        Full bleed: no gutter around this.
+      </div>
+    ),
   },
 }

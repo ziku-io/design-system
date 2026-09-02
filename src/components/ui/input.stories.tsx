@@ -27,3 +27,29 @@ export const Disabled: Story = {
   args: { disabled: true, defaultValue: "read only" },
 }
 export const File: Story = { args: { type: "file", placeholder: undefined } }
+
+/**
+ * `ghost` shows no chrome until it is pointed at, for a field inside something
+ * already bordered. `cell` fills a table cell, so the grid does not move when a
+ * row goes from reading to editing. Both were app-level CSS classes before.
+ */
+export const Variants: Story = {
+  render: () => (
+    <div className="grid w-72 gap-4">
+      <div className="grid gap-2">
+        <Label>Default</Label>
+        <Input placeholder="you@company.com" />
+      </div>
+      <div className="grid gap-2">
+        <Label>Ghost</Label>
+        <Input variant="ghost" placeholder="Untitled view" />
+      </div>
+      <div className="grid gap-2">
+        <Label>Cell</Label>
+        <div className="rounded-md border">
+          <Input variant="cell" defaultValue="1,240.00" />
+        </div>
+      </div>
+    </div>
+  ),
+}

@@ -7,6 +7,8 @@ import {
   AvatarGroup,
   AvatarGroupCount,
   AvatarImage,
+  AvatarStack,
+  UserAvatar,
 } from "./avatar"
 
 const meta: Meta<typeof Avatar> = {
@@ -72,5 +74,26 @@ export const Group: Story = {
       ))}
       <AvatarGroupCount>+5</AvatarGroupCount>
     </AvatarGroup>
+  ),
+}
+
+/** The composition every app rewrote: the image, the initials fallback, and
+ *  `alt` equal to the name. `initials` now exists once in the repository. */
+export const Users: StoryObj = {
+  render: () => (
+    <div className="flex items-center gap-6">
+      <UserAvatar name="Maria de Sousa Pinto" />
+      <UserAvatar name="Ada Lovelace" size="lg" />
+      <AvatarStack
+        max={3}
+        people={[
+          { name: "Ana Silva" },
+          { name: "António Silvestre" },
+          { name: "Ada Lovelace" },
+          { name: "Beatriz Costa" },
+          { name: "Carlos Dias" },
+        ]}
+      />
+    </div>
   ),
 }

@@ -63,15 +63,32 @@ and each one is already load-bearing somewhere:
   `TabsList` scrolls inside `max-w-full`. Both are set by the consumer's data,
   so neither can be assumed short.
 
+`Sidebar` takes `rootClassName` as well as `className`: `className` reaches only
+the fixed pane, so `print:hidden` there leaves the spacer behind as an empty
+gutter. `AppShell`'s `classNames.sidebar` goes to `rootClassName` for exactly
+that reason - a consumer used to hide this with `!important` on our `data-slot`
+attributes, which made any restructure here a silent break over there.
+
 `SidebarInset` needs its `min-w-0`. It is a flex child, so it defaults to
 `min-width: auto` and a wide table inside it stretches the row rather than
 scrolling: the inset claimed the full 983px next to a 256px sidebar instead of
 the 727px left over. This one bites at desktop width, not on a phone, because
 the sidebar is a `Sheet` below `md`.
 
+**Preferences live here, not in the app.** `src/lib/preferences.ts` holds the
+theme and zoom stores (`useThemePreference`, `useZoom`) and `antiFlashScript`,
+the import-free string a consumer's build inlines into `index.html`. Both keys
+go through `storageKey()`. Nothing in the library may hardcode an app's name.
+
 **Dark is the default.** No class on `<html>` renders dark; `.light` opts out;
 `.dark` also works so next-themes behaves. Tokens live on `:root, .dark` and are
 overridden by `.light`. Never define a colour only inside one of those blocks.
+
+**The two sidebar collapse modes animate differently.** `offcanvas` slides the
+fixed pane on `transform` and leaves the spacer's width unanimated; `icon`
+changes the pane's own width (16rem to 3rem), which no transform can express, so
+it still animates `width`. They shared one model until #27, and a collapse
+re-laid-out the whole document for 200ms. Do not merge them back.
 
 **One brand accent, a blue-purple** (`#5b5bd6`). It drives `--primary`,
 `--ring`, `--link` and the sidebar active state. Use `text-link` for inline

@@ -230,6 +230,14 @@
   * {
     @apply border-border outline-ring/50;
   }
+  /* The zoom preference. Everything in the library is sized in rem, so one
+     multiplier on the root scales the whole interface — `useZoom` writes it,
+     and `antiFlashScript` writes it again before the first paint so the page
+     does not resize under the reader. Unset means 1, i.e. an app that never
+     offers zoom pays nothing for this. */
+  html {
+    font-size: calc(100% * var(--app-zoom, 1));
+  }
   body {
     @apply bg-background text-foreground antialiased;
   }
@@ -238,7 +246,7 @@
 /* Unlayered on purpose: these beat the utilities baked into the shadcn components,
    where GitHub's structure differs from shadcn defaults.
    ponytail: keep this block short — if it grows, fork the component instead. */
-[data-slot="input"],
+[data-slot="input"][data-variant="default"],
 [data-slot="textarea"],
 [data-slot="select-trigger"] {
   background-color: var(--field);
