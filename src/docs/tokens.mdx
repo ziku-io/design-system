@@ -110,6 +110,40 @@ something went wrong. Never pick one by eye; `palette.test.ts` measures them.
 
 <ChartPalette />
 
+## Categorical slots
+
+Five colours that mean nothing, for the things an app has to tell apart without
+any of them being good or bad: a service line, a project type, a team, a tag.
+
+They are a third set on purpose. The status families carry meaning, and a
+service line tinted danger red says the service line is broken. The chart set
+above is built for a filled bar carrying no label, which is a 3:1 problem with
+no tint to sit on. A slot is text on a tint, so it is a 4.5:1 problem: use
+`text-slot-2` on `bg-slot-2-subtle`.
+
+Every slot clears 4.5:1 on its own tint, on the page and on a card. The five
+hold a worst pairwise ΔE of 23.9 dark and 20.6 light across normal vision and
+protanopia, deuteranopia and tritanopia, and every hue sits at least 25° off all
+four status hues and off the brand.
+
+Five, because Tailwind only ships classes it can find written out: a
+`text-slot-6` that nothing names does not exist. An app with a sixth category
+adds a sixth pair to `globals.css` and a sixth literal where it names them.
+
+<TokenTable
+  rows={[
+    { token: "slot-1", on: "slot-1-subtle", use: "The first category, whatever the app's first category is" },
+    { token: "slot-2", on: "slot-2-subtle", use: "The second" },
+    { token: "slot-3", on: "slot-3-subtle", use: "The third" },
+    { token: "slot-4", on: "slot-4-subtle", use: "The fourth" },
+    { token: "slot-5", on: "slot-5-subtle", use: "The fifth" },
+  ]}
+/>
+
+Never pick one by meaning. A slot is the position a thing holds in the app's own
+list, so reordering that list recolours the chips, which is usually not what you
+want.
+
 ## Radius
 
 Flat: 6px on controls and boxes (`rounded-md`, `rounded-lg`), 4px small, 8px for

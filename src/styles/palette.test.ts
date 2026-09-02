@@ -110,6 +110,7 @@ function distance(a: string, b: string, vision?: string) {
 }
 
 const CHARTS = [1, 2, 3, 4, 5] as const
+const SLOTS = [1, 2, 3, 4, 5] as const
 const VISIONS = [undefined, "protan", "deutan", "tritan"]
 
 const STATUS = ["danger", "warning", "success", "info"] as const
@@ -175,6 +176,33 @@ describe.each([
     const ls = CHARTS.map((n) => luminance(t[`chart-${n}`])).sort((a, b) => a - b)
     for (let i = 1; i < ls.length; i++)
       expect((ls[i] + 0.05) / (ls[i - 1] + 0.05)).toBeGreaterThanOrEqual(1.12)
+  })
+
+
+  it.each(SLOTS)("reads slot-%i as text on its tint, the page and a card", (n) => {
+    // A slot is text and icons, not a filled bar, so 4.5:1 and not 3:1.
+    for (const ground of [t[`slot-${n}-subtle`], t.background, t.card])
+      expect(contrast(t[`slot-${n}`], ground)).toBeGreaterThanOrEqual(4.5)
+  })
+
+  it("keeps the slots apart from each other", () => {
+    const hexes = SLOTS.map((n) => t[`slot-${n}`])
+    for (const vision of VISIONS)
+      for (const [i, a] of hexes.entries())
+        for (const b of hexes.slice(i + 1))
+          expect(distance(a, b, vision)).toBeGreaterThanOrEqual(20)
+  })
+
+  it("keeps a category from reading as a state", () => {
+    // The whole point of a separate ramp: a service line tinted danger red
+    // says the service line is broken. 25deg clear of all four status hues,
+    // and of the brand, so nothing borrows a meaning it does not have.
+    const meanings = ["danger", "warning", "success", "info", "primary"]
+    for (const n of SLOTS)
+      for (const m of meanings) {
+        const d = Math.abs(hue(t[`slot-${n}`]) - hue(t[m]))
+        expect(Math.min(d, 360 - d)).toBeGreaterThanOrEqual(25)
+      }
   })
 
   it("separates cards from the page", () => {

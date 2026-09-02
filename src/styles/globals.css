@@ -90,6 +90,36 @@
   --chart-3: #5c90a8;
   --chart-4: #d4ae4e;
   --chart-5: #ac5248;
+
+  /* ── Categorical slots ─────────────────────────────────────────────
+     Five colours that mean nothing.
+     
+     A service line, a project type, a team, a tag: things an app needs to tell
+     apart without any of them being good or bad. The status families are the
+     wrong tool (danger red on a service line says the service line is broken)
+     and the chart set is too: those are built for a 3:1 filled bar carrying no
+     label, and carry no tint to sit on.
+     
+     `slot-n` is text and icons, `slot-n-subtle` the ground under them. Every
+     slot clears 4.5:1 on its own tint, on the page and on a card, and the five
+     hold a worst pairwise deltaE of 23.9 across normal, protan, deutan and
+     tritan vision. Their hues sit at least 25deg off all four status hues and
+     off the brand, so a category is never read as a state.
+     
+     Five, because Tailwind only ships classes it can find written out: a
+     `text-slot-6` that nothing names does not exist. An app with a sixth
+     category adds a sixth pair here and a sixth literal where it names them.
+     `palette.test.ts` measures all of it. */
+  --slot-1: #dcedc6;
+  --slot-1-subtle: #1f2615;
+  --slot-2: #69cc69;
+  --slot-2-subtle: #152515;
+  --slot-3: #6786ce;
+  --slot-3-subtle: #151a26;
+  --slot-4: #ddb4e7;
+  --slot-4-subtle: #221526;
+  --slot-5: #b27699;
+  --slot-5-subtle: #22191e;
   --sidebar: #14181f;
   --sidebar-foreground: #d7dde5;
   --sidebar-primary: #7966cf;
@@ -164,6 +194,19 @@
   --chart-3: #355360;
   --chart-4: #9b7b29;
   --chart-5: #79261d;
+
+  /* The same five hues, relit for a white card. Worst pairwise deltaE 20.6;
+     see the note on the dark set. */
+  --slot-1: #3c492a;
+  --slot-1-subtle: #f1f4ee;
+  --slot-2: #297e29;
+  --slot-2-subtle: #ecf6ec;
+  --slot-3: #2f4b8c;
+  --slot-3-subtle: #eceff6;
+  --slot-4: #472251;
+  --slot-4-subtle: #f3edf5;
+  --slot-5: #924c75;
+  --slot-5-subtle: #f4eef1;
   --sidebar: #f4f5f8;
   --sidebar-foreground: #2b3038;
   --sidebar-primary: #7966cf;
@@ -230,6 +273,16 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+  --color-slot-1: var(--slot-1);
+  --color-slot-1-subtle: var(--slot-1-subtle);
+  --color-slot-2: var(--slot-2);
+  --color-slot-2-subtle: var(--slot-2-subtle);
+  --color-slot-3: var(--slot-3);
+  --color-slot-3-subtle: var(--slot-3-subtle);
+  --color-slot-4: var(--slot-4);
+  --color-slot-4-subtle: var(--slot-4-subtle);
+  --color-slot-5: var(--slot-5);
+  --color-slot-5-subtle: var(--slot-5-subtle);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
