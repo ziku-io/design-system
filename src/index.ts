@@ -30,9 +30,11 @@ export * from "./blocks/auth/login-form"
 export * from "./blocks/auth/register-form"
 export * from "./blocks/auth/forgot-password-form"
 export * from "./blocks/search/command-menu"
+export * from "./blocks/search/combobox"
 export * from "./blocks/data/data-table"
 export * from "./blocks/data/types"
 export * from "./blocks/data/kanban"
+export * from "./blocks/data/chip-picker"
 export * from "./blocks/data/csv"
 export * from "./blocks/data/list-url"
 export {
@@ -42,11 +44,16 @@ export {
   type ViewsBackend,
 } from "./blocks/data/use-data-table-views"
 export * from "./blocks/shell/app-shell"
+export * from "./blocks/shell/preference-menus"
 export * from "./blocks/modal/modal"
+export * from "./blocks/modal/confirm"
 export * from "./blocks/page/page-header"
 export * from "./blocks/page/empty-state"
 export * from "./blocks/page/error-state"
+export * from "./blocks/page/error-boundary"
+export * from "./blocks/page/stat-tile"
 export { cn } from "./lib/utils"
+export { initials } from "./lib/initials"
 export { setStoragePrefix, storagePrefix, storageKey } from "./lib/storage"
 export {
   UIStringsProvider,
@@ -59,3 +66,17 @@ export {
 export { Link, LinkProvider, type LinkProps } from "./lib/link"
 export { useIsMobile } from "./hooks/use-mobile"
 export { useTheme, type Theme } from "./hooks/use-theme"
+export {
+  antiFlashScript,
+  resolveTheme,
+  useThemePreference,
+  useZoom,
+  ZOOM_DEFAULT,
+  ZOOM_MAX,
+  ZOOM_MIN,
+  ZOOM_STEPS,
+  type ResolvedTheme,
+  type ThemeControl,
+  type ThemePreference,
+  type ZoomControl,
+} from "./lib/preferences"

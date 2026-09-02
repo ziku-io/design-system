@@ -19,7 +19,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { Separator } from "@/components/ui/separator"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { UserAvatar } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,6 +29,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Link } from "@/lib/link"
+import { cn } from "@/lib/utils"
 import { useStrings } from "@/lib/strings"
 
 export interface NavItem {
@@ -63,6 +64,18 @@ export interface ShellUser {
 export interface AppShellProps {
   /** Logo / product name shown at the top of the sidebar */
   brand: React.ReactNode
+  /**
+   * Where the brand links to. `null` renders it as plain content, for an app
+   * whose home is behind the nav rather than at `/`.
+   */
+  brandHref?: string | null
+  /**
+   * Anything above the nav and outside the brand's link: a workspace switcher,
+   * a tenant picker, a search box. It could not go in `brand`, because a
+   * dropdown inside a link is neither valid markup nor operable with a
+   * keyboard, and an app that wanted one had to put it in the top bar instead.
+   */
+  sidebarHeader?: React.ReactNode
   nav: NavGroup[]
   /** Current pathname, used to highlight the active item */
   currentPath?: string
@@ -74,21 +87,33 @@ export interface AppShellProps {
   headerActions?: React.ReactNode
   /** Left side of the top bar, after the trigger (breadcrumbs, page title) */
   headerContent?: React.ReactNode
+  /**
+   * Classes for the three regions a page has reasons to reach: hiding the
+   * chrome for print, sticking the header, colouring the sidebar. Without
+   * these a consumer's stylesheet has to select on this library's own
+   * `data-slot` attributes, which makes any restructure here a silent break
+   * over there.
+   */
+  classNames?: {
+    /** The whole sidebar column, spacer included, so `print:hidden` works. */
+    sidebar?: string
+    header?: string
+    main?: string
+  }
+  /**
+   * Drops `main`'s gutter for a page that runs to the edges — a map, a board, a
+   * document preview. The alternative was a negative margin in the page that
+   * had to match this file's padding, and a version bump already broke one.
+   */
+  bleed?: boolean
   children: React.ReactNode
-}
-
-function initials(name: string) {
-  return name
-    .split(" ")
-    .map((s) => s[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase()
 }
 
 /** Standard authenticated app layout: collapsible sidebar nav + top bar + content area. */
 export function AppShell({
   brand,
+  brandHref = "/",
+  sidebarHeader,
   nav,
   currentPath,
   user,
@@ -96,6 +121,8 @@ export function AppShell({
   onSignOut,
   headerActions,
   headerContent,
+  classNames,
+  bleed = false,
   children,
 }: AppShellProps) {
   const t = useStrings().shell
@@ -115,15 +142,24 @@ export function AppShell({
       >
         {t.skipToContent}
       </a>
-      <Sidebar collapsible="icon">
+      <Sidebar collapsible="icon" rootClassName={classNames?.sidebar}>
         <SidebarHeader>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton size="lg" asChild>
-                <Link href="/">{brand}</Link>
-              </SidebarMenuButton>
+              {brandHref === null ? (
+                <div className="flex h-12 items-center gap-2 p-2 text-sm">{brand}</div>
+              ) : (
+                <SidebarMenuButton size="lg" asChild>
+                  <Link href={brandHref}>{brand}</Link>
+                </SidebarMenuButton>
+              )}
             </SidebarMenuItem>
           </SidebarMenu>
+          {/* After the brand and outside its link. Hidden with the labels when
+           *  the sidebar collapses to icons: a switcher 3rem wide is not one. */}
+          {sidebarHeader && (
+            <div className="group-data-[collapsible=icon]:hidden">{sidebarHeader}</div>
+          )}
         </SidebarHeader>
         <SidebarContent>
           {nav.map((group, i) => (
@@ -165,12 +201,11 @@ export function AppShell({
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <SidebarMenuButton size="lg" className="data-[state=open]:bg-sidebar-accent">
-                      <Avatar className="size-8 rounded-lg">
-                        <AvatarImage src={user.avatarUrl} alt={user.name} />
-                        <AvatarFallback className="rounded-lg">
-                          {initials(user.name)}
-                        </AvatarFallback>
-                      </Avatar>
+                      <UserAvatar
+                        name={user.name}
+                        src={user.avatarUrl}
+                        className="size-8 rounded-lg *:rounded-lg"
+                      />
                       <div className="grid flex-1 text-left text-sm leading-tight">
                         <span className="truncate font-medium">{user.name}</span>
                         <span className="truncate text-xs text-muted-foreground">
@@ -212,7 +247,9 @@ export function AppShell({
         )}
       </Sidebar>
       <SidebarInset>
-        <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
+        <header
+          className={cn("flex h-14 shrink-0 items-center gap-2 border-b px-4", classNames?.header)}
+        >
           <SidebarTrigger className="-ml-1" />
           <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
           {/* min-w-0: a flex child defaults to min-width:auto, so a long
@@ -226,7 +263,11 @@ export function AppShell({
         <main
           id="content"
           tabIndex={-1}
-          className="flex flex-1 flex-col gap-6 p-4 md:p-6 outline-none"
+          className={cn(
+            "flex flex-1 flex-col outline-none",
+            bleed ? "gap-0" : "gap-6 p-4 md:p-6",
+            classNames?.main,
+          )}
         >
           {children}
         </main>

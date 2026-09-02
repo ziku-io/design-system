@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import { useState } from "react"
 
 import { Modal } from "./modal"
+import { ConfirmProvider, useConfirm } from "./confirm"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -112,4 +113,52 @@ export const Wide: StoryObj = {
       </p>
     </Demo>
   ),
+}
+
+/** The question `Modal` deliberately left out. Both buttons resolve a promise
+ *  the caller is awaiting, so the page reads `if (await confirm(…))`. */
+export const Awaitable: StoryObj = {
+  render: function ConfirmDemo() {
+    const [said, setSaid] = useState<string>("")
+    function Ask() {
+      const { confirm, prompt } = useConfirm()
+      return (
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            variant="danger"
+            onClick={async () => {
+              const yes = await confirm({
+                title: "Delete this client?",
+                description: "Their fee notes and documents go with them.",
+                confirmLabel: "Delete",
+                danger: true,
+              })
+              setSaid(yes ? "deleted" : "kept")
+            }}
+          >
+            Delete client
+          </Button>
+          <Button
+            variant="outline"
+            onClick={async () => {
+              const name = await prompt({
+                title: "Name this view",
+                label: "View name",
+                defaultValue: "Overdue",
+              })
+              setSaid(name === null ? "cancelled" : name)
+            }}
+          >
+            Rename view
+          </Button>
+          <span className="text-sm text-muted-foreground">{said}</span>
+        </div>
+      )
+    }
+    return (
+      <ConfirmProvider>
+        <Ask />
+      </ConfirmProvider>
+    )
+  },
 }

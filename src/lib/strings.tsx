@@ -25,6 +25,11 @@ export interface UIStrings {
     /** What `ErrorState` says when the caller gives it no title. */
     loadFailed: string
     retry: string
+    /** What `ErrorBoundary` says over a render that threw. Not `loadFailed`:
+     *  nothing was being fetched, the screen itself broke. */
+    crashed: string
+    /** The yes of `confirm()`. A caller with a verb passes `confirmLabel`. */
+    confirm: string
   }
   auth: {
     /** Login */
@@ -67,6 +72,17 @@ export interface UIStrings {
     signOut: string
     /** The first thing a keyboard user reaches, jumping the sidebar nav. */
     skipToContent: string
+  }
+  preferences: {
+    /** The theme menu's own name, on its trigger and its heading. */
+    appearance: string
+    /** Follow the operating system, which is the default. */
+    system: string
+    light: string
+    dark: string
+    zoom: string
+    /** An item in the zoom menu: `zoomLevel(125)` reads "125%". */
+    zoomLevel: (percent: number) => string
   }
   dataTable: {
     /** The view every table starts on. */
@@ -173,6 +189,8 @@ export const defaultStrings: UIStrings = {
     none: "None",
     loadFailed: "This did not load.",
     retry: "Try again",
+    crashed: "Something went wrong on this screen.",
+    confirm: "Confirm",
   },
   auth: {
     loginTitle: "Welcome back",
@@ -209,6 +227,14 @@ export const defaultStrings: UIStrings = {
   shell: {
     signOut: "Sign out",
     skipToContent: "Skip to content",
+  },
+  preferences: {
+    appearance: "Appearance",
+    system: "System",
+    light: "Light",
+    dark: "Dark",
+    zoom: "Zoom",
+    zoomLevel: (percent) => `${num(percent)}%`,
   },
   dataTable: {
     allView: "All",
