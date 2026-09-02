@@ -2,6 +2,7 @@ import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
+import { FIELD_VARIANTS } from "@/lib/field-variants"
 
 const inputVariants = cva(
   cn(
@@ -14,19 +15,8 @@ const inputVariants = cva(
       variant: {
         default:
           "border border-input bg-transparent shadow-xs focus-visible:border-ring dark:bg-input/30",
-        /**
-         * No chrome until it is pointed at or focused. For a field that sits
-         * inside something already bordered — a picker's trigger, a toolbar —
-         * where a second box around it reads as a second control.
-         */
-        ghost:
-          "border border-transparent bg-transparent hover:border-input focus-visible:border-ring",
-        /**
-         * A table cell that happens to be editable: no border, no rounding, and
-         * the cell's own padding. It fills the cell, so the grid does not move
-         * when a row goes from reading to editing.
-         */
-        cell: "h-8 rounded-none border-0 bg-transparent px-2 shadow-none hover:bg-accent/40 focus-visible:bg-background focus-visible:ring-inset",
+        ghost: FIELD_VARIANTS.ghost,
+        cell: `h-8 px-2 ${FIELD_VARIANTS.cell}`,
       },
     },
     defaultVariants: { variant: "default" },

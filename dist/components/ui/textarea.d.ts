@@ -1,3 +1,9 @@
+import { FieldVariant } from '../../lib/field-variants';
 import * as React from "react";
-declare function Textarea({ className, ...props }: React.ComponentProps<"textarea">): React.JSX.Element;
+export type TextareaProps = React.ComponentProps<"textarea"> & {
+    /** `ghost` is the tinted field, `cell` the borderless one. Same two
+     *  treatments as `Input` and `SelectTrigger`, from the same definition. */
+    variant?: FieldVariant;
+};
+declare function Textarea({ className, variant, ...props }: TextareaProps): React.JSX.Element;
 export { Textarea };

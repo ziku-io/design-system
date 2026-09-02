@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import { Input } from "./input"
+import { Textarea } from "./textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./select"
 import { Label } from "./label"
 
 const meta: Meta<typeof Input> = {
@@ -43,6 +45,16 @@ export const Variants: Story = {
       <div className="grid gap-2">
         <Label>Ghost</Label>
         <Input variant="ghost" placeholder="Untitled view" />
+        <Textarea variant="ghost" rows={2} placeholder="Notes" />
+        <Select>
+          <SelectTrigger variant="ghost" className="w-full">
+            <SelectValue placeholder="Pick one" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="a">Lead</SelectItem>
+            <SelectItem value="b">Active</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
       <div className="grid gap-2">
         <Label>Cell</Label>

@@ -20,6 +20,15 @@ const STAGES = [
   { value: "closed", label: "Closed" },
 ]
 
+/** A set whose members carry a colour, which is how a row of them is read
+ *  before the words are. `className` is per option, so the palette stays the
+ *  app's. */
+const SERVICES = [
+  { value: "tax", label: "Tax", className: "bg-info-subtle text-info-fg" },
+  { value: "audit", label: "Audit", className: "bg-success-subtle text-success-fg" },
+  { value: "payroll", label: "Payroll", className: "bg-warning-subtle text-warning-fg" },
+]
+
 /** Picked values stay visible in the trigger; the fourth and beyond collapse
  *  into a "+N" rather than growing the row. */
 export const Stages: StoryObj = {
@@ -29,6 +38,18 @@ export const Stages: StoryObj = {
       <div className="grid max-w-sm gap-2">
         <Label>Stages</Label>
         <ChipPicker options={STAGES} value={value} onChange={setValue} placeholder="Any stage" />
+      </div>
+    )
+  },
+}
+
+export const Coloured: StoryObj = {
+  render: function Coloured() {
+    const [value, setValue] = React.useState<string[]>(["tax"])
+    return (
+      <div className="grid max-w-sm gap-2">
+        <Label>Services</Label>
+        <ChipPicker options={SERVICES} value={value} onChange={setValue} placeholder="No service" />
       </div>
     )
   },

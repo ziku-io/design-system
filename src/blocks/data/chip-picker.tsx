@@ -10,6 +10,10 @@ import { useStrings } from "@/lib/strings"
 export interface ChipOption {
   value: string
   label: string
+  /** Classes for this value's badge. A set whose members carry a colour — a
+   *  service line, a stage, a tag — is read by shape before it is read by word,
+   *  and one grey badge per value throws that away. */
+  className?: string
 }
 
 export interface ChipPickerProps {
@@ -69,7 +73,11 @@ export function ChipPicker({
             <span className="text-muted-foreground">{placeholder}</span>
           ) : (
             shown.map((option) => (
-              <Badge key={option.value} variant="secondary" className="max-w-40 truncate">
+              <Badge
+                key={option.value}
+                variant="secondary"
+                className={cn("max-w-40 truncate", option.className)}
+              >
                 {option.label}
               </Badge>
             ))
@@ -97,7 +105,14 @@ export function ChipPicker({
                 {/* Decorative: the row is the control and carries the state in
                  *  `aria-selected`, so a second announcement would double it. */}
                 <Checkbox checked={on} tabIndex={-1} aria-hidden className="pointer-events-none" />
-                <span className="min-w-0 flex-1 truncate">{option.label}</span>
+                {option.className ? (
+                  <Badge variant="secondary" className={cn("truncate", option.className)}>
+                    {option.label}
+                  </Badge>
+                ) : (
+                  <span className="min-w-0 flex-1 truncate">{option.label}</span>
+                )}
+                {option.className && <span className="min-w-0 flex-1" />}
                 {on && <CheckIcon className="size-3.5 shrink-0" weight="bold" />}
               </button>
             )

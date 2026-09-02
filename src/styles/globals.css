@@ -247,8 +247,8 @@
    where GitHub's structure differs from shadcn defaults.
    ponytail: keep this block short — if it grows, fork the component instead. */
 [data-slot="input"][data-variant="default"],
-[data-slot="textarea"],
-[data-slot="select-trigger"] {
+[data-slot="textarea"][data-variant="default"],
+[data-slot="select-trigger"][data-variant="default"] {
   background-color: var(--field);
 }
 /* GitHub's neutral button: filled, bordered, not transparent */
@@ -260,7 +260,7 @@
   background-color: var(--accent);
 }
 /* The field background above wins over any utility, so the hover has to live here too */
-[data-slot="select-trigger"]:not([disabled]):hover {
+[data-slot="select-trigger"][data-variant="default"]:not([disabled]):hover {
   background-color: var(--accent);
 }
 /* Links are blue even though the primary action color is green */
