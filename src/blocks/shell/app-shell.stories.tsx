@@ -39,7 +39,9 @@ const nav = [
       { title: "Dashboard", href: "/", icon: HouseIcon },
       { title: "Projects", href: "/projects", icon: FolderIcon },
       { title: "Analytics", href: "/analytics", icon: ChartBarIcon },
-      { title: "Team", href: "/team", icon: UsersIcon },
+      // A count in the nav: what is waiting on this person, said in the one
+      // place they look before opening anything.
+      { title: "Team", href: "/team", icon: UsersIcon, badge: 3 },
     ],
   },
   {

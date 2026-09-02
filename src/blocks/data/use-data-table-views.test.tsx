@@ -19,8 +19,8 @@ const base: DataTableState = {
   mode: "table",
 }
 
-const render = (viewKey: string | undefined, backend?: ViewsBackend) =>
-  renderHook(() => useDataTableViews(base, [], viewKey, backend))
+const render = (viewKey: string | undefined, backend?: ViewsBackend, openOn?: string) =>
+  renderHook(() => useDataTableViews(base, [], viewKey, backend, openOn))
 
 /** A backend that records what it was asked to do. */
 function fake(seed: SavedView[] = []) {
@@ -134,7 +134,9 @@ describe("with a backend", () => {
     // It went up private: migrating a personal view must not publish it.
     expect((calls.create[0] as SavedView).shared).toBe(false)
     // And it is not there twice, once local and once remote.
-    await waitFor(() => expect(result.current.views.map((v) => v.name)).toEqual(["All", "Missing id"]))
+    await waitFor(() =>
+      expect(result.current.views.map((v) => v.name)).toEqual(["All", "Missing id"]),
+    )
     // A remote view is not written back to localStorage, or the next mount
     // would load it a second time.
     await waitFor(() =>
@@ -210,5 +212,64 @@ describe("with a backend", () => {
     // A table that will not draw is worse than a table missing a view.
     await waitFor(() => expect(result.current.loaded).toBe(true))
     expect(result.current.views.map((v) => v.name)).toContain("Mine")
+  })
+})
+
+describe("opening on a named view", () => {
+  it("opens on one this browser saved", () => {
+    localStorage.setItem(
+      "ziku.views.clients",
+      JSON.stringify({
+        views: [
+          { id: "default", name: "All", icon: "table", state: base },
+          { id: "v1-mine", name: "Mine", icon: "star", state: base },
+        ],
+        activeId: "default",
+      }),
+    )
+    const { result } = render("clients", undefined, "v1-mine")
+    expect(result.current.active.id).toBe("v1-mine")
+  })
+
+  it("waits for a view that lives on the server", async () => {
+    const { backend } = fake([
+      {
+        id: "server-1",
+        name: "Shared",
+        icon: "users",
+        state: base,
+        shared: true,
+        canDelete: false,
+      },
+    ])
+    // Not there on the first render: the link points at a view the backend has
+    // not answered with yet, which is the case a plain initial state misses.
+    const { result } = render("clients", backend, "server-1")
+    expect(result.current.active.id).toBe("default")
+    await waitFor(() => expect(result.current.active.id).toBe("server-1"))
+  })
+
+  it("ignores an id that names no view, rather than showing nothing", () => {
+    const { result } = render("clients", undefined, "v9-deleted")
+    expect(result.current.active.id).toBe("default")
+  })
+
+  it("stops steering once somebody picks a view", async () => {
+    const { backend } = fake([
+      {
+        id: "server-1",
+        name: "Shared",
+        icon: "users",
+        state: base,
+        shared: true,
+        canDelete: false,
+      },
+    ])
+    const { result } = render("clients", backend, "server-1")
+    // The person clicks "All" before the server answers. A link decides where a
+    // table opens, never where it stays.
+    act(() => result.current.select("default"))
+    await waitFor(() => expect(result.current.loaded).toBe(true))
+    expect(result.current.active.id).toBe("default")
   })
 })
