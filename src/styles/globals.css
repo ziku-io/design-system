@@ -77,11 +77,19 @@
   --tooltip-foreground: #ffffff;
   --ring: #8c78e4; /* focus ring follows the brand */
   --link: #a79ef0;
-  --chart-1: #7966cf;
-  --chart-2: #4aa06e;
-  --chart-3: #4fa9c2;
-  --chart-4: #cfa54e;
-  --chart-5: #c4699f;
+  /* Charts are a different problem from badges, and the two sets are tuned
+     apart. A bar carries no label, so neighbouring series have to survive
+     greyscale and colour blindness: these five hold a worst pairwise deltaE of
+     36.0 across normal, protan, deutan and tritan vision, every one of them at
+     3:1 or better on both the card and the page, and the lightness staggered so
+     the separation survives greyscale. Slot 5 is a red, for a series that means
+     something went wrong. `palette.test.ts` measures all three properties; do
+     not swap one by eye. */
+  --chart-1: #8f5bd6;
+  --chart-2: #cce6d8;
+  --chart-3: #5c90a8;
+  --chart-4: #d4ae4e;
+  --chart-5: #ac5248;
   --sidebar: #14181f;
   --sidebar-foreground: #d7dde5;
   --sidebar-primary: #7966cf;
@@ -149,11 +157,13 @@
   --tooltip-foreground: #ffffff;
   --ring: #7966cf;
   --link: #5b4fc4;
-  --chart-1: #7966cf;
-  --chart-2: #38855c;
-  --chart-3: #357f93;
-  --chart-4: #a97c22;
-  --chart-5: #b0578c;
+  /* Same five hues as the dark set, relit for a white card. Worst pairwise
+     deltaE 28.4; see the note on the dark set. */
+  --chart-1: #7f49ca;
+  --chart-2: #44996c;
+  --chart-3: #355360;
+  --chart-4: #9b7b29;
+  --chart-5: #79261d;
   --sidebar: #f4f5f8;
   --sidebar-foreground: #2b3038;
   --sidebar-primary: #7966cf;

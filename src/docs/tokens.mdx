@@ -101,7 +101,12 @@ without touching the page.
 
 ## Charts
 
-Five hues, ordered so adjacent series stay distinguishable.
+Five hues for series, tuned apart from the badge colours above. A bar carries no
+label of its own, so these are measured for separation rather than for contrast
+alone: worst pairwise ΔE 36.0 dark and 28.4 light, across normal vision and
+protanopia, deuteranopia and tritanopia, with the lightness staggered so the
+series stay apart in greyscale. Slot 5 is a red, for a series that means
+something went wrong. Never pick one by eye; `palette.test.ts` measures them.
 
 <ChartPalette />
 

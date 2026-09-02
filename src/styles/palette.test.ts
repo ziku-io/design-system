@@ -43,6 +43,75 @@ function hue(hex: string) {
   return h * 60
 }
 
+
+/** sRGB -> CIE Lab, and the three colour-vision simulations, so the chart set
+ *  can be measured rather than eyeballed. A bar carries no label, so what
+ *  matters between two series is perceptual distance, not contrast: v0.15.0
+ *  shipped a set at deltaE 5.7 that looked fine to normal vision and collapsed
+ *  under deuteranopia. Machado 2009 matrices at full severity, applied in
+ *  linear RGB, which is where they are defined. */
+
+const unlin = (c: number) =>
+  c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055
+
+const toLinear = (hex: string) =>
+  [1, 3, 5].map((i) => channel(parseInt(hex.slice(i, i + 2), 16) / 255))
+
+const XYZ = [
+  [0.4124564, 0.3575761, 0.1804375],
+  [0.2126729, 0.7151522, 0.072175],
+  [0.0193339, 0.119192, 0.9503041],
+]
+const WHITE = [0.95047, 1.0, 1.08883]
+
+function lab(rgb: number[]) {
+  const xyz = XYZ.map((row) => row.reduce((a, m, j) => a + m * rgb[j], 0))
+  const f = xyz.map((v, i) => {
+    const t = v / WHITE[i]
+    return t > 216 / 24389 ? Math.cbrt(t) : (841 / 108) * t + 4 / 29
+  })
+  return [116 * f[1] - 16, 500 * (f[0] - f[1]), 200 * (f[1] - f[2])]
+}
+
+const CVD: Record<string, number[][]> = {
+  protan: [
+    [0.152286, 1.052583, -0.204868],
+    [0.114503, 0.786281, 0.099216],
+    [-0.003882, -0.048116, 1.051998],
+  ],
+  deutan: [
+    [0.367322, 0.860646, -0.227968],
+    [0.280085, 0.672501, 0.047413],
+    [-0.01182, 0.04294, 0.968881],
+  ],
+  tritan: [
+    [1.255528, -0.076749, -0.178779],
+    [-0.078411, 0.930809, 0.147602],
+    [0.004733, 0.691367, 0.3039],
+  ],
+}
+
+/** Perceptual distance between two hexes, optionally as one form of colour
+ *  blindness sees them. */
+function distance(a: string, b: string, vision?: string) {
+  const project = (hex: string) => {
+    let rgb = toLinear(hex)
+    if (vision) {
+      const m = CVD[vision]
+      rgb = m.map((row) =>
+        Math.min(1, Math.max(0, row.reduce((s, v, j) => s + v * rgb[j], 0))),
+      )
+    }
+    // back through the transfer function and in again, as a display would
+    return lab(rgb.map((c) => channel(unlin(c))))
+  }
+  const [la, lb] = [project(a), project(b)]
+  return Math.hypot(la[0] - lb[0], la[1] - lb[1], la[2] - lb[2])
+}
+
+const CHARTS = [1, 2, 3, 4, 5] as const
+const VISIONS = [undefined, "protan", "deutan", "tritan"]
+
 const STATUS = ["danger", "warning", "success", "info"] as const
 
 const pairs: [string, string][] = [
@@ -82,6 +151,30 @@ describe.each([
         const gap = Math.abs(a - b)
         expect(Math.min(gap, 360 - gap)).toBeGreaterThanOrEqual(30)
       }
+  })
+
+
+  it("keeps chart series apart, including to a colour blind reader", () => {
+    const hexes = CHARTS.map((n) => t[`chart-${n}`])
+    for (const vision of VISIONS)
+      for (const [i, a] of hexes.entries())
+        for (const b of hexes.slice(i + 1))
+          expect(distance(a, b, vision)).toBeGreaterThanOrEqual(20)
+  })
+
+  it("draws every chart series against the surfaces it sits on", () => {
+    // 3:1, the threshold for a mark carrying no text of its own.
+    for (const n of CHARTS) {
+      expect(contrast(t[`chart-${n}`], t.card)).toBeGreaterThanOrEqual(3)
+      expect(contrast(t[`chart-${n}`], t.background)).toBeGreaterThanOrEqual(3)
+    }
+  })
+
+  it("separates chart series in greyscale too", () => {
+    // Lightness is staggered on purpose: a printed or greyscale chart keeps it.
+    const ls = CHARTS.map((n) => luminance(t[`chart-${n}`])).sort((a, b) => a - b)
+    for (let i = 1; i < ls.length; i++)
+      expect((ls[i] + 0.05) / (ls[i - 1] + 0.05)).toBeGreaterThanOrEqual(1.12)
   })
 
   it("separates cards from the page", () => {
