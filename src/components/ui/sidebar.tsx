@@ -532,7 +532,13 @@ function SidebarMenuButton({
     />
   )
 
-  if (!tooltip) {
+  // The bare button whenever there is nothing to show. `hidden` on the content
+  // suppresses the popper but leaves the trigger mounted, so an expanded
+  // sidebar, which is the default and the state an app spends most of its time
+  // in, paid for an anchor ref per item on top of `Slot.Root` and whatever ref
+  // the app's router link adds. Every link on every page, for a tooltip nobody
+  // can see.
+  if (!tooltip || state !== "collapsed" || isMobile) {
     return button
   }
 
@@ -549,12 +555,7 @@ function SidebarMenuButton({
     // waiting 400ms to read it is 400ms of guessing which icon is which.
     <Tooltip delayDuration={0}>
       <TooltipTrigger asChild>{button}</TooltipTrigger>
-      <TooltipContent
-        side="right"
-        align="center"
-        hidden={state !== "collapsed" || isMobile}
-        {...tooltip}
-      />
+      <TooltipContent side="right" align="center" {...tooltip} />
     </Tooltip>
   )
 }

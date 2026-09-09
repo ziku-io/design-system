@@ -1272,7 +1272,7 @@ function Mr({ asChild: e = !1, isActive: t = !1, variant: n = "default", size: r
 		}), s),
 		...c
 	});
-	return i ? (typeof i == "string" && (i = { children: i }), /* @__PURE__ */ o(ir, {
+	return !i || d !== "collapsed" || u ? f : (typeof i == "string" && (i = { children: i }), /* @__PURE__ */ o(ir, {
 		delayDuration: 0,
 		children: [/* @__PURE__ */ a(ar, {
 			asChild: !0,
@@ -1280,10 +1280,9 @@ function Mr({ asChild: e = !1, isActive: t = !1, variant: n = "default", size: r
 		}), /* @__PURE__ */ a(or, {
 			side: "right",
 			align: "center",
-			hidden: d !== "collapsed" || u,
 			...i
 		})]
-	})) : f;
+	}));
 }
 function Nr({ className: e, asChild: t = !1, showOnHover: n = !1, ...r }) {
 	let i = t ? g.Root : "button";
