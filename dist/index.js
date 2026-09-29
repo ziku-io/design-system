@@ -3928,17 +3928,17 @@ function Pa(e) {
 }
 //#endregion
 //#region src/blocks/shell/app-shell.tsx
-function Fa({ brand: e, brandHref: t = "/", sidebarHeader: n, nav: r, currentPath: s, user: c, userMenu: l, onSignOut: u, headerActions: d, headerContent: f, classNames: p, bleed: m = !1, children: h }) {
-	let g = J().shell;
+function Fa({ brand: e, brandHref: t = "/", sidebarHeader: n, sidebarFooter: r, nav: s, currentPath: c, user: l, userMenu: u, onSignOut: d, headerActions: f, headerContent: p, classNames: m, bleed: h = !1, children: g }) {
+	let _ = J().shell;
 	return /* @__PURE__ */ o(hr, { children: [
 		/* @__PURE__ */ a("a", {
 			href: "#content",
 			className: "sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-background focus:px-3 focus:py-2 focus:text-sm focus:outline-2 focus:outline-ring",
-			children: g.skipToContent
+			children: _.skipToContent
 		}),
 		/* @__PURE__ */ o(gr, {
 			collapsible: "icon",
-			rootClassName: p?.sidebar,
+			rootClassName: m?.sidebar,
 			children: [
 				/* @__PURE__ */ o(xr, { children: [/* @__PURE__ */ a(kr, { children: /* @__PURE__ */ a(Ar, { children: t === null ? /* @__PURE__ */ a("div", {
 					className: "flex h-12 items-center gap-2 p-2 text-sm",
@@ -3954,34 +3954,34 @@ function Fa({ brand: e, brandHref: t = "/", sidebarHeader: n, nav: r, currentPat
 					className: "group-data-[collapsible=icon]:hidden",
 					children: n
 				})] }),
-				/* @__PURE__ */ a(wr, { children: r.map((e, t) => /* @__PURE__ */ o(Tr, { children: [e.label && /* @__PURE__ */ a(Er, { children: e.label }), /* @__PURE__ */ a(Or, { children: /* @__PURE__ */ a(kr, { children: e.items.map((e) => /* @__PURE__ */ o(Ar, { children: [/* @__PURE__ */ a(Mr, {
+				/* @__PURE__ */ a(wr, { children: s.map((e, t) => /* @__PURE__ */ o(Tr, { children: [e.label && /* @__PURE__ */ a(Er, { children: e.label }), /* @__PURE__ */ a(Or, { children: /* @__PURE__ */ a(kr, { children: e.items.map((e) => /* @__PURE__ */ o(Ar, { children: [/* @__PURE__ */ a(Mr, {
 					asChild: !0,
-					isActive: s === e.href,
+					isActive: c === e.href,
 					tooltip: e.title,
 					children: /* @__PURE__ */ o(q, {
 						href: e.href,
 						children: [e.icon && /* @__PURE__ */ a(e.icon, {}), /* @__PURE__ */ a("span", { children: e.title })]
 					})
 				}), e.badge !== void 0 && e.badge !== null && /* @__PURE__ */ a(Pr, { children: e.badge })] }, e.href)) }) })] }, e.label ?? t)) }),
-				c && /* @__PURE__ */ a(Sr, { children: /* @__PURE__ */ a(kr, { children: /* @__PURE__ */ a(Ar, { children: /* @__PURE__ */ o(Ht, { children: [/* @__PURE__ */ a(Wt, {
+				(l || r) && /* @__PURE__ */ o(Sr, { children: [l && /* @__PURE__ */ a(kr, { children: /* @__PURE__ */ a(Ar, { children: /* @__PURE__ */ o(Ht, { children: [/* @__PURE__ */ a(Wt, {
 					asChild: !0,
 					children: /* @__PURE__ */ o(Mr, {
 						size: "lg",
 						className: "data-[state=open]:bg-sidebar-accent",
 						children: [
 							/* @__PURE__ */ a(H, {
-								name: c.name,
-								src: c.avatarUrl,
+								name: l.name,
+								src: l.avatarUrl,
 								className: "size-8 rounded-lg *:rounded-lg"
 							}),
 							/* @__PURE__ */ o("div", {
 								className: "grid flex-1 text-left text-sm leading-tight",
 								children: [/* @__PURE__ */ a("span", {
 									className: "truncate font-medium",
-									children: c.name
+									children: l.name
 								}), /* @__PURE__ */ a("span", {
 									className: "truncate text-xs text-muted-foreground",
-									children: c.role ?? c.email
+									children: l.role ?? l.email
 								})]
 							}),
 							/* @__PURE__ */ a(w, { className: "ml-auto size-4" })
@@ -3996,23 +3996,26 @@ function Fa({ brand: e, brandHref: t = "/", sidebarHeader: n, nav: r, currentPat
 							className: "font-normal",
 							children: [/* @__PURE__ */ a("div", {
 								className: "text-sm font-medium",
-								children: c.name
+								children: l.name
 							}), /* @__PURE__ */ a("div", {
 								className: "text-xs text-muted-foreground",
-								children: c.email
+								children: l.email
 							})]
 						}),
-						l && /* @__PURE__ */ o(i, { children: [/* @__PURE__ */ a(Qt, {}), l] }),
-						u && /* @__PURE__ */ o(i, { children: [/* @__PURE__ */ a(Qt, {}), /* @__PURE__ */ o(qt, {
-							onSelect: u,
-							children: [/* @__PURE__ */ a(Se, {}), g.signOut]
+						u && /* @__PURE__ */ o(i, { children: [/* @__PURE__ */ a(Qt, {}), u] }),
+						d && /* @__PURE__ */ o(i, { children: [/* @__PURE__ */ a(Qt, {}), /* @__PURE__ */ o(qt, {
+							onSelect: d,
+							children: [/* @__PURE__ */ a(Se, {}), _.signOut]
 						})] })
 					]
-				})] }) }) }) })
+				})] }) }) }), r && /* @__PURE__ */ a("div", {
+					className: "group-data-[collapsible=icon]:hidden",
+					children: r
+				})] })
 			]
 		}),
 		/* @__PURE__ */ o(yr, { children: [/* @__PURE__ */ o("header", {
-			className: R("flex h-14 shrink-0 items-center gap-2 border-b px-4", p?.header),
+			className: R("flex h-14 shrink-0 items-center gap-2 border-b px-4", m?.header),
 			children: [
 				/* @__PURE__ */ a(_r, { className: "-ml-1" }),
 				/* @__PURE__ */ a(Un, {
@@ -4021,18 +4024,18 @@ function Fa({ brand: e, brandHref: t = "/", sidebarHeader: n, nav: r, currentPat
 				}),
 				/* @__PURE__ */ a("div", {
 					className: "flex min-w-0 flex-1 items-center gap-2",
-					children: f
+					children: p
 				}),
-				d && /* @__PURE__ */ a("div", {
+				f && /* @__PURE__ */ a("div", {
 					className: "flex items-center gap-2",
-					children: d
+					children: f
 				})
 			]
 		}), /* @__PURE__ */ a("main", {
 			id: "content",
 			tabIndex: -1,
-			className: R("flex flex-1 flex-col outline-none", m ? "gap-0" : "gap-6 p-4 md:p-6", p?.main),
-			children: h
+			className: R("flex flex-1 flex-col outline-none", h ? "gap-0" : "gap-6 p-4 md:p-6", m?.main),
+			children: g
 		})] })
 	] });
 }

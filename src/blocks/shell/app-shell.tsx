@@ -76,6 +76,12 @@ export interface AppShellProps {
    * keyboard, and an app that wanted one had to put it in the top bar instead.
    */
   sidebarHeader?: React.ReactNode
+  /**
+   * Anything below the nav, under the user menu: a build credit, a version
+   * string, a support link. It renders whether or not there is a `user`, and is
+   * hidden with the labels when the sidebar collapses to icons.
+   */
+  sidebarFooter?: React.ReactNode
   nav: NavGroup[]
   /** Current pathname, used to highlight the active item */
   currentPath?: string
@@ -114,6 +120,7 @@ export function AppShell({
   brand,
   brandHref = "/",
   sidebarHeader,
+  sidebarFooter,
   nav,
   currentPath,
   user,
@@ -194,55 +201,62 @@ export function AppShell({
             </SidebarGroup>
           ))}
         </SidebarContent>
-        {user && (
+        {(user || sidebarFooter) && (
           <SidebarFooter>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <SidebarMenuButton size="lg" className="data-[state=open]:bg-sidebar-accent">
-                      <UserAvatar
-                        name={user.name}
-                        src={user.avatarUrl}
-                        className="size-8 rounded-lg *:rounded-lg"
-                      />
-                      <div className="grid flex-1 text-left text-sm leading-tight">
-                        <span className="truncate font-medium">{user.name}</span>
-                        <span className="truncate text-xs text-muted-foreground">
-                          {user.role ?? user.email}
-                        </span>
-                      </div>
-                      <CaretUpDownIcon className="ml-auto size-4" />
-                    </SidebarMenuButton>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    side="top"
-                    align="start"
-                    className="w-(--radix-dropdown-menu-trigger-width) min-w-56"
-                  >
-                    <DropdownMenuLabel className="font-normal">
-                      <div className="text-sm font-medium">{user.name}</div>
-                      <div className="text-xs text-muted-foreground">{user.email}</div>
-                    </DropdownMenuLabel>
-                    {userMenu && (
-                      <>
-                        <DropdownMenuSeparator />
-                        {userMenu}
-                      </>
-                    )}
-                    {onSignOut && (
-                      <>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onSelect={onSignOut}>
-                          <SignOutIcon />
-                          {t.signOut}
-                        </DropdownMenuItem>
-                      </>
-                    )}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </SidebarMenuItem>
-            </SidebarMenu>
+            {user && (
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <SidebarMenuButton size="lg" className="data-[state=open]:bg-sidebar-accent">
+                        <UserAvatar
+                          name={user.name}
+                          src={user.avatarUrl}
+                          className="size-8 rounded-lg *:rounded-lg"
+                        />
+                        <div className="grid flex-1 text-left text-sm leading-tight">
+                          <span className="truncate font-medium">{user.name}</span>
+                          <span className="truncate text-xs text-muted-foreground">
+                            {user.role ?? user.email}
+                          </span>
+                        </div>
+                        <CaretUpDownIcon className="ml-auto size-4" />
+                      </SidebarMenuButton>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      side="top"
+                      align="start"
+                      className="w-(--radix-dropdown-menu-trigger-width) min-w-56"
+                    >
+                      <DropdownMenuLabel className="font-normal">
+                        <div className="text-sm font-medium">{user.name}</div>
+                        <div className="text-xs text-muted-foreground">{user.email}</div>
+                      </DropdownMenuLabel>
+                      {userMenu && (
+                        <>
+                          <DropdownMenuSeparator />
+                          {userMenu}
+                        </>
+                      )}
+                      {onSignOut && (
+                        <>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onSelect={onSignOut}>
+                            <SignOutIcon />
+                            {t.signOut}
+                          </DropdownMenuItem>
+                        </>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            )}
+            {/* Hidden with the labels when the sidebar collapses to icons: a
+             *  credit line 3rem wide is not one. */}
+            {sidebarFooter && (
+              <div className="group-data-[collapsible=icon]:hidden">{sidebarFooter}</div>
+            )}
           </SidebarFooter>
         )}
       </Sidebar>

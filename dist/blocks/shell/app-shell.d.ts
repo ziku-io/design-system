@@ -43,6 +43,12 @@ export interface AppShellProps {
      * keyboard, and an app that wanted one had to put it in the top bar instead.
      */
     sidebarHeader?: React.ReactNode;
+    /**
+     * Anything below the nav, under the user menu: a build credit, a version
+     * string, a support link. It renders whether or not there is a `user`, and is
+     * hidden with the labels when the sidebar collapses to icons.
+     */
+    sidebarFooter?: React.ReactNode;
     nav: NavGroup[];
     /** Current pathname, used to highlight the active item */
     currentPath?: string;
@@ -76,4 +82,4 @@ export interface AppShellProps {
     children: React.ReactNode;
 }
 /** Standard authenticated app layout: collapsible sidebar nav + top bar + content area. */
-export declare function AppShell({ brand, brandHref, sidebarHeader, nav, currentPath, user, userMenu, onSignOut, headerActions, headerContent, classNames, bleed, children, }: AppShellProps): React.JSX.Element;
+export declare function AppShell({ brand, brandHref, sidebarHeader, sidebarFooter, nav, currentPath, user, userMenu, onSignOut, headerActions, headerContent, classNames, bleed, children, }: AppShellProps): React.JSX.Element;
