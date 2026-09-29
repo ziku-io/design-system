@@ -241,8 +241,10 @@ export const LongBreadcrumb: StoryObj<typeof AppShell> = {
  * change — here the header is tinted and the sidebar carries `print:hidden`,
  * neither of which used to be possible without a `!important` selector on this
  * library's `data-slot` attributes. `sidebarHeader` is the slot above the nav
- * that is not inside the brand's link, so a dropdown can live in it. `bleed`
- * drops `main`'s gutter for a page that runs to the edges.
+ * that is not inside the brand's link, so a dropdown can live in it.
+ * `sidebarFooter` is the matching slot under the user menu, for a credit or a
+ * version string. `bleed` drops `main`'s gutter for a page that runs to the
+ * edges.
  */
 export const Seams: StoryObj<typeof AppShell> = {
   args: {
@@ -265,6 +267,7 @@ export const Seams: StoryObj<typeof AppShell> = {
         </DropdownMenuContent>
       </DropdownMenu>
     ),
+    sidebarFooter: <p className="px-2 pb-1 text-[0.625rem] text-muted-foreground/70">v1.4.2</p>,
     children: (
       <div className="flex h-40 items-center justify-center bg-muted text-sm text-muted-foreground">
         Full bleed: no gutter around this.
