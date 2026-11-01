@@ -25,9 +25,11 @@ upstream diffs stay small. Add an alias there if one is missing. Never install
 lucide.
 
 **Adding a shadcn component:**
+
 ```bash
 pnpm dlx shadcn@latest add <name>
 ```
+
 then: swap the lucide import, write `<name>.stories.tsx` beside it, and export it
 from `src/index.ts`. Check whether `add` overwrote a neighbouring file — it
 sometimes rewrites `dialog.tsx` and reintroduces lucide.
@@ -76,7 +78,7 @@ the 727px left over. This one bites at desktop width, not on a phone, because
 the sidebar is a `Sheet` below `md`.
 
 **Preferences live here, not in the app.** `src/lib/preferences.ts` holds the
-theme and zoom stores (`useThemePreference`, `useZoom`) and `antiFlashScript`,
+zoom store (`useZoom`) and `antiFlashScript`,
 the import-free string a consumer's build inlines into `index.html`. Both keys
 go through `storageKey()`. Nothing in the library may hardcode an app's name.
 
@@ -88,9 +90,7 @@ worse than no variant at all. The unlayered `--field` fill in `globals.css` is
 keyed to `[data-variant="default"]` for the same reason — a tinted or borderless
 field must not have the box's background painted back under it.
 
-**Dark is the default.** No class on `<html>` renders dark; `.light` opts out;
-`.dark` also works so next-themes behaves. Tokens live on `:root, .dark` and are
-overridden by `.light`. Never define a colour only inside one of those blocks.
+**The library is light-only.** Tokens live on `:root`.
 
 **The two sidebar collapse modes animate differently.** `offcanvas` slides the
 fixed pane on `transform` and leaves the spacer's width unanimated; `icon`
@@ -98,7 +98,7 @@ changes the pane's own width (16rem to 3rem), which no transform can express, so
 it still animates `width`. They shared one model until #27, and a collapse
 re-laid-out the whole document for 200ms. Do not merge them back.
 
-**One brand accent, a blue-purple** (`#5b5bd6`). It drives `--primary`,
+**One brand accent, a blue-purple** (`#6b5bd6`). It drives `--primary`,
 `--ring`, `--link` and the sidebar active state. Use `text-link` for inline
 links, never `text-primary`: the fill is tuned for white text on top of it, the
 link colour for reading against the page. A link inside a sentence also needs
@@ -117,16 +117,11 @@ for `danger`, `warning`, `success` and `info`.
   New code says `danger`.
 
 **Measure, do not eyeball.** Every colour pair in the theme was checked to
-4.5:1. If you change one, compute the ratio against both themes' page *and*
-card backgrounds before committing.
+4.5:1. If you change one, compute the ratio against page and card backgrounds before committing.
 
 **The unlayered CSS block at the bottom of `globals.css`** overrides shadcn
 defaults where GitHub's structure differs. Keep it short. If it grows past a
 handful of rules, fork the component instead.
-
-**Storybook is not on `@storybook/addon-themes`.** It renders no toolbar in
-Storybook 10; the theme switcher is a hand-rolled `globalTypes` toolbar in
-`.storybook/preview.tsx`. Don't reinstall the addon.
 
 **Package shape.** `tw-animate-css` is a runtime dependency, not a dev one — the
 shipped stylesheet imports it. Consumers compile `globals.css` themselves, so

@@ -4,7 +4,7 @@ import { Meta } from "@storybook/addon-docs/blocks";
 
 # Ziku design system
 
-One component library for every Ziku web app. Built on [shadcn/ui](https://ui.shadcn.com) (Radix primitives + Tailwind v4), themed after GitHub and dark by default, with prebuilt pages and flows so a new app ships with the same login, register, and navigation every time.
+One component library for every Ziku web app. Built on [shadcn/ui](https://ui.shadcn.com) (Radix primitives + Tailwind v4), with prebuilt pages and flows so a new app ships with the same login, register, and navigation every time.
 
 ## Install
 
@@ -42,16 +42,6 @@ import { LinkProvider } from "@ziku/ui";
 
 <LinkProvider component={NextLink}>{children}</LinkProvider>;
 ```
-
-## Dark mode
-
-Dark is the default — do nothing and the app renders dark, styled after GitHub. To opt a page into light, put `class="light"` on `<html>`. `class="dark"` is also honoured, so `next-themes` works:
-
-```tsx
-<ThemeProvider attribute="class" defaultTheme="dark">
-```
-
-Use the theme toggle in the Storybook toolbar to preview both.
 
 ## Icons
 

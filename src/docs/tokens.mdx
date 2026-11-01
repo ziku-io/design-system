@@ -10,12 +10,7 @@ Colours are CSS variables in `src/styles/globals.css`. Tailwind utilities read
 them: `bg-primary`, `text-muted-foreground`, `border-danger-border`.
 
 Every value on this page is read from the live stylesheet, so it cannot drift
-from the CSS — and it follows the **theme switcher in the toolbar**. Flip it to
-see the other half of the palette.
-
-**Dark is the default.** An app that sets no class on `<html>` renders dark. Add
-`class="light"` to opt out. `class="dark"` also works, so `next-themes` with
-`attribute="class"` behaves normally in both directions.
+from the CSS.
 
 ## Accent
 
@@ -40,7 +35,7 @@ WCAG 1.4.1.
 
 ## Status
 
-Four states, each with four jobs. Every pairing clears 4.5:1 in both themes; the
+Four states, each with four jobs. Every pairing clears 4.5:1; the
 numbers were measured, not guessed.
 
 <StatusPalette />
@@ -77,7 +72,7 @@ keep working. New code should say `danger`.
     { token: "border", use: "Every border, unless a status owns it" },
     { token: "input", use: "Control borders" },
     { token: "field", use: "Input backgrounds" },
-    { token: "tooltip", on: "tooltip-foreground", use: "Tooltip surface, solid in both themes" },
+    { token: "tooltip", on: "tooltip-foreground", use: "Tooltip surface" },
   ]}
 />
 
@@ -103,7 +98,7 @@ without touching the page.
 
 Five hues for series, tuned apart from the badge colours above. A bar carries no
 label of its own, so these are measured for separation rather than for contrast
-alone: worst pairwise ΔE 36.0 dark and 28.4 light, across normal vision and
+alone: worst pairwise ΔE 28.4 across normal vision and
 protanopia, deuteranopia and tritanopia, with the lightness staggered so the
 series stay apart in greyscale. Slot 5 is a red, for a series that means
 something went wrong. Never pick one by eye; `palette.test.ts` measures them.
@@ -122,7 +117,7 @@ no tint to sit on. A slot is text on a tint, so it is a 4.5:1 problem: use
 `text-slot-2` on `bg-slot-2-subtle`.
 
 Every slot clears 4.5:1 on its own tint, on the page and on a card. The five
-hold a worst pairwise ΔE of 23.9 dark and 20.6 light across normal vision and
+hold a worst pairwise ΔE of 20.6 across normal vision and
 protanopia, deuteranopia and tritanopia, and every hue sits at least 25° off all
 four status hues and off the brand.
 

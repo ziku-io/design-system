@@ -52,5 +52,4 @@ export { setStoragePrefix, storagePrefix, storageKey } from './lib/storage';
 export { UIStringsProvider, useStrings, defaultStrings, type UIStrings, type PartialUIStrings, type UIStringsProviderProps, } from './lib/strings';
 export { Link, LinkProvider, type LinkProps } from './lib/link';
 export { useIsMobile } from './hooks/use-mobile';
-export { useTheme, type Theme } from './hooks/use-theme';
-export { antiFlashScript, resolveTheme, useThemePreference, useZoom, ZOOM_DEFAULT, ZOOM_MAX, ZOOM_MIN, ZOOM_STEPS, type ResolvedTheme, type ThemeControl, type ThemePreference, type ZoomControl, } from './lib/preferences';
+export { antiFlashScript, useZoom, ZOOM_DEFAULT, ZOOM_MAX, ZOOM_MIN, ZOOM_STEPS, type ZoomControl, } from './lib/preferences';

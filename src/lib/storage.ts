@@ -7,7 +7,7 @@
  * replacing something it used to store itself, installs its own once at start
  * up and every key follows.
  *
- * ponytail: a module value with a setter, the same shape as `installTheme` in
+ * ponytail: a module value with a setter, the same shape as a module-level preference store in
  * the apps. No provider: this is read outside the tree as often as inside it,
  * and a key is not something a subtree should be able to disagree about.
  */

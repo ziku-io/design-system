@@ -1,5 +1,7 @@
 import * as React from "react";
-declare function Card({ className, ...props }: React.ComponentProps<"div">): React.JSX.Element;
+declare function Card({ className, variant, ...props }: React.ComponentProps<"div"> & {
+    variant?: "default" | "glass";
+}): React.JSX.Element;
 declare function CardHeader({ className, ...props }: React.ComponentProps<"div">): React.JSX.Element;
 declare function CardTitle({ className, ...props }: React.ComponentProps<"div">): React.JSX.Element;
 declare function CardDescription({ className, ...props }: React.ComponentProps<"div">): React.JSX.Element;

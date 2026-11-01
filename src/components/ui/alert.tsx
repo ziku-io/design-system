@@ -10,7 +10,7 @@ const alertVariants = cva(
       variant: {
         default: "bg-card text-card-foreground",
         // Status banners: a tinted ground, a matching border and text that
-        // clears 4.5:1 against that ground in both themes.
+        // clears 4.5:1 against that ground
         danger: "border-danger-border bg-danger-subtle text-danger-fg",
         warning: "border-warning-border bg-warning-subtle text-warning-fg",
         success: "border-success-border bg-success-subtle text-success-fg",

@@ -13,18 +13,14 @@ function block(marker: string): Record<string, string> {
   if (start === -1) throw new Error(`palette block not found: ${marker}`)
   const seg = css.slice(start, css.indexOf("\n}", start))
   const out: Record<string, string> = {}
-  for (const [, name, hex] of seg.matchAll(/--([\w-]+):\s*(#[0-9a-f]{6})/g))
-    out[name] = hex
+  for (const [, name, hex] of seg.matchAll(/--([\w-]+):\s*(#[0-9a-f]{6})/g)) out[name] = hex
   return out
 }
 
-const channel = (c: number) =>
-  c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4
+const channel = (c: number) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4)
 
 function luminance(hex: string) {
-  const [r, g, b] = [1, 3, 5].map((i) =>
-    channel(parseInt(hex.slice(i, i + 2), 16) / 255),
-  )
+  const [r, g, b] = [1, 3, 5].map((i) => channel(parseInt(hex.slice(i, i + 2), 16) / 255))
   return 0.2126 * r + 0.7152 * g + 0.0722 * b
 }
 
@@ -43,7 +39,6 @@ function hue(hex: string) {
   return h * 60
 }
 
-
 /** sRGB -> CIE Lab, and the three colour-vision simulations, so the chart set
  *  can be measured rather than eyeballed. A bar carries no label, so what
  *  matters between two series is perceptual distance, not contrast: v0.15.0
@@ -51,8 +46,7 @@ function hue(hex: string) {
  *  under deuteranopia. Machado 2009 matrices at full severity, applied in
  *  linear RGB, which is where they are defined. */
 
-const unlin = (c: number) =>
-  c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055
+const unlin = (c: number) => (c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055)
 
 const toLinear = (hex: string) =>
   [1, 3, 5].map((i) => channel(parseInt(hex.slice(i, i + 2), 16) / 255))
@@ -99,7 +93,13 @@ function distance(a: string, b: string, vision?: string) {
     if (vision) {
       const m = CVD[vision]
       rgb = m.map((row) =>
-        Math.min(1, Math.max(0, row.reduce((s, v, j) => s + v * rgb[j], 0))),
+        Math.min(
+          1,
+          Math.max(
+            0,
+            row.reduce((s, v, j) => s + v * rgb[j], 0),
+          ),
+        ),
       )
     }
     // back through the transfer function and in again, as a display would
@@ -125,21 +125,16 @@ const pairs: [string, string][] = [
   ["tooltip-foreground", "tooltip"],
   ["link", "background"],
   ["link", "card"],
-  ...STATUS.flatMap(
-    (s): [string, string][] => [
-      [`${s}-foreground`, s],
-      [`${s}-fg`, `${s}-subtle`],
-      [`${s}-fg`, "background"],
-      [`${s}-fg`, "card"],
-    ],
-  ),
+  ...STATUS.flatMap((s): [string, string][] => [
+    [`${s}-foreground`, s],
+    [`${s}-fg`, `${s}-subtle`],
+    [`${s}-fg`, "background"],
+    [`${s}-fg`, "card"],
+  ]),
 ]
 
-describe.each([
-  ["dark", ":root,\n.dark {"],
-  ["light", "\n.light {"],
-])("%s palette", (_mode, marker) => {
-  const t = block(marker)
+describe("palette", () => {
+  const t = block(":root {")
 
   it.each(pairs)("%s on %s is readable", (fg, bg) => {
     expect(contrast(t[fg], t[bg])).toBeGreaterThanOrEqual(4.5)
@@ -153,7 +148,6 @@ describe.each([
         expect(Math.min(gap, 360 - gap)).toBeGreaterThanOrEqual(30)
       }
   })
-
 
   it("keeps chart series apart, including to a colour blind reader", () => {
     const hexes = CHARTS.map((n) => t[`chart-${n}`])
@@ -177,7 +171,6 @@ describe.each([
     for (let i = 1; i < ls.length; i++)
       expect((ls[i] + 0.05) / (ls[i - 1] + 0.05)).toBeGreaterThanOrEqual(1.12)
   })
-
 
   it.each(SLOTS)("reads slot-%i as text on its tint, the page and a card", (n) => {
     // A slot is text and icons, not a filled bar, so 4.5:1 and not 3:1.

@@ -1,157 +1,27 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-/* Dark is the default: no class on <html> renders dark. `.light` opts out, `.dark` is
-   explicit (so next-themes with attribute="class" works in both directions). */
-@custom-variant dark (&:where(:root:not(.light), :root:not(.light) *, .dark, .dark *));
-
-/* Palette started from GitHub Primer and was softened: neutrals pulled off pure
-   black/white, accents desaturated, and the five status hues spread at least 45deg
-   apart so nothing reads as "the same colour, slightly different". */
-:root,
-.dark {
-  /* Tells the UA to render its own chrome dark: scrollbars, autofill, the caret
-     and the date/colour pickers. Without it they render light on a #14181f page. */
-  color-scheme: dark;
-
-  --background: #14181f; /* soft ink, not black — 13:1 against the text, not 17:1 */
-  --foreground: #d7dde5;
-  --card: #1a1f28;
-  --card-foreground: #d7dde5;
-  --popover: #1a1f28;
-  --popover-foreground: #d7dde5;
-
-  /* Brand accent: muted violet. Drives primary buttons, links and focus rings. */
-  --primary: #7966cf;
-  --primary-foreground: #ffffff;
-
-  --secondary: #232935;
-  --secondary-foreground: #d7dde5;
-  --muted: #232935;
-  --muted-foreground: #98a1af;
-  /* Hover surface, tinted toward the brand so hovers feel related to it. */
-  --accent: #282539;
-  --accent-foreground: #d7dde5;
-
-  /* ── Status ────────────────────────────────────────────────────────
-     Each has four jobs: `solid` fills a button or badge, `foreground` is the
-     text on that fill, `fg` is the text/icon on a page background, and
-     `subtle`/`border` are the banner. Every pairing below is >= 4.5:1.
-     Hues sit at 356 / 42 / 148 / 193 / 251 — evenly spaced on purpose, so a
-     red badge next to an amber one next to a violet one stays legible. */
-  --danger: #c74e56;
-  --danger-foreground: #ffffff;
-  --danger-fg: #e07a80;
-  --danger-subtle: #251617;
-  --danger-border: #4b3234;
-
-  --warning: #c8a041;
-  /* Dark text on amber: white on any usable amber is 3:1 at best. */
-  --warning-foreground: #1a1405;
-  --warning-fg: #dcb154;
-  --warning-subtle: #252115;
-  --warning-border: #4c4430;
-
-  --success: #36855b;
-  --success-foreground: #ffffff;
-  --success-fg: #5cc389;
-  --success-subtle: #17231d;
-  --success-border: #324a3c;
-
-  /* Teal, not blue: at Primer's blue it sat 24deg from the violet brand and the
-     two were hard to tell apart in a badge row. */
-  --info: #367f93;
-  --info-foreground: #ffffff;
-  --info-fg: #5cb6cd;
-  --info-subtle: #172124;
-  --info-border: #31474d;
-
-  /* shadcn components reference --destructive; danger is the name we use. */
-  --destructive: var(--danger);
-  --destructive-foreground: var(--danger-foreground);
-
-  --border: #333a47;
-  --input: #333a47;
-  --field: #14181f;
-  --tooltip: #333a47;
-  --tooltip-foreground: #ffffff;
-  --ring: #8c78e4; /* focus ring follows the brand */
-  --link: #a79ef0;
-  /* Charts are a different problem from badges, and the two sets are tuned
-     apart. A bar carries no label, so neighbouring series have to survive
-     greyscale and colour blindness: these five hold a worst pairwise deltaE of
-     36.0 across normal, protan, deutan and tritan vision, every one of them at
-     3:1 or better on both the card and the page, and the lightness staggered so
-     the separation survives greyscale. Slot 5 is a red, for a series that means
-     something went wrong. `palette.test.ts` measures all three properties; do
-     not swap one by eye. */
-  --chart-1: #8f5bd6;
-  --chart-2: #cce6d8;
-  --chart-3: #5c90a8;
-  --chart-4: #d4ae4e;
-  --chart-5: #ac5248;
-
-  /* ── Categorical slots ─────────────────────────────────────────────
-     Five colours that mean nothing.
-     
-     A service line, a project type, a team, a tag: things an app needs to tell
-     apart without any of them being good or bad. The status families are the
-     wrong tool (danger red on a service line says the service line is broken)
-     and the chart set is too: those are built for a 3:1 filled bar carrying no
-     label, and carry no tint to sit on.
-     
-     `slot-n` is text and icons, `slot-n-subtle` the ground under them. Every
-     slot clears 4.5:1 on its own tint, on the page and on a card, and the five
-     hold a worst pairwise deltaE of 23.9 across normal, protan, deutan and
-     tritan vision. Their hues sit at least 25deg off all four status hues and
-     off the brand, so a category is never read as a state.
-     
-     Five, because Tailwind only ships classes it can find written out: a
-     `text-slot-6` that nothing names does not exist. An app with a sixth
-     category adds a sixth pair here and a sixth literal where it names them.
-     `palette.test.ts` measures all of it. */
-  --slot-1: #dcedc6;
-  --slot-1-subtle: #1f2615;
-  --slot-2: #69cc69;
-  --slot-2-subtle: #152515;
-  --slot-3: #6786ce;
-  --slot-3-subtle: #151a26;
-  --slot-4: #ddb4e7;
-  --slot-4-subtle: #221526;
-  --slot-5: #b27699;
-  --slot-5-subtle: #22191e;
-  --sidebar: #14181f;
-  --sidebar-foreground: #d7dde5;
-  --sidebar-primary: #7966cf;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #282539;
-  --sidebar-accent-foreground: #d7dde5;
-  --sidebar-border: #333a47;
-  --sidebar-ring: #8c78e4;
-}
-
-.light {
+:root {
   color-scheme: light;
 
-  /* A soft grey page, not paper-white: white cards sit on top of it, so a card
-     still reads as a raised surface without the page itself glaring. */
-  --background: #f4f5f8;
-  --foreground: #2b3038;
+  /* Cool paper ground and translucent elevated surfaces keep the interface
+     spacious without turning routine controls into decorative glass. */
+  --background: #f5f7fb;
+  --foreground: #172033;
   --card: #ffffff;
-  --card-foreground: #2b3038;
+  --card-foreground: #172033;
   --popover: #ffffff;
-  --popover-foreground: #2b3038;
+  --popover-foreground: #172033;
 
-  --primary: #7966cf;
+  --primary: #6b5bd6;
   --primary-foreground: #ffffff;
 
-  /* Muted surfaces have to sit below the page now, not above it. */
-  --secondary: #e9ebf1;
-  --secondary-foreground: #2b3038;
-  --muted: #e9ebf1;
-  --muted-foreground: #565e6c;
-  --accent: #ece9f7;
-  --accent-foreground: #2b3038;
+  --secondary: #eef1f7;
+  --secondary-foreground: #172033;
+  --muted: #eef1f7;
+  --muted-foreground: #596579;
+  --accent: #e9eafe;
+  --accent-foreground: #172033;
 
   --danger: #c74e56;
   --danger-foreground: #ffffff;
@@ -180,23 +50,22 @@
   --destructive: var(--danger);
   --destructive-foreground: var(--danger-foreground);
 
-  --border: #d5d9e3;
-  --input: #d5d9e3;
+  --border: #d9deea;
+  --input: #d9deea;
   --field: #ffffff;
-  --tooltip: #2b3038;
+  --tooltip: #172033;
   --tooltip-foreground: #ffffff;
-  --ring: #7966cf;
-  --link: #5b4fc4;
-  /* Same five hues as the dark set, relit for a white card. Worst pairwise
-     deltaE 28.4; see the note on the dark set. */
+  --ring: #6b5bd6;
+  --link: #4a4ab5;
+  --surface-glass: rgb(255 255 255 / 0.74);
+  --surface-glass-border: rgb(255 255 255 / 0.7);
+  --surface-shadow: none;
   --chart-1: #7f49ca;
   --chart-2: #44996c;
   --chart-3: #355360;
   --chart-4: #9b7b29;
   --chart-5: #79261d;
 
-  /* The same five hues, relit for a white card. Worst pairwise deltaE 20.6;
-     see the note on the dark set. */
   --slot-1: #3c492a;
   --slot-1-subtle: #f1f4ee;
   --slot-2: #297e29;
@@ -207,23 +76,22 @@
   --slot-4-subtle: #f3edf5;
   --slot-5: #924c75;
   --slot-5-subtle: #f4eef1;
-  --sidebar: #f4f5f8;
-  --sidebar-foreground: #2b3038;
-  --sidebar-primary: #7966cf;
+  --sidebar: #f5f7fb;
+  --sidebar-foreground: #172033;
+  --sidebar-primary: #6b5bd6;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #ece9f7;
-  --sidebar-accent-foreground: #2b3038;
-  --sidebar-border: #d5d9e3;
-  --sidebar-ring: #7966cf;
+  --sidebar-accent: #e9eafe;
+  --sidebar-accent-foreground: #172033;
+  --sidebar-border: #d9deea;
+  --sidebar-ring: #5b5bd6;
 }
 
 @theme inline {
-  /* GitHub is flat: 6px on controls and boxes, not the shadcn 8/12px scale */
-  --radius: 6px;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 6px;
-  --radius-xl: 8px;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -292,10 +160,8 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --font-sans:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica,
-    Arial, sans-serif;
-  --font-mono:
-    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
 }
 
 @layer base {

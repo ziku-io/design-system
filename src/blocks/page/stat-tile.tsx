@@ -57,7 +57,10 @@ export function StatTile({
   return (
     <div
       data-slot="stat-tile"
-      className={cn("rounded-lg border bg-card p-4", className)}
+      className={cn(
+        "rounded-lg border border-[var(--surface-glass-border)] bg-[var(--surface-glass)] p-4 shadow-[var(--surface-shadow)] backdrop-blur-xl",
+        className,
+      )}
       {...props}
     >
       <div className="flex items-center justify-between gap-2">

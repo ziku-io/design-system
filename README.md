@@ -30,40 +30,20 @@ your router's link component, and pass any subset — the rest stays English:
 </LinkProvider>
 ```
 
-## Theme and zoom
-
-Dark is the default and `.light` opts out, so a light-preferring user's choice
-has to be on `<html>` before the first paint or their machine flashes dark on
-every load. The library ships the store and the script; the app inlines the
-script.
-
-```ts
-// vite.config.ts
-import { antiFlashScript } from "@ziku/ui"
-
-transformIndexHtml: (html) =>
-  html.replace("<head>", `<head><script>${antiFlashScript()}</script>`)
-```
+## Zoom
 
 ```tsx
-import { ThemeMenu, ZoomMenu, useThemePreference, useZoom } from "@ziku/ui"
+import { ZoomMenu, useZoom } from "@ziku/ui"
 ```
 
-Both are stored under `storageKey()`, so two Ziku apps on one origin keep
-separate settings: `ziku.theme` (`system` | `light` | `dark`) and `ziku.zoom`
-(a percentage, 75-150). Call `setStoragePrefix("portal")` once at start-up to
-change the namespace, and pass the same prefix to `antiFlashScript`. **An app
-that already stores a theme under its own key has to migrate it** - read the old
-key once and write it through `setTheme`, or its users' setting resets on the
-upgrade.
+Zoom is stored under `storageKey("zoom")`. Call `setStoragePrefix("portal")` once
+at start-up to change its namespace.
 
-Zoom scales the root font-size, which the whole library is sized against. It is
-not browser zoom: the breakpoints stay where they are, so a desktop layout does
-not become the phone one at 150%.
+Zoom scales the root font-size. Breakpoints do not change at 150%.
 
 Cut a release with `pnpm release patch` — see CLAUDE.md.
 
-Ziku design system. shadcn/ui components themed after GitHub (dark by default), plus ready-made auth pages and app navigation, documented in Storybook.
+Ziku design system. Clean light-first shadcn/ui components, ready-made auth pages and app navigation, documented in Storybook.
 
 ```bash
 pnpm install
@@ -97,7 +77,7 @@ src/blocks/data/     DataTable (TanStack v9: chips, sorting, grouping, saved vie
 src/blocks/modal/    Modal (title bar, scrolling body, footer)
 src/blocks/page/     PageHeader, EmptyState
 src/docs/            MDX docs pages
-src/styles/          globals.css (GitHub Primer tokens, dark default)
+src/styles/          globals.css (light-first surface tokens)
 src/lib/             cn, Link/LinkProvider, UIStrings/UIStringsProvider, Phosphor icon aliases
 ```
 

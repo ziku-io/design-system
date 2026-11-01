@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
-import { ThemeMenu, ZoomMenu } from "./preference-menus"
+import { ZoomMenu } from "./preference-menus"
 
 const meta: Meta = {
   title: "Blocks/Preferences",
@@ -9,12 +9,9 @@ const meta: Meta = {
 }
 export default meta
 
-/** Both menus write through to `<html>`: the theme swaps the class, the zoom
- *  sets `--app-zoom`. In Storybook the toolbar overrides the theme back. */
-export const Menus: StoryObj = {
+export const Zoom: StoryObj = {
   render: () => (
     <div className="flex items-center gap-2 rounded-md border p-2">
-      <ThemeMenu />
       <ZoomMenu />
     </div>
   ),

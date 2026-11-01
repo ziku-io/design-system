@@ -16,8 +16,20 @@ const meta: Meta<typeof Card> = {
 }
 export default meta
 export const Default: StoryObj<typeof Card> = {
+  render: () => <CardExample />,
+}
+
+export const Glass: StoryObj<typeof Card> = {
   render: () => (
-    <Card className="w-96">
+    <div className="rounded-2xl bg-[radial-gradient(circle_at_top_left,_#c7d2fe,_transparent_45%),radial-gradient(circle_at_bottom_right,_#bae6fd,_transparent_50%),#e8edf7] p-8">
+      <CardExample variant="glass" />
+    </div>
+  ),
+}
+
+function CardExample({ variant }: { variant?: "default" | "glass" }) {
+  return (
+    <Card className="w-96" variant={variant}>
       <CardHeader>
         <CardTitle>Project settings</CardTitle>
         <CardDescription>Manage how this project behaves.</CardDescription>
@@ -33,5 +45,5 @@ export const Default: StoryObj<typeof Card> = {
         <Button>Save</Button>
       </CardFooter>
     </Card>
-  ),
+  )
 }

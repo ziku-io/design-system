@@ -15,10 +15,10 @@ function Textarea({ className, variant, ...props }: TextareaProps) {
       data-slot="textarea"
       data-variant={variant ?? "default"}
       className={cn(
-        "flex field-sizing-content min-h-16 w-full rounded-md px-3 py-2 text-base transition-[color,box-shadow] outline-none placeholder:text-muted-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 md:text-sm dark:aria-invalid:ring-destructive/40",
+        "flex field-sizing-content min-h-16 w-full rounded-md px-3 py-2 text-base transition-[color,box-shadow] outline-none placeholder:text-muted-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 md:text-sm",
         variant
           ? FIELD_VARIANTS[variant]
-          : "border border-input bg-transparent shadow-xs focus-visible:border-ring dark:bg-input/30",
+          : "border border-input bg-transparent shadow-xs focus-visible:border-ring",
         className,
       )}
       {...props}

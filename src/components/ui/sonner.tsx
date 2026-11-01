@@ -1,3 +1,5 @@
+import * as React from "react"
+
 import {
   CircleCheckIcon,
   InfoIcon,
@@ -7,19 +9,11 @@ import {
 } from "@/lib/icons"
 import { Toaster as Sonner, toast, type ToasterProps } from "sonner"
 
-import { useTheme } from "@/hooks/use-theme"
-
-const Toaster = ({ theme, ...props }: ToasterProps) => {
-  // Follows the .light/.dark class, not the OS: this library is class-driven.
-  const resolved = useTheme()
-
+const Toaster = ({ theme: _theme, ...props }: ToasterProps) => {
   return (
     <Sonner
-      theme={theme ?? resolved}
+      theme="light"
       className="toaster group"
-      // A toast with no visible dismiss can only be swiped or waited out, and
-      // an error is exactly the one a reader wants gone on their own terms.
-      // Before the spread, so a consumer can still pass `closeButton={false}`.
       closeButton
       icons={{
         success: <CircleCheckIcon className="size-4" />,

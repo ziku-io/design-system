@@ -73,12 +73,6 @@ export interface UIStrings {
         skipToContent: string;
     };
     preferences: {
-        /** The theme menu's own name, on its trigger and its heading. */
-        appearance: string;
-        /** Follow the operating system, which is the default. */
-        system: string;
-        light: string;
-        dark: string;
         zoom: string;
         /** An item in the zoom menu: `zoomLevel(125)` reads "125%". */
         zoomLevel: (percent: number) => string;

@@ -1,17 +1,7 @@
 import * as React from "react"
 
-import { useTheme } from "@/hooks/use-theme"
-
-/**
- * Documentation components for the token pages.
- *
- * Values are read from the live stylesheet with `getComputedStyle` rather than
- * copied into the page, so the docs cannot drift from `globals.css` — and they
- * follow the toolbar's theme switch.
- */
-
+/** Documentation components for the token pages. */
 function useTokenValues(names: string[]) {
-  const theme = useTheme()
   const [values, setValues] = React.useState<Record<string, string>>({})
 
   React.useLayoutEffect(() => {
@@ -19,9 +9,7 @@ function useTokenValues(names: string[]) {
     const next: Record<string, string> = {}
     for (const name of names) next[name] = styles.getPropertyValue(`--${name}`).trim()
     setValues(next)
-    // `theme` is the dependency that matters: the class on <html> changes and
-    // every value with it.
-  }, [theme, names.join(",")])
+  }, [names.join(",")])
 
   return values
 }
@@ -33,9 +21,7 @@ const mono = {
 
 /**
  * Colours are set explicitly on every cell. Storybook's docs chrome has its own
- * typography CSS, and inheriting it means the table follows the chrome's theme
- * instead of the tokens it is documenting — which reads fine by luck in one
- * theme and is unreadable in the other.
+ * typography CSS, and inheriting it makes the table unreadable.
  */
 const cell: React.CSSProperties = {
   display: "flex",
@@ -53,7 +39,7 @@ const headCell: React.CSSProperties = {
   fontSize: 12,
 }
 
-/** A panel that carries its own surface, so it is legible in either theme. */
+/** A panel with its own surface, independent of Storybook chrome. */
 const panel: React.CSSProperties = {
   margin: "16px 0",
   border: "1px solid var(--border)",
