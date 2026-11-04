@@ -16,6 +16,7 @@ const percents = new Intl.NumberFormat("pt-PT", {
   maximumFractionDigits: 1,
   signDisplay: "exceptZero",
 })
+const shares = new Intl.NumberFormat("pt-PT", { style: "percent", maximumFractionDigits: 0 })
 const days = new Intl.DateTimeFormat("pt-PT", { dateStyle: "medium" })
 const moments = new Intl.DateTimeFormat("pt-PT", { dateStyle: "medium", timeStyle: "short" })
 
@@ -126,6 +127,9 @@ export const ptPT: UIStrings = {
     pageOf: (page, total) => `Página ${num(page)} de ${num(total)}`,
     previousPage: "Anterior",
     nextPage: "Seguinte",
+    addRow: "Adicionar linha",
+    saveRow: "Guardar linha",
+    addRowFailed: "A linha não foi guardada. Tente novamente.",
   },
   search: {
     placeholder: "Pesquisar…",
@@ -150,12 +154,15 @@ export const ptPT: UIStrings = {
     sidebarDescription: "Mostra a barra lateral em ecrãs pequenos.",
     commandTitle: "Paleta de comandos",
     commandDescription: "Procure um comando para executar…",
+    chooseFile: "Escolha um ficheiro",
+    filesChosen: (count) => `${num(count)} ficheiros`,
   },
   format: {
     number: num,
     date: (date) => days.format(date),
     dateTime: (date) => moments.format(date),
     fileSize: (value) => bytes(value, num),
+    percent: (value) => shares.format(value / 100),
   },
   dashboard: {
     change: (percent) => percents.format(percent / 100),
@@ -176,14 +183,21 @@ export const ptPT: UIStrings = {
     // start on Monday (ISO 8601).
     locale: { ...pt, options: { ...pt.options, weekStartsOn: 1 } },
   },
+  editable: {
+    edit: (value) => (value ? `Editar ${value}` : "Editar"),
+    save: "Guardar",
+    required: "Não pode ficar vazio.",
+    saveFailed: "Não foi possível guardar. Tente novamente.",
+  },
   upload: {
     dropHere: "Largue os ficheiros aqui ou",
     dropFile: "Largue um ficheiro aqui ou",
     browse: "procure",
+    images: "Imagens",
     limits: ({ accept, maxSize, maxFiles }) =>
       [
         accept,
-        maxSize && `até ${maxSize} cada`,
+        maxSize && (maxFiles === 1 ? `até ${maxSize}` : `até ${maxSize} cada`),
         maxFiles && maxFiles > 1 && `${num(maxFiles)} ficheiros no máximo`,
       ]
         .filter(Boolean)

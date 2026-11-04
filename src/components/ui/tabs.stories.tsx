@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
+import { CreditCardIcon, GearSixIcon, UsersIcon } from "@phosphor-icons/react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs"
 
 const meta: Meta<typeof Tabs> = {
@@ -48,13 +49,24 @@ export const Line: Story = {
     </Tabs>
   ),
 }
+/** A settings-style nav column: no track, the active row tinted, the rest
+ *  tinting on hover. */
 export const Vertical: Story = {
   render: () => (
-    <Tabs defaultValue="general" orientation="vertical" className="flex w-96 gap-4">
-      <TabsList>
-        <TabsTrigger value="general">General</TabsTrigger>
-        <TabsTrigger value="members">Members</TabsTrigger>
-        <TabsTrigger value="billing">Billing</TabsTrigger>
+    <Tabs defaultValue="general" orientation="vertical" className="flex w-96 gap-6">
+      <TabsList className="w-40">
+        <TabsTrigger value="general">
+          <GearSixIcon />
+          General
+        </TabsTrigger>
+        <TabsTrigger value="members">
+          <UsersIcon />
+          Members
+        </TabsTrigger>
+        <TabsTrigger value="billing">
+          <CreditCardIcon />
+          Billing
+        </TabsTrigger>
       </TabsList>
       {panels}
     </Tabs>

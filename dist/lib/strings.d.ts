@@ -135,6 +135,13 @@ export interface UIStrings {
         /** Next to a shared view somebody else owns, in the picker. */
         sharedBy: (owner: string) => string;
         noGrouping: string;
+        /** Under the last row when the page passes `onAddRow`. */
+        addRow: string;
+        /** The check on the new row. Cancel is `common.cancel`. */
+        saveRow: string;
+        /** Under the new row when `onAddRow` rejected. The row stays, with what
+         *  the reader typed still in it. */
+        addRowFailed: string;
         /** Under the last row of a `paged` table while the next page is in flight. */
         loadingMore: string;
         /** Instead of the `empty` slot when conditions are on and nothing matched:
@@ -181,6 +188,10 @@ export interface UIStrings {
         sidebarDescription: string;
         commandTitle: string;
         commandDescription: string;
+        /** A file input with nothing picked yet. */
+        chooseFile: string;
+        /** A multiple file input once more than one is picked: "3 files". */
+        filesChosen: (count: number) => string;
     };
     /** How values are written. One place, so a chart tooltip, a tile and a file
      *  size all agree on "1.234,5" or "1,234.5". */
@@ -192,6 +203,8 @@ export interface UIStrings {
         dateTime: (date: Date) => string;
         /** Bytes as a person reads them: `fileSize(1536)` reads "1.5 KB". */
         fileSize: (bytes: number) => string;
+        /** A share out of 100, unsigned: `percent(62)` reads "62%". */
+        percent: (value: number) => string;
     };
     dashboard: {
         /** `StatTile`'s `change`: `change(12.5)` reads "+12.5%". */
@@ -215,6 +228,17 @@ export interface UIStrings {
          *  day of the week. A react-day-picker locale, not a string. */
         locale: DayPickerLocale;
     };
+    /** `EditableText`: text with a pencil that turns into a field. */
+    editable: {
+        /** The pencil's label: `edit("Q3 report")` reads "Edit Q3 report". */
+        edit: (value: string) => string;
+        save: string;
+        /** Under the field when `required` and the value is blank. */
+        required: string;
+        /** Under the field when `onSave` rejected. The field stays open with the
+         *  reader's text in it, so nothing they typed is lost. */
+        saveFailed: string;
+    };
     upload: {
         /** The drop zone's line: "Drop files here or" ahead of `browse`. */
         dropHere: string;
@@ -228,6 +252,9 @@ export interface UIStrings {
             maxSize?: string;
             maxFiles?: number;
         }) => string;
+        /** What `image/*` reads as in the accepted types. An extension reads as
+         *  itself in capitals (PDF, CSV), so only the wildcard needs a word. */
+        images: string;
         tooLarge: (name: string, max: string) => string;
         wrongType: (name: string) => string;
         tooMany: (max: number) => string;

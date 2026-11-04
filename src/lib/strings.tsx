@@ -137,6 +137,13 @@ export interface UIStrings {
     /** Next to a shared view somebody else owns, in the picker. */
     sharedBy: (owner: string) => string
     noGrouping: string
+    /** Under the last row when the page passes `onAddRow`. */
+    addRow: string
+    /** The check on the new row. Cancel is `common.cancel`. */
+    saveRow: string
+    /** Under the new row when `onAddRow` rejected. The row stays, with what
+     *  the reader typed still in it. */
+    addRowFailed: string
     /** Under the last row of a `paged` table while the next page is in flight. */
     loadingMore: string
     /** Instead of the `empty` slot when conditions are on and nothing matched:
@@ -183,6 +190,10 @@ export interface UIStrings {
     sidebarDescription: string
     commandTitle: string
     commandDescription: string
+    /** A file input with nothing picked yet. */
+    chooseFile: string
+    /** A multiple file input once more than one is picked: "3 files". */
+    filesChosen: (count: number) => string
   }
   /** How values are written. One place, so a chart tooltip, a tile and a file
    *  size all agree on "1.234,5" or "1,234.5". */
@@ -194,6 +205,8 @@ export interface UIStrings {
     dateTime: (date: Date) => string
     /** Bytes as a person reads them: `fileSize(1536)` reads "1.5 KB". */
     fileSize: (bytes: number) => string
+    /** A share out of 100, unsigned: `percent(62)` reads "62%". */
+    percent: (value: number) => string
   }
   dashboard: {
     /** `StatTile`'s `change`: `change(12.5)` reads "+12.5%". */
@@ -217,6 +230,17 @@ export interface UIStrings {
      *  day of the week. A react-day-picker locale, not a string. */
     locale: DayPickerLocale
   }
+  /** `EditableText`: text with a pencil that turns into a field. */
+  editable: {
+    /** The pencil's label: `edit("Q3 report")` reads "Edit Q3 report". */
+    edit: (value: string) => string
+    save: string
+    /** Under the field when `required` and the value is blank. */
+    required: string
+    /** Under the field when `onSave` rejected. The field stays open with the
+     *  reader's text in it, so nothing they typed is lost. */
+    saveFailed: string
+  }
   upload: {
     /** The drop zone's line: "Drop files here or" ahead of `browse`. */
     dropHere: string
@@ -226,6 +250,9 @@ export interface UIStrings {
     /** Under the drop zone, built from what the caller allows. `maxFiles` is
      *  left out when it is 1: `dropFile` already says so. */
     limits: (limits: { accept?: string; maxSize?: string; maxFiles?: number }) => string
+    /** What `image/*` reads as in the accepted types. An extension reads as
+     *  itself in capitals (PDF, CSV), so only the wildcard needs a word. */
+    images: string
     tooLarge: (name: string, max: string) => string
     wrongType: (name: string) => string
     tooMany: (max: number) => string
@@ -253,6 +280,7 @@ const percents = new Intl.NumberFormat(undefined, {
   maximumFractionDigits: 1,
   signDisplay: "exceptZero",
 })
+const shares = new Intl.NumberFormat(undefined, { style: "percent", maximumFractionDigits: 0 })
 const days = new Intl.DateTimeFormat(undefined, { dateStyle: "medium" })
 const moments = new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" })
 
@@ -380,6 +408,9 @@ export const defaultStrings: UIStrings = {
     pageOf: (page, total) => `Page ${num(page)} of ${num(total)}`,
     previousPage: "Previous",
     nextPage: "Next",
+    addRow: "Add row",
+    saveRow: "Save row",
+    addRowFailed: "That row did not save. Try again.",
   },
   search: {
     placeholder: "Search…",
@@ -406,12 +437,15 @@ export const defaultStrings: UIStrings = {
     sidebarDescription: "Displays the mobile sidebar.",
     commandTitle: "Command palette",
     commandDescription: "Search for a command to run…",
+    chooseFile: "Choose a file",
+    filesChosen: (count) => `${num(count)} files`,
   },
   format: {
     number: num,
     date: (date) => days.format(date),
     dateTime: (date) => moments.format(date),
     fileSize: (value) => bytes(value, num),
+    percent: (value) => shares.format(value / 100),
   },
   dashboard: {
     change: (percent) => percents.format(percent / 100),
@@ -430,14 +464,21 @@ export const defaultStrings: UIStrings = {
     thisYear: "This year",
     locale: enUS,
   },
+  editable: {
+    edit: (value) => (value ? `Edit ${value}` : "Edit"),
+    save: "Save",
+    required: "This can't be empty.",
+    saveFailed: "That did not save. Try again.",
+  },
   upload: {
     dropHere: "Drop files here or",
     dropFile: "Drop a file here or",
     browse: "browse",
+    images: "Images",
     limits: ({ accept, maxSize, maxFiles }) =>
       [
         accept,
-        maxSize && `up to ${maxSize} each`,
+        maxSize && (maxFiles === 1 ? `up to ${maxSize}` : `up to ${maxSize} each`),
         maxFiles && maxFiles > 1 && `${num(maxFiles)} files at most`,
       ]
         .filter(Boolean)

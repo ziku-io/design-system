@@ -50,23 +50,34 @@ export const Sizes: Story = {
 export const WithBadge: Story = {
   render: () => (
     <div className="flex items-center gap-3">
-      <Avatar size="lg">
-        <AvatarImage src="https://github.com/shadcn.png" alt="shadcn" />
-        <AvatarFallback>CN</AvatarFallback>
-        <AvatarBadge className="bg-primary" />
+      {/* Presence: a dot, in a status colour because it is a state. */}
+      <Avatar>
+        <AvatarFallback>AL</AvatarFallback>
+        <AvatarBadge className="bg-success" />
       </Avatar>
+      <Avatar size="lg">
+        <AvatarFallback>GH</AvatarFallback>
+        <AvatarBadge className="bg-success" />
+      </Avatar>
+      {/* A verified mark: the icon shows from the default size up. */}
       <Avatar size="lg">
         <AvatarFallback>ZK</AvatarFallback>
         <AvatarBadge>
-          <CheckIcon weight="bold" />
+          <CheckIcon />
         </AvatarBadge>
+      </Avatar>
+      <Avatar size="sm">
+        <AvatarFallback>SM</AvatarFallback>
+        <AvatarBadge className="bg-warning" />
       </Avatar>
     </div>
   ),
 }
+/** On a card, where most stacks sit: the card-coloured ring cuts each face out
+ *  of the one behind it. */
 export const Group: Story = {
   render: () => (
-    <AvatarGroup>
+    <AvatarGroup className="rounded-lg border bg-card p-3">
       {["AL", "GH", "ZK"].map((i) => (
         <Avatar key={i}>
           <AvatarFallback>{i}</AvatarFallback>

@@ -147,7 +147,12 @@ export const Overview: StoryObj = {
           <ChartContainer config={trendConfig} className="aspect-auto h-56 w-full">
             <AreaChart data={trend} margin={{ left: 8, right: 8 }}>
               <CartesianGrid vertical={false} />
-              <XAxis dataKey="week" tickLine={false} axisLine={false} />
+              <XAxis
+                dataKey="week"
+                tickLine={false}
+                axisLine={false}
+                padding={{ left: 16, right: 16 }}
+              />
               <ChartTooltip content={<ChartTooltipContent />} />
               <Area
                 dataKey="opened"

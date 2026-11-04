@@ -7,6 +7,7 @@ import { RegisterForm } from "./register-form"
 import { ForgotPasswordForm } from "./forgot-password-form"
 import { Button } from "@/components/ui/button"
 import { UIStringsProvider } from "@/lib/strings"
+import { ptPT } from "@/lib/strings-pt"
 
 const meta: Meta = {
   title: "Blocks/Auth",
@@ -94,20 +95,9 @@ export const ForgotPassword: StoryObj = { render: () => <ForgotDemo /> }
  *  changed, and the app that owns it supplies whatever it likes. */
 export const Translated: StoryObj = {
   render: () => (
-    <UIStringsProvider
-      strings={{
-        auth: {
-          loginTitle: "Bem-vindo de volta",
-          loginDescription: "Inicie sessão na sua conta",
-          email: "Email",
-          emailPlaceholder: "voce@empresa.pt",
-          password: "Palavra-passe",
-          signIn: "Iniciar sessão",
-          invalidEmail: "Introduza um email válido",
-          passwordRequired: "A palavra-passe é obrigatória",
-        },
-      }}
-    >
+    // The whole dictionary: a partial one left "Forgot password?" and
+    // "Create one" in English on an otherwise Portuguese form.
+    <UIStringsProvider strings={ptPT}>
       <AuthLayout logo={Logo}>
         <LoginForm onSubmit={() => wait(800)} />
       </AuthLayout>

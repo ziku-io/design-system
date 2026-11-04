@@ -122,7 +122,6 @@ const pairs: [string, string][] = [
   ["muted-foreground", "background"],
   ["muted-foreground", "card"],
   ["primary-foreground", "primary"],
-  ["tooltip-foreground", "tooltip"],
   ["link", "background"],
   ["link", "card"],
   ...STATUS.flatMap((s): [string, string][] => [

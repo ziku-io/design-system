@@ -3,6 +3,8 @@ import { act, cleanup, fireEvent, render, screen, within } from "@testing-librar
 
 import { DataTable } from "./data-table"
 import { Kanban } from "./kanban"
+import { TableAddRow } from "./new-row"
+import { Table, TableBody } from "@/components/ui/table"
 import { chipLabel, isBlankFilter, rank, type DataTableColumn, type DataTableQuery } from "./types"
 
 afterEach(cleanup)
@@ -593,5 +595,107 @@ describe("DataTable windowing and paging together", () => {
     // The end-of-window trigger must not read as "the list is exhausted" on
     // mount, or a windowed table pulls every page the moment it renders.
     expect(more).not.toHaveBeenCalled()
+  })
+})
+
+describe("grouping", () => {
+  it("drops the grouped column: its value is the group header already", () => {
+    const rows = [
+      { id: "1", name: "Deal 1", stage: "Lead" },
+      { id: "2", name: "Deal 2", stage: "Won" },
+    ]
+    render(
+      <DataTable
+        columns={[
+          { key: "name", header: "Deal" },
+          { key: "stage", header: "Stage", facet: true },
+        ]}
+        data={rows}
+        rowId={(r) => r.id}
+        defaultGroup="stage"
+      />,
+    )
+    const headers = screen.getAllByRole("columnheader").map((h) => h.textContent)
+    expect(headers.some((h) => h?.includes("Deal"))).toBe(true)
+    expect(headers.some((h) => h === "Stage")).toBe(false)
+    // The group label is still there, as the row above its rows.
+    expect(screen.getByText("Lead")).toBeTruthy()
+  })
+})
+
+describe("DataTable onAddRow", () => {
+  const open = (onAddRow: (v: Record<string, string>) => void | Promise<void>, data = deals) => {
+    render(<DataTable columns={columns} data={data} search={false} onAddRow={onAddRow} />)
+    fireEvent.click(screen.getByRole("button", { name: "Add row" }))
+  }
+
+  it("offers no add button without onAddRow", () => {
+    render(<DataTable columns={columns} data={deals} search={false} />)
+    expect(screen.queryByRole("button", { name: "Add row" })).toBeNull()
+  })
+
+  it("saves the typed values on Enter and closes the row", async () => {
+    const onAddRow = vi.fn()
+    open(onAddRow)
+    const name = screen.getByRole("textbox", { name: "Deal" })
+    fireEvent.change(name, { target: { value: "  Delta " } })
+    await act(async () => {
+      fireEvent.keyDown(name, { key: "Enter" })
+    })
+    expect(onAddRow).toHaveBeenCalledWith({ name: "Delta", stage: "" })
+    expect(screen.queryByRole("textbox", { name: "Deal" })).toBeNull()
+  })
+
+  it("keeps the row and says so when the save rejects", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {})
+    open(() => Promise.reject(new Error("nope")))
+    fireEvent.change(screen.getByRole("textbox", { name: "Deal" }), { target: { value: "Delta" } })
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Save row" }))
+    })
+    expect(screen.getByRole("alert")).toBeTruthy()
+    expect((screen.getByRole("textbox", { name: "Deal" }) as HTMLInputElement).value).toBe("Delta")
+  })
+
+  it("cancels on the cross without saving", () => {
+    const onAddRow = vi.fn()
+    open(onAddRow)
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }))
+    expect(onAddRow).not.toHaveBeenCalled()
+    expect(screen.getByRole("button", { name: "Add row" })).toBeTruthy()
+  })
+
+  it("opens from an empty table", () => {
+    open(vi.fn(), [])
+    expect(screen.getByRole("textbox", { name: "Deal" })).toBeTruthy()
+  })
+})
+
+describe("TableAddRow", () => {
+  it("opens on a plain table and saves what was typed", async () => {
+    const onAdd = vi.fn()
+    render(
+      <Table>
+        <TableBody>
+          <TableAddRow
+            columns={[
+              { key: "id", header: "Invoice" },
+              { key: "menu", header: "" },
+            ]}
+            onAdd={onAdd}
+          />
+        </TableBody>
+      </Table>,
+    )
+    fireEvent.click(screen.getByRole("button", { name: "Add row" }))
+    fireEvent.change(screen.getByRole("textbox", { name: "Invoice" }), {
+      target: { value: "INV-004" },
+    })
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Save row" }))
+    })
+    // The header-less column is furniture: no field, no key.
+    expect(onAdd).toHaveBeenCalledWith({ id: "INV-004" })
+    expect(screen.getByRole("button", { name: "Add row" })).toBeTruthy()
   })
 })

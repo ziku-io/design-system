@@ -63,6 +63,10 @@ and each one is already load-bearing somewhere:
   `max-h-(--radix-popover-content-available-height)`, which is what lets
   `DataTable` keep asking for `w-88` (352px, wider than a small phone) without
   the panel leaving the screen. Dropdown and Select already had the pattern.
+- Every floating surface opens below its trigger, aligned to its start edge,
+  4px away, and keeps a 16px gutter (`collisionPadding`) when it has to shift
+  to stay on screen. `SelectContent` is `popper`, not Radix's `item-aligned`,
+  which laid the list over the trigger and hid the field that was clicked.
 - A surface that can hold arbitrary content caps its height in `dvh` and
   scrolls. Without it a tall dialog centres itself and puts its own header
   above the top of the screen, out of reach: measured at -481px on a 478px
@@ -81,7 +85,14 @@ attributes, which made any restructure here a silent break over there.
 `min-width: auto` and a wide table inside it stretches the row rather than
 scrolling: the inset claimed the full 983px next to a 256px sidebar instead of
 the 727px left over. This one bites at desktop width, not on a phone, because
-the sidebar is a `Sheet` below `md`.
+the sidebar is a slide-in panel below `md`.
+
+**There is no Sheet.** An edge panel is `Drawer` (`src/blocks/drawer/`), which
+has `Modal`'s API: a translated title bar, a body that scrolls, a footer that
+does not, and focus on the first field. The raw shadcn `Sheet` left every app
+to assemble its own header and footer, so it was removed. The sidebar's phone
+panel and `Drawer` share `EDGE_PANEL` and `SCRIM` in `src/lib/surfaces.ts`, and
+Modal and Drawer share `focusFirstField` in `src/lib/focus.ts`.
 
 **Preferences live here, not in the app.** `src/lib/preferences.ts` holds the
 zoom store (`useZoom`) and `antiFlashScript`,
@@ -97,14 +108,15 @@ always comes from CSS here.
 each take `variant="ghost" | "cell"`, and all three read the same strings from
 `src/lib/field-variants.ts`. They sit next to each other on one form, so a
 `ghost` that means one thing on the text field and another on the select is
-worse than no variant at all. The unlayered `--field` fill in `globals.css` is
-keyed to `[data-variant="default"]` for the same reason — a tinted or borderless
-field must not have the box's background painted back under it.
+worse than no variant at all. The bordered default is `FIELD_DEFAULT` in the
+same file, applied as a class. Never style a field by `[data-slot="input"]`:
+`FormControl` replaces the slot, and a stylesheet rule keyed on it left every
+field inside a form transparent.
 
 **The library is light-only.** Tokens live on `:root`.
 
 **Two materials, both in `src/lib/surfaces.ts`.** `OVERLAY` for anything that
-floats (dialog, popover, menus, listboxes, chart tooltip), `SURFACE` for
+floats (dialog, popover, menus, listboxes, tooltips), `SURFACE` for
 anything on the page (card, stat tile, dashboard panel). Neither is glass: a
 translucent dialog let the page behind show through its body. The blur stays
 only on chrome content scrolls under, the shell header and the sidebar. The
@@ -160,9 +172,9 @@ for `danger`, `warning`, `success` and `info`.
 **Measure, do not eyeball.** Every colour pair in the theme was checked to
 4.5:1. If you change one, compute the ratio against page and card backgrounds before committing.
 
-**The unlayered CSS block at the bottom of `globals.css`** overrides shadcn
-defaults where GitHub's structure differs. Keep it short. If it grows past a
-handful of rules, fork the component instead.
+**No component styling in `globals.css`.** It held an unlayered block of
+`[data-slot]` overrides; every one moved into the component that owns it. We
+own these files: change the classes, do not override them from a stylesheet.
 
 **Package shape.** `tw-animate-css` is a runtime dependency, not a dev one — the
 shipped stylesheet imports it. Consumers compile `globals.css` themselves, so

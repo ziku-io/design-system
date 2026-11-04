@@ -1,5 +1,6 @@
 import { RowData } from '@tanstack/react-table';
 import { CsvDecimal } from './csv';
+import { NewRowValues } from './new-row';
 import { DataTableColumn, DataTableQuery, DataTableState, DataTableView } from './types';
 import { ViewsBackend } from './use-data-table-views';
 import * as React from "react";
@@ -120,6 +121,15 @@ export interface DataTableProps<T extends RowData> {
      *  somebody's private records should not grow a download button because a
      *  library version did. See `CsvExport`. */
     csv?: CsvExport;
+    /**
+     * Turns on "Add row": a row of fields under the last one, with a check and a
+     * cross. Called with one trimmed string per column, by `key`; parsing and
+     * validating them is the page's job. Return a promise and the row waits;
+     * reject and it stays open, with the reader's text in it. The table never
+     * adds the row itself: the new record arrives through `data`, as it would
+     * from anywhere else. Not offered on the board.
+     */
+    onAddRow?: (values: NewRowValues) => void | Promise<void>;
     className?: string;
 }
 /**
@@ -127,4 +137,4 @@ export interface DataTableProps<T extends RowData> {
  * and saved views — the Notion-style list every product needs. Built on
  * TanStack Table v9.
  */
-export declare function DataTable<T extends RowData>({ columns, data, loading, error, onRetry, empty, rowId, search, searchPlaceholder, toolbar, onRowClick, pageSize, defaultSort, defaultHidden, defaultFilters, defaultGroup, defaultMode, renderCard, boardSubtitle, presets, viewKey, onStateChange, view, viewsBackend, paged, csv, className, }: DataTableProps<T>): React.JSX.Element;
+export declare function DataTable<T extends RowData>({ columns, data, loading, error, onRetry, empty, rowId, search, searchPlaceholder, toolbar, onRowClick, pageSize, defaultSort, defaultHidden, defaultFilters, defaultGroup, defaultMode, renderCard, boardSubtitle, presets, viewKey, onStateChange, view, viewsBackend, paged, csv, onAddRow, className, }: DataTableProps<T>): React.JSX.Element;

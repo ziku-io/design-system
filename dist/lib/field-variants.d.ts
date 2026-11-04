@@ -7,6 +7,12 @@
  * A consuming app had defined exactly this as `.input-ghost` and `.input-cell`
  * and applied them across all three, which is the shape of a missing variant.
  */
+/**
+ * The bordered box every field starts as. In the component's own classes, not
+ * a stylesheet rule keyed on `data-slot`: `FormControl` replaces the slot, so
+ * that rule missed every field inside a form and they rendered transparent.
+ */
+export declare const FIELD_DEFAULT = "border border-input bg-field focus-visible:border-ring";
 export declare const FIELD_VARIANTS: {
     /**
      * A tinted field instead of an outlined box, for a sheet of properties that

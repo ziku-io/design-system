@@ -1,7 +1,7 @@
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 import { PanelLeftIcon } from "@/lib/icons"
-import { Slot } from "radix-ui"
+import { Dialog as DialogPrimitive, Slot } from "radix-ui"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
@@ -9,13 +9,8 @@ import { useStrings } from "@/lib/strings"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet"
+import { EDGE_PANEL, SCRIM } from "@/lib/surfaces"
+import { focusFirstField } from "@/lib/focus"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
@@ -189,26 +184,47 @@ function Sidebar({
 
   if (isMobile) {
     return (
-      <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
-        <SheetContent
-          data-sidebar="sidebar"
-          data-slot="sidebar"
-          data-mobile="true"
-          className="w-(--sidebar-width) bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
-          style={
-            {
-              "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
-            } as React.CSSProperties
-          }
-          side={side}
-        >
-          <SheetHeader className="sr-only">
-            <SheetTitle>{t.sidebarTitle}</SheetTitle>
-            <SheetDescription>{t.sidebarDescription}</SheetDescription>
-          </SheetHeader>
-          <div className="flex h-full w-full flex-col">{children}</div>
-        </SheetContent>
-      </Sheet>
+      // The edge panel `Drawer` uses, without its title bar: the sidebar is its
+      // own header. The title and description stay for a screen reader, which
+      // announces a dialog by them.
+      <DialogPrimitive.Root open={openMobile} onOpenChange={setOpenMobile} {...props}>
+        <DialogPrimitive.Portal>
+          <DialogPrimitive.Overlay className={SCRIM} />
+          <DialogPrimitive.Content
+            data-sidebar="sidebar"
+            data-slot="sidebar"
+            data-mobile="true"
+            // The panel, not its first link: Radix's default lit up the logo
+            // as if it were the current page every time the menu opened.
+            onOpenAutoFocus={focusFirstField}
+            // Back to the button that opened it. The trigger is not a Radix
+            // trigger, so Radix had nowhere to return focus to and dropped it
+            // on the body: a keyboard reader was sent to the top of the page.
+            onCloseAutoFocus={(event) => {
+              const trigger = document.querySelector<HTMLElement>('[data-sidebar="trigger"]')
+              if (!trigger) return
+              event.preventDefault()
+              trigger.focus()
+            }}
+            className={cn(
+              EDGE_PANEL.base,
+              EDGE_PANEL[side],
+              "w-(--sidebar-width) bg-sidebar text-sidebar-foreground outline-none",
+            )}
+            style={
+              {
+                "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
+              } as React.CSSProperties
+            }
+          >
+            <DialogPrimitive.Title className="sr-only">{t.sidebarTitle}</DialogPrimitive.Title>
+            <DialogPrimitive.Description className="sr-only">
+              {t.sidebarDescription}
+            </DialogPrimitive.Description>
+            <div className="flex h-full w-full flex-col">{children}</div>
+          </DialogPrimitive.Content>
+        </DialogPrimitive.Portal>
+      </DialogPrimitive.Root>
     )
   }
 

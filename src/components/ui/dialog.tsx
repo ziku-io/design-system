@@ -3,7 +3,7 @@ import { XIcon } from "@/lib/icons"
 import { Dialog as DialogPrimitive } from "radix-ui"
 
 import { cn } from "@/lib/utils"
-import { OVERLAY } from "@/lib/surfaces"
+import { OVERLAY, SCRIM } from "@/lib/surfaces"
 import { useStrings } from "@/lib/strings"
 import { Button } from "@/components/ui/button"
 
@@ -30,10 +30,7 @@ function DialogOverlay({
   return (
     <DialogPrimitive.Overlay
       data-slot="dialog-overlay"
-      className={cn(
-        "fixed inset-0 z-50 bg-overlay data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0",
-        className,
-      )}
+      className={cn(SCRIM, className)}
       {...props}
     />
   )

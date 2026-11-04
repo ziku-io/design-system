@@ -255,6 +255,39 @@ export const Empty: Story = {
   render: () => <DataTable columns={columns} data={[]} empty="No deals yet." />,
 }
 
+/** "Add row" under the last row opens a row of fields with a check and a
+ *  cross. A facet with an `order` gets a select; the rest get a text field.
+ *  Enter saves, Escape cancels. The page parses what it gets and adds the
+ *  record to `data` itself; this one refuses a blank name to show the error. */
+export const AddRow: Story = {
+  render: function Render() {
+    const [rows, setRows] = useState(deals.slice(0, 4))
+    return (
+      <DataTable
+        columns={columns}
+        data={rows}
+        rowId={(d) => String(d.id)}
+        search={false}
+        onAddRow={async (v) => {
+          await new Promise((r) => setTimeout(r, 400))
+          if (!v.name) throw new Error("A deal needs a name")
+          setRows((old) => [
+            ...old,
+            {
+              id: old.length + 100,
+              name: v.name,
+              company: v.company,
+              owner: v.owner,
+              stage: (v.stage || "Lead") as Deal["stage"],
+              value: Number(v.value.replace(/[^\d.]/g, "")) || 0,
+            },
+          ])
+        }}
+      />
+    )
+  },
+}
+
 /** Filtered down to nothing, which is not the same as having nothing: the page's
  *  `empty` slot is for an empty list, and this state gets a way back out. */
 export const EmptyAfterFiltering: Story = {

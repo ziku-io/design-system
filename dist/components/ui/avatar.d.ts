@@ -15,13 +15,6 @@ export interface UserAvatarProps extends React.ComponentProps<typeof Avatar> {
      *  a ticker, a case number — rather than a person's name. */
     fallback?: React.ReactNode;
 }
-/**
- * A person, drawn as their picture or as their initials.
- *
- * The three lines underneath are the ones every app was writing again: the
- * image, the fallback, and `alt` equal to the name so a screen reader reads a
- * person rather than "image".
- */
 declare function UserAvatar({ name, src, fallback, className, ...props }: UserAvatarProps): React.JSX.Element;
 export interface AvatarStackProps extends React.ComponentProps<"div"> {
     people: {

@@ -71,10 +71,14 @@
   --border: #dde0e4;
   --input: #dde0e4;
   --field: #fdfdff;
-  --tooltip: #494d54;
-  --tooltip-foreground: #ffffff;
   --ring: #706cbb;
   --link: #6063aa;
+  /* Sonner sets its own --success-border, --info-border and --warning-border on
+     the toaster, shadowing ours for everything inside it. These resolve here, at
+     the root, where the names still mean ours, and the Toaster hands them back. */
+  --toast-success-border: var(--success-border);
+  --toast-info-border: var(--info-border);
+  --toast-warning-border: var(--warning-border);
   --surface-glass: rgb(255 255 255 / 0.74);
   --surface-glass-border: rgb(255 255 255 / 0.7);
   --surface-shadow: none;
@@ -163,8 +167,6 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-field: var(--field);
-  --color-tooltip: var(--tooltip);
-  --color-tooltip-foreground: var(--tooltip-foreground);
   --color-ring: var(--ring);
   --color-overlay: var(--overlay);
   /* Floating surfaces only. Tinted with the text grey, under 0.05 opacity: a
@@ -205,6 +207,27 @@
      transitions). Not named `ease-out`, which Tailwind owns and the shadcn
      components already use. Apps had pasted this curve by hand three times. */
   --ease-settle: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Progress: a third-width bar crossing the track when the amount is
+     unknown, and a band of light passing along a known one still moving. */
+  --animate-progress-indeterminate: progress-indeterminate 1.4s ease-in-out infinite;
+  --animate-progress-shimmer: progress-shimmer 2s ease-in-out infinite;
+  @keyframes progress-indeterminate {
+    from {
+      translate: -100% 0;
+    }
+    to {
+      translate: 300% 0;
+    }
+  }
+  @keyframes progress-shimmer {
+    from {
+      translate: -100% 0;
+    }
+    to {
+      translate: 200% 0;
+    }
+  }
 }
 
 @layer base {
@@ -224,22 +247,9 @@
   }
 }
 
-/* Unlayered on purpose: these beat the utilities baked into the shadcn components,
-   where GitHub's structure differs from shadcn defaults.
-   ponytail: keep this block short — if it grows, fork the component instead. */
-[data-slot="input"][data-variant="default"],
-[data-slot="textarea"][data-variant="default"],
-[data-slot="select-trigger"][data-variant="default"] {
-  background-color: var(--field);
-}
-/* The field background above wins over any utility, so the hover has to live here too */
-[data-slot="select-trigger"][data-variant="default"]:not([disabled]):hover {
-  background-color: var(--accent);
-}
-
-/* Unlayered for the same reason as the block above, plus one of its own: an
-   !important inside a layer loses to an !important outside one, and sonner
-   injects its slide-in unlayered. In @layer base this would not win against it. */
+/* Unlayered on purpose: an !important inside a layer loses to an !important
+   outside one, and sonner injects its slide-in unlayered. In @layer base this
+   would not win against it. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

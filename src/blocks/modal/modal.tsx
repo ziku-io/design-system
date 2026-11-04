@@ -11,6 +11,7 @@ import {
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 import { useStrings } from "@/lib/strings"
+import { focusFirstField } from "@/lib/focus"
 
 const SIZES = {
   sm: "sm:max-w-sm",
@@ -71,6 +72,7 @@ export function Modal({
         // gap-0 and p-0 undo DialogContent's own padded grid: the padding
         // belongs to the three sections, so only the middle one scrolls.
         className={cn("flex max-h-[92dvh] flex-col gap-0 p-0", SIZES[size], className)}
+        onOpenAutoFocus={focusFirstField}
       >
         <div className="flex shrink-0 items-start justify-between gap-4 border-b px-5 py-3.5">
           <div className="grid gap-1">
@@ -89,7 +91,10 @@ export function Modal({
         </div>
 
         {children != null && (
-          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-4">
+          <div
+            data-overlay-body
+            className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-4"
+          >
             {children}
           </div>
         )}

@@ -77,5 +77,5 @@ export function ErrorState({
       </Alert>
     )
   }
-  return <EmptyState icon={icon} title={what} action={doing} className={className} />
+  return <EmptyState tone="danger" icon={icon} title={what} action={doing} className={className} />
 }

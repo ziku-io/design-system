@@ -30,7 +30,35 @@ export const Invalid: Story = {
 export const Disabled: Story = {
   args: { disabled: true, defaultValue: "read only" },
 }
-export const File: Story = { args: { type: "file", placeholder: undefined } }
+/** `type="file"` draws as a field: a tinted upload icon, then the file's name
+ *  once one is picked, or the count when `multiple` gets several. The native
+ *  input is inside, so the label, the keyboard and a form all still work. */
+export const File: Story = {
+  render: () => (
+    <div className="grid w-80 gap-4">
+      <div className="grid gap-2">
+        <Label htmlFor="cv">CV</Label>
+        <Input id="cv" type="file" accept=".pdf" />
+      </div>
+      <div className="grid gap-2">
+        <Label htmlFor="receipts">Receipts</Label>
+        <Input id="receipts" type="file" multiple accept="image/*,.pdf" />
+      </div>
+      <div className="grid gap-2">
+        <Label htmlFor="small">Small</Label>
+        <Input id="small" type="file" size="sm" />
+      </div>
+      <div className="grid gap-2">
+        <Label htmlFor="bad">Invalid</Label>
+        <Input id="bad" type="file" aria-invalid />
+      </div>
+      <div className="grid gap-2">
+        <Label htmlFor="off">Disabled</Label>
+        <Input id="off" type="file" disabled />
+      </div>
+    </div>
+  ),
+}
 
 /**
  * `ghost` shows no chrome until it is pointed at, for a field inside something

@@ -98,7 +98,12 @@ export const Lines: StoryObj = {
     <ChartContainer config={config} className="h-64 w-full max-w-xl">
       <LineChart data={monthly}>
         <CartesianGrid vertical={false} />
-        <XAxis dataKey="month" tickLine={false} axisLine={false} />
+        <XAxis
+          dataKey="month"
+          tickLine={false}
+          axisLine={false}
+          padding={{ left: 16, right: 16 }}
+        />
         <ChartTooltip content={<ChartTooltipContent indicator="line" />} />
         <Line dataKey="opened" stroke="var(--color-opened)" strokeWidth={2} dot={false} />
         <Line dataKey="closed" stroke="var(--color-closed)" strokeWidth={2} dot={false} />

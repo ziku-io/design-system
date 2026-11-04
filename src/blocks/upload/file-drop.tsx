@@ -14,6 +14,26 @@ import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { validateFiles, type FileRejection, type FileRules } from "./validate-files"
 
+/**
+ * The accepted types as a person reads them: `.pdf,image/*` is "PDF, Images",
+ * not the MIME syntax the input takes. A type that is not an extension or an
+ * image wildcard is shown by its subtype in capitals (`application/pdf` is
+ * "PDF"), which is what its extension would say.
+ */
+function acceptLabel(accept: string, images: string): string {
+  const labels = accept
+    .split(",")
+    .map((pattern) => pattern.trim().toLowerCase())
+    .filter(Boolean)
+    .map((pattern) => {
+      if (pattern.startsWith(".")) return pattern.slice(1).toUpperCase()
+      if (pattern === "image/*") return images
+      const [type, subtype] = pattern.split("/")
+      return subtype && subtype !== "*" ? subtype.toUpperCase() : type
+    })
+  return [...new Set(labels)].join(", ")
+}
+
 export interface FileDropProps extends FileRules {
   /** The files that passed the rules. The app uploads them; this only picks. */
   onFiles: (files: File[]) => void
@@ -53,7 +73,7 @@ export function FileDrop({
 
   const maxLabel = maxSize === undefined ? undefined : t.format.fileSize(maxSize)
   const limits = t.upload.limits({
-    accept: accept?.split(",").join(", "),
+    accept: accept && acceptLabel(accept, t.upload.images),
     maxSize: maxLabel,
     maxFiles,
   })
@@ -153,7 +173,7 @@ export function UploadList({ items, onRemove, onRetry, className, ...props }: Up
           {item.status === "failed" && onRetry && (
             <Button
               variant="ghost"
-              size="icon"
+              size="icon-sm"
               aria-label={t.upload.retry}
               onClick={() => onRetry(item.id)}
             >
@@ -163,7 +183,7 @@ export function UploadList({ items, onRemove, onRetry, className, ...props }: Up
           {onRemove && (
             <Button
               variant="ghost"
-              size="icon"
+              size="icon-sm"
               aria-label={t.upload.remove(item.name)}
               onClick={() => onRemove(item.id)}
             >

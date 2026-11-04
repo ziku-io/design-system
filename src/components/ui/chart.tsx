@@ -250,7 +250,9 @@ function ChartLegendContent({
   return (
     <div
       className={cn(
-        "flex items-center justify-center gap-4",
+        // Wraps between items, never inside one: a two-word series name broke
+        // over two lines next to its swatch on a narrow donut.
+        "flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5",
         verticalAlign === "top" ? "pb-3" : "pt-3",
         className,
       )}
@@ -265,7 +267,7 @@ function ChartLegendContent({
             <div
               key={index}
               className={cn(
-                "flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground",
+                "flex items-center gap-1.5 whitespace-nowrap text-muted-foreground [&>svg]:size-3.5",
               )}
             >
               {itemConfig?.icon && !hideIcon ? (

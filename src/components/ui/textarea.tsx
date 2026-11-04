@@ -1,7 +1,7 @@
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
-import { FIELD_VARIANTS, type FieldVariant } from "@/lib/field-variants"
+import { FIELD_DEFAULT, FIELD_VARIANTS, type FieldVariant } from "@/lib/field-variants"
 
 export type TextareaProps = React.ComponentProps<"textarea"> & {
   /** `ghost` is the tinted field, `cell` the borderless one. Same two
@@ -16,9 +16,7 @@ function Textarea({ className, variant, ...props }: TextareaProps) {
       data-variant={variant ?? "default"}
       className={cn(
         "flex field-sizing-content min-h-16 w-full rounded-md px-3 py-2 text-base transition-[color,box-shadow] outline-none placeholder:text-muted-foreground focus-visible:ring-[1.5px] focus-visible:ring-ring/80 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 md:text-sm",
-        variant
-          ? FIELD_VARIANTS[variant]
-          : "border border-input bg-transparent shadow-xs focus-visible:border-ring",
+        variant ? FIELD_VARIANTS[variant] : FIELD_DEFAULT,
         className,
       )}
       {...props}

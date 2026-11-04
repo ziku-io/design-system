@@ -10,7 +10,7 @@ declare function SelectTrigger({ className, size, children, variant, ...props }:
      *  treatments as `Input` and `Textarea`, from the same definition. */
     variant?: FieldVariant;
 }): React.JSX.Element;
-declare function SelectContent({ className, children, position, align, ...props }: React.ComponentProps<typeof SelectPrimitive.Content>): React.JSX.Element;
+declare function SelectContent({ className, children, position, align, sideOffset, collisionPadding, ...props }: React.ComponentProps<typeof SelectPrimitive.Content>): React.JSX.Element;
 declare function SelectLabel({ className, ...props }: React.ComponentProps<typeof SelectPrimitive.Label>): React.JSX.Element;
 declare function SelectItem({ className, children, ...props }: React.ComponentProps<typeof SelectPrimitive.Item>): React.JSX.Element;
 declare function SelectSeparator({ className, ...props }: React.ComponentProps<typeof SelectPrimitive.Separator>): React.JSX.Element;

@@ -46,6 +46,9 @@ export interface DataTableColumn<T> {
    *  by default. On the board every entry gets a column, even an empty one. */
   order?: string[]
   sortable?: boolean
+  /** `false` leaves this column blank on the row `onAddRow` opens: an id, a
+   *  timestamp, anything the server fills in. Furniture is always blank. */
+  addable?: boolean
   /** Extra classes on this column's cells (width, alignment, whitespace). */
   className?: string
   /**
