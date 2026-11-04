@@ -5,6 +5,7 @@ import { Command as CommandPrimitive } from "cmdk"
 import { SearchIcon } from "@/lib/icons"
 
 import { cn } from "@/lib/utils"
+import { useStrings } from "@/lib/strings"
 import {
   Dialog,
   DialogContent,
@@ -27,8 +28,8 @@ function Command({ className, ...props }: React.ComponentProps<typeof CommandPri
 }
 
 function CommandDialog({
-  title = "Command Palette",
-  description = "Search for a command to run...",
+  title,
+  description,
   children,
   className,
   showCloseButton = true,
@@ -39,6 +40,7 @@ function CommandDialog({
   className?: string
   showCloseButton?: boolean
 }) {
+  const t = useStrings().ui
   return (
     <Dialog {...props}>
       <DialogContent
@@ -49,8 +51,8 @@ function CommandDialog({
             header renders into the page whether or not the palette is open, and
             a screen reader reads the title and description of a closed dialog. */}
         <DialogHeader className="sr-only">
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
+          <DialogTitle>{title ?? t.commandTitle}</DialogTitle>
+          <DialogDescription>{description ?? t.commandDescription}</DialogDescription>
         </DialogHeader>
         <Command className="**:data-[slot=command-input-wrapper]:h-12 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]]:px-2 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5">
           {children}

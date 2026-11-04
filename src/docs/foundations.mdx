@@ -1,0 +1,82 @@
+import { Meta } from "@storybook/addon-docs/blocks"
+
+<Meta title="Docs/Foundations" />
+
+# Foundations
+
+What every Ziku app shares before it renders a single component. All of it ships
+in `@ziku/ui/styles.css` and the package itself; an app adds nothing to get it.
+
+## Type
+
+**Inter Variable**, self-hosted through `@fontsource-variable/inter`, which is a
+dependency of this package. `styles.css` imports it. No Google Fonts link, no
+`@font-face` in the app. The system stack sits behind it in `--font-sans` for
+the moment before the file arrives.
+
+Monospace is the platform's (`--font-mono`): SF Mono, Menlo, Consolas. Use
+`font-mono` for IDs, amounts in a ledger, keyboard keys.
+
+| Use                 | Class                                   |
+| ------------------- | --------------------------------------- |
+| Page title          | `text-2xl font-semibold tracking-tight` (`PageHeader`) |
+| Panel title         | `text-sm font-semibold` (`DashboardPanel`) |
+| Body                | `text-sm`                               |
+| Secondary text      | `text-sm text-muted-foreground`         |
+| Small label         | `SectionLabel` — never hand-rolled uppercase |
+| A number that changes | add `tabular-nums`                    |
+
+Weights in use: 400, 500, 600. Nothing bolder: 700 on Inter next to 600 reads
+as a mistake, not a hierarchy.
+
+## Icons
+
+**Phosphor only**, `@phosphor-icons/react`, imported with the `*Icon` names
+(`HouseIcon`, not `House`). Never Lucide or Heroicons.
+
+- **Weight:** `regular`. `fill` only to mark a selected state against its own
+  regular twin (a starred item, the active tab icon). No `duotone`, no `bold`.
+- **Size** follows the text it sits next to, set with a class, not the `size`
+  prop:
+  - `size-4` (16px) inline with `text-sm`, in buttons, menus, table cells,
+    tiles. Buttons and menu items apply it already.
+  - `size-5` (20px) in a toolbar or the command palette.
+  - `size-6` inside `EmptyState`'s circle. Nothing larger in product UI.
+- **Colour:** inherits `currentColor`. A decorative icon beside a label is
+  `text-muted-foreground`. An icon that is the only content of a button needs
+  an `aria-label` from the dictionary; one beside text gets `aria-hidden`.
+- Blocks take icons as the component, `icon={WalletIcon}`, so they can size it.
+
+## Colour
+
+See **Design tokens** for the full table. The rules that matter day to day:
+
+- The palette is soft: text is a dark gray, not black, and every colour is
+  kept below OKLCH chroma 0.12. Do not reach for a stronger colour to add
+  emphasis; use weight or size.
+- Never write a hex value in an app. If a colour is missing, it belongs in
+  `globals.css`, with its contrast measured.
+- `primary` is a fill. Inline links are `text-link`.
+- Status text is `text-{status}-fg`, never the fill (`text-danger` fails contrast).
+- Series in a chart take `chart-1`…`chart-5` in order. Categories that mean
+  nothing (tags, owners) take the `slot-*` ramp.
+- Motion that brings something in uses `ease-settle`.
+
+## Language
+
+Every word a component renders comes from one typed dictionary. Wrap the app
+once:
+
+```tsx
+import { ptPT, UIStringsProvider } from "@ziku/ui"
+
+<UIStringsProvider strings={ptPT}>{app}</UIStringsProvider>
+```
+
+- `ptPT` is complete European Portuguese. English is the default when nothing
+  is wrapped.
+- An app can override any subset on top: `strings={{ ...ptPT, auth: { ...ptPT.auth, signIn: "Entrar" } }}`.
+- Numbers, percentages and dates inside the dictionary are formatted for its
+  locale, so `StatTile`'s `change` and `ActivityList`'s times follow the language.
+- A component that renders a word not in the dictionary fails
+  `no-literal-strings.test.ts`. That covers `blocks/` and `components/ui/`.

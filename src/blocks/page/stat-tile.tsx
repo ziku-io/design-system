@@ -2,6 +2,7 @@ import * as React from "react"
 import type { Icon } from "@phosphor-icons/react"
 
 import { cn } from "@/lib/utils"
+import { useStrings } from "@/lib/strings"
 
 /**
  * One tracking value for every uppercase label in the library.
@@ -29,7 +30,11 @@ export interface StatTileProps extends Omit<React.ComponentProps<"div">, "title"
   /** A line under the value: a comparison, a period, a breakdown. */
   hint?: React.ReactNode
   icon?: Icon
-  /** Which way is up. Only colours the hint; the value stays readable. */
+  /** Percent change against the previous period: `12.5` reads "+12.5%" in the
+   *  dictionary's number format, ahead of the hint. Sets `trend` from its sign. */
+  change?: number
+  /** Which way is up. Only colours the hint; the value stays readable. Pass it
+   *  with `change` when falling is the good direction, e.g. churn or cost. */
   trend?: "up" | "down" | "flat"
 }
 
@@ -50,10 +55,13 @@ export function StatTile({
   value,
   hint,
   icon: TileIcon,
-  trend = "flat",
+  change,
+  trend,
   className,
   ...props
 }: StatTileProps) {
+  const t = useStrings().dashboard
+  const tone = trend ?? (change === undefined || change === 0 ? "flat" : change > 0 ? "up" : "down")
   return (
     <div
       data-slot="stat-tile"
@@ -70,7 +78,14 @@ export function StatTile({
       {/* `tabular-nums`: a column of these should not shuffle sideways when a
        *  digit changes, and a dashboard that polls changes them constantly. */}
       <div className="mt-2 text-2xl font-semibold tabular-nums">{value}</div>
-      {hint && <div className={cn("mt-1 text-xs", TREND[trend])}>{hint}</div>}
+      {(hint || change !== undefined) && (
+        <div className={cn("mt-1 flex flex-wrap gap-x-1 text-xs", TREND[tone])}>
+          {change !== undefined && (
+            <span className="font-medium tabular-nums">{t.change(change)}</span>
+          )}
+          {hint && <span>{hint}</span>}
+        </div>
+      )}
     </div>
   )
 }

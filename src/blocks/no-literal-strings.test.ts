@@ -15,7 +15,10 @@ import { describe, expect, it } from "vitest"
  * two or more letters is a literal somebody has to justify, and the only
  * justification is being in `useStrings()`.
  */
-const BLOCKS = join(import.meta.dirname, ".")
+const BLOCKS = join(import.meta.dirname, "..")
+// `components/ui/` too: its few words are screen-reader labels, which are the
+// easiest literals to miss because nobody sighted ever sees them.
+const SCANNED = ["blocks", "components/ui"].map((dir) => join(BLOCKS, dir))
 
 function sources(dir: string): string[] {
   return readdirSync(dir).flatMap((name) => {
@@ -116,7 +119,7 @@ function templateProse(literal: string): string {
 }
 
 describe("blocks", () => {
-  const files = sources(BLOCKS)
+  const files = SCANNED.flatMap(sources)
 
   it("finds the block sources", () => {
     expect(files.length).toBeGreaterThan(5)

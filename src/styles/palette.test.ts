@@ -131,6 +131,12 @@ const pairs: [string, string][] = [
     [`${s}-fg`, "background"],
     [`${s}-fg`, "card"],
   ]),
+  // Button text on its tinted fill. Hover is `brightness-95`, which darkens
+  // fill and text together, so the ratio barely moves.
+  ...(["primary", "danger", "success", "warning"] as const).map((s): [string, string] => [
+    `${s}-button-foreground`,
+    `${s}-button`,
+  ]),
 ]
 
 describe("palette", () => {

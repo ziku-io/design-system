@@ -43,10 +43,16 @@ schemas are factories over the strings (`loginSchema(t)`) rather than constants,
 and why props like `title` keep winning over the provider. `defaultStrings` is
 exported so an app can see what it is overriding.
 
-`components/ui/` is exempt: those take their text as children from the caller,
-so there is nothing to translate. The exceptions are the two shadcn writes into
-`dialog.tsx` ("Close", the footer's "Close" button) — leave them, `Modal` is
-what apps use and it goes through the dictionary.
+`components/ui/` is covered too. Most of its text arrives as children, but the
+few words a primitive renders on its own (close buttons, pagination, the
+sidebar toggle, the command palette's hidden title) read the `ui` group. They
+are nearly all screen-reader labels, which is why the no-literal test scans
+that directory as well: nobody sighted notices one left in English.
+
+`ptPT` (`src/lib/strings-pt.ts`) is a complete European Portuguese dictionary,
+typed as the whole `UIStrings`, so a new key breaks the build until it is
+translated there too. Numbers and dates inside a dictionary are formatted with
+that dictionary's locale.
 
 **Every primitive has to survive 320px.** An app should not have to override a
 library class to make a screen work on a phone. Three rules follow from that,
@@ -92,13 +98,34 @@ field must not have the box's background painted back under it.
 
 **The library is light-only.** Tokens live on `:root`.
 
+**The palette is soft on purpose.** Text is a gray (`#44484e`, about 8:1 on the
+page), not black, and no token goes past OKLCH chroma 0.12: brand 0.12, status
+fills 0.06 to 0.10, chart series 0.09, slots 0.09. A new colour stays under
+those caps and still passes `palette.test.ts`. Pushing the chroma up to win a
+contrast check is the wrong fix; move lightness instead.
+
+Filled buttons do not use the solid fills. `default`, `danger`, `success` and
+`warning` read `--{x}-button` (a light tint) with `--{x}-button-foreground`
+(dark text in the same hue), and hover with `brightness-95`. The solid
+`--primary` is for small marks: checkboxes, switches, progress, the sidebar's
+active item.
+
+The Storybook chrome is themed from `.storybook/theme.ts`. It copies a handful
+of tokens as hex, because the manager page never loads `globals.css`;
+`theme.test.ts` fails if a copy drifts.
+
+**Type is Inter Variable**, self-hosted via `@fontsource-variable/inter`, a
+runtime dependency imported by `globals.css` like `tw-animate-css`. Icon,
+type and colour conventions are written down in `src/docs/foundations.mdx`;
+change that page when you change a convention.
+
 **The two sidebar collapse modes animate differently.** `offcanvas` slides the
 fixed pane on `transform` and leaves the spacer's width unanimated; `icon`
 changes the pane's own width (16rem to 3rem), which no transform can express, so
 it still animates `width`. They shared one model until #27, and a collapse
 re-laid-out the whole document for 200ms. Do not merge them back.
 
-**One brand accent, a blue-purple** (`#6b5bd6`). It drives `--primary`,
+**One brand accent, a muted blue-purple** (`#706cbb`). It drives `--primary`,
 `--ring`, `--link` and the sidebar active state. Use `text-link` for inline
 links, never `text-primary`: the fill is tuned for white text on top of it, the
 link colour for reading against the page. A link inside a sentence also needs
@@ -169,7 +196,8 @@ src/blocks/shell/    AppShell (sidebar nav, ⌘K palette, user menu)
 src/blocks/data/     DataTable (TanStack v9), Kanban, saved views
 src/blocks/modal/    Modal (title bar, scrolling body, footer)
 src/blocks/search/   CommandMenu (cmdk), SearchTrigger
-src/blocks/page/     PageHeader, EmptyState
+src/blocks/page/     PageHeader, EmptyState, StatTile
+src/blocks/dashboard/ Dashboard, DashboardPanel, ActivityList
 src/docs/            MDX docs pages
 src/lib/             cn, Link/LinkProvider, UIStrings, Phosphor icon aliases
 src/styles/          globals.css — GitHub Primer tokens

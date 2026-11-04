@@ -1,89 +1,105 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+/* Inter, self-hosted and variable: one file covers every weight, and nothing
+   is fetched from a third party. Resolved from this package's own dependencies,
+   like tw-animate-css above, so a consumer installs nothing extra. */
+@import "@fontsource-variable/inter";
 
 :root {
   color-scheme: light;
 
   /* Cool paper ground and translucent elevated surfaces keep the interface
      spacious without turning routine controls into decorative glass. */
-  --background: #f5f7fb;
-  --foreground: #172033;
-  --card: #ffffff;
-  --card-foreground: #172033;
-  --popover: #ffffff;
-  --popover-foreground: #172033;
+  --background: #f4f6f8;
+  --foreground: #44484e;
+  --card: #fdfdff;
+  --card-foreground: #44484e;
+  --popover: #fdfdff;
+  --popover-foreground: #44484e;
 
-  --primary: #6b5bd6;
+  --primary: #706cbb;
   --primary-foreground: #ffffff;
+  /* Button fills. A tint with dark text in the same hue, not the solid
+     --primary under white: the solid fill was the heaviest thing on any screen
+     it sat on. --primary stays solid for checkboxes, switches and progress,
+     which are small enough to need the weight. */
+  --primary-button: #dadbfc;
+  --primary-button-foreground: #56548d;
 
-  --secondary: #eef1f7;
-  --secondary-foreground: #172033;
-  --muted: #eef1f7;
-  --muted-foreground: #596579;
-  --accent: #e9eafe;
-  --accent-foreground: #172033;
+  --secondary: #edeff3;
+  --secondary-foreground: #44484e;
+  --muted: #edeff3;
+  --muted-foreground: #676b72;
+  --accent: #ebebf9;
+  --accent-foreground: #44484e;
 
-  --danger: #c74e56;
+  --danger: #ac5f60;
   --danger-foreground: #ffffff;
-  --danger-fg: #a9353d;
-  --danger-subtle: #fbf0f0;
-  --danger-border: #ebd2d4;
+  --danger-fg: #a05556;
+  --danger-subtle: #fcf0f0;
+  --danger-border: #efd6d5;
+  --danger-button: #f8d4d3;
+  --danger-button-foreground: #884647;
 
-  --warning: #c8a041;
-  --warning-foreground: #1a1405;
-  --warning-fg: #7d5f18;
-  --warning-subtle: #fbf6e9;
-  --warning-border: #e8dcbd;
+  --warning: #cbad6d;
+  --warning-foreground: #352d1c;
+  --warning-fg: #7d6839;
+  --warning-subtle: #f7f3eb;
+  --warning-border: #e5dcc8;
+  --warning-button: #eddcb9;
+  --warning-button-foreground: #725711;
 
-  --success: #36855b;
+  --success: #4b8061;
   --success-foreground: #ffffff;
-  --success-fg: #256b47;
-  --success-subtle: #eef7f2;
-  --success-border: #cbe2d6;
+  --success-fg: #457559;
+  --success-subtle: #edf6f0;
+  --success-border: #cee2d5;
+  --success-button: #cce5d5;
+  --success-button-foreground: #236744;
 
-  --info: #367f93;
+  --info: #497c8c;
   --info-foreground: #ffffff;
-  --info-fg: #256a7c;
-  --info-subtle: #edf5f8;
-  --info-border: #cadfe6;
+  --info-fg: #3f7282;
+  --info-subtle: #ebf6f9;
+  --info-border: #c9e1e9;
 
   --destructive: var(--danger);
   --destructive-foreground: var(--danger-foreground);
 
-  --border: #d9deea;
-  --input: #d9deea;
-  --field: #ffffff;
-  --tooltip: #172033;
+  --border: #dde0e4;
+  --input: #dde0e4;
+  --field: #fdfdff;
+  --tooltip: #494d54;
   --tooltip-foreground: #ffffff;
-  --ring: #6b5bd6;
-  --link: #4a4ab5;
+  --ring: #706cbb;
+  --link: #6063aa;
   --surface-glass: rgb(255 255 255 / 0.74);
   --surface-glass-border: rgb(255 255 255 / 0.7);
   --surface-shadow: none;
-  --chart-1: #7f49ca;
-  --chart-2: #44996c;
-  --chart-3: #355360;
-  --chart-4: #9b7b29;
-  --chart-5: #79261d;
+  --chart-1: #3e598d;
+  --chart-2: #3b9ba7;
+  --chart-3: #9f8141;
+  --chart-4: #5d4454;
+  --chart-5: #758067;
 
-  --slot-1: #3c492a;
-  --slot-1-subtle: #f1f4ee;
-  --slot-2: #297e29;
-  --slot-2-subtle: #ecf6ec;
-  --slot-3: #2f4b8c;
-  --slot-3-subtle: #eceff6;
-  --slot-4: #472251;
-  --slot-4-subtle: #f3edf5;
-  --slot-5: #924c75;
-  --slot-5-subtle: #f4eef1;
-  --sidebar: #f5f7fb;
-  --sidebar-foreground: #172033;
-  --sidebar-primary: #6b5bd6;
+  --slot-1: #532750;
+  --slot-1-subtle: #f7f0f6;
+  --slot-2: #8b566d;
+  --slot-2-subtle: #f9eff3;
+  --slot-3: #72578f;
+  --slot-3-subtle: #f4f1f9;
+  --slot-4: #55743b;
+  --slot-4-subtle: #eff4ec;
+  --slot-5: #343e29;
+  --slot-5-subtle: #f0f4ec;
+  --sidebar: #f4f6f8;
+  --sidebar-foreground: #44484e;
+  --sidebar-primary: #706cbb;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #e9eafe;
-  --sidebar-accent-foreground: #172033;
-  --sidebar-border: #d9deea;
-  --sidebar-ring: #5b5bd6;
+  --sidebar-accent: #ebebf9;
+  --sidebar-accent-foreground: #44484e;
+  --sidebar-border: #dde0e4;
+  --sidebar-ring: #706cbb;
 }
 
 @theme inline {
@@ -100,6 +116,8 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-button: var(--primary-button);
+  --color-primary-button-foreground: var(--primary-button-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -113,16 +131,22 @@
   --color-danger-fg: var(--danger-fg);
   --color-danger-subtle: var(--danger-subtle);
   --color-danger-border: var(--danger-border);
+  --color-danger-button: var(--danger-button);
+  --color-danger-button-foreground: var(--danger-button-foreground);
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
   --color-warning-fg: var(--warning-fg);
   --color-warning-subtle: var(--warning-subtle);
   --color-warning-border: var(--warning-border);
+  --color-warning-button: var(--warning-button);
+  --color-warning-button-foreground: var(--warning-button-foreground);
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
   --color-success-fg: var(--success-fg);
   --color-success-subtle: var(--success-subtle);
   --color-success-border: var(--success-border);
+  --color-success-button: var(--success-button);
+  --color-success-button-foreground: var(--success-button-foreground);
   --color-info: var(--info);
   --color-info-foreground: var(--info-foreground);
   --color-info-fg: var(--info-fg);
@@ -159,9 +183,16 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  /* The system stack stays behind Inter, so text renders in a close match
+     while the font file loads instead of in a serif. */
   --font-sans:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+    "Inter Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial,
+    sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  /* `ease-settle`: the one easing for things that arrive (panels, route
+     transitions). Not named `ease-out`, which Tailwind owns and the shadcn
+     components already use. Apps had pasted this curve by hand three times. */
+  --ease-settle: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @layer base {

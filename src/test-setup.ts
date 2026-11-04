@@ -36,3 +36,13 @@ if (!Element.prototype.hasPointerCapture) {
   Element.prototype.releasePointerCapture = () => {}
 }
 Element.prototype.scrollIntoView ??= () => {}
+
+// jsdom has no layout, so every box measures 0×0, and Recharts' responsive
+// container warns about a zero-size chart on mount, which the story smoke test
+// counts as a failure. Give that one container a size; everything else keeps
+// jsdom's zeros, which DataTable's windowing relies on reading as "not laid out".
+const measure = Element.prototype.getBoundingClientRect
+Element.prototype.getBoundingClientRect = function (this: Element) {
+  if (this.classList.contains("recharts-responsive-container")) return new DOMRect(0, 0, 320, 200)
+  return measure.call(this)
+}

@@ -1,3 +1,4 @@
+import { DayPickerLocale } from 'react-day-picker';
 import * as React from "react";
 /**
  * Every word the blocks render, in one place.
@@ -157,7 +158,87 @@ export interface UIStrings {
     modal: {
         close: string;
     };
+    /** The few words the shadcn primitives in `components/ui/` render on their
+     *  own, nearly all of them for a screen reader. Everything else a primitive
+     *  shows arrives as children from the caller. */
+    ui: {
+        close: string;
+        breadcrumb: string;
+        /** The collapsed middle of a breadcrumb trail. */
+        more: string;
+        pagination: string;
+        previous: string;
+        next: string;
+        goToPreviousPage: string;
+        goToNextPage: string;
+        morePages: string;
+        toggleSidebar: string;
+        /** The mobile sidebar is a sheet, and a sheet needs a title to be announced. */
+        sidebarTitle: string;
+        sidebarDescription: string;
+        commandTitle: string;
+        commandDescription: string;
+    };
+    /** How values are written. One place, so a chart tooltip, a tile and a file
+     *  size all agree on "1.234,5" or "1,234.5". */
+    format: {
+        number: (value: number) => string;
+        /** A calendar day: a picker's trigger, an axis tick. */
+        date: (date: Date) => string;
+        /** A moment: when something happened. */
+        dateTime: (date: Date) => string;
+        /** Bytes as a person reads them: `fileSize(1536)` reads "1.5 KB". */
+        fileSize: (bytes: number) => string;
+    };
+    dashboard: {
+        /** `StatTile`'s `change`: `change(12.5)` reads "+12.5%". */
+        change: (percent: number) => string;
+        /** An `ActivityList` with nothing in it. */
+        noActivity: string;
+    };
+    datePicker: {
+        placeholder: string;
+        rangePlaceholder: string;
+        /** Joins the two ends of a range on the trigger: "4 Nov – 10 Nov". */
+        rangeSeparator: string;
+        clear: string;
+        today: string;
+        last7Days: string;
+        last30Days: string;
+        last90Days: string;
+        thisMonth: string;
+        thisYear: string;
+        /** Month and weekday names, the calendar's own aria-labels, and the first
+         *  day of the week. A react-day-picker locale, not a string. */
+        locale: DayPickerLocale;
+    };
+    upload: {
+        /** The drop zone's line: "Drop files here or" ahead of `browse`. */
+        dropHere: string;
+        /** `dropHere` for a zone that takes one file. */
+        dropFile: string;
+        browse: string;
+        /** Under the drop zone, built from what the caller allows. `maxFiles` is
+         *  left out when it is 1: `dropFile` already says so. */
+        limits: (limits: {
+            accept?: string;
+            maxSize?: string;
+            maxFiles?: number;
+        }) => string;
+        tooLarge: (name: string, max: string) => string;
+        wrongType: (name: string) => string;
+        tooMany: (max: number) => string;
+        remove: (name: string) => string;
+        uploading: string;
+        failed: string;
+        retry: string;
+        /** Beside an `UploadSlots` slot the form can be sent without. */
+        optional: string;
+    };
 }
+/** Bytes in 1024 steps, one decimal under ten. Shared by every locale: only
+ *  the number format and the unit letters differ, and those are passed in. */
+export declare function bytes(value: number, format: (n: number) => string, units?: string[]): string;
 /** English. What a consumer gets when it wraps nothing. */
 export declare const defaultStrings: UIStrings;
 /** What a consumer passes: any subset, merged over the English above. */

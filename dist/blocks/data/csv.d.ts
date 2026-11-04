@@ -21,7 +21,7 @@
  * inconsistently.
  */
 export type CsvDecimal = "." | ",";
-export declare const csvDelimiter: (decimal: CsvDecimal) => "," | ";";
+export declare const csvDelimiter: (decimal: CsvDecimal) => ";" | ",";
 /**
  * One cell, as text.
  *

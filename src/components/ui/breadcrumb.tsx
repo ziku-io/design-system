@@ -3,9 +3,10 @@ import { ChevronRight, MoreHorizontal } from "@/lib/icons"
 import { Slot } from "radix-ui"
 
 import { cn } from "@/lib/utils"
+import { useStrings } from "@/lib/strings"
 
 function Breadcrumb({ ...props }: React.ComponentProps<"nav">) {
-  return <nav aria-label="breadcrumb" data-slot="breadcrumb" {...props} />
+  return <nav aria-label={useStrings().ui.breadcrumb} data-slot="breadcrumb" {...props} />
 }
 
 function BreadcrumbList({ className, ...props }: React.ComponentProps<"ol">) {
@@ -85,7 +86,7 @@ function BreadcrumbEllipsis({ className, ...props }: React.ComponentProps<"span"
       {...props}
     >
       <MoreHorizontal aria-hidden="true" className="size-4" />
-      <span className="sr-only">More</span>
+      <span className="sr-only">{useStrings().ui.more}</span>
     </span>
   )
 }

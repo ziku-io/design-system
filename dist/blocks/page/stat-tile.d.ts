@@ -13,7 +13,11 @@ export interface StatTileProps extends Omit<React.ComponentProps<"div">, "title"
     /** A line under the value: a comparison, a period, a breakdown. */
     hint?: React.ReactNode;
     icon?: Icon;
-    /** Which way is up. Only colours the hint; the value stays readable. */
+    /** Percent change against the previous period: `12.5` reads "+12.5%" in the
+     *  dictionary's number format, ahead of the hint. Sets `trend` from its sign. */
+    change?: number;
+    /** Which way is up. Only colours the hint; the value stays readable. Pass it
+     *  with `change` when falling is the good direction, e.g. churn or cost. */
     trend?: "up" | "down" | "flat";
 }
 /**
@@ -22,4 +26,4 @@ export interface StatTileProps extends Omit<React.ComponentProps<"div">, "title"
  * Not a `Card`: a row of these is a row of tiles, and `CardHeader`'s padding
  * makes each one twice the height it needs.
  */
-export declare function StatTile({ label, value, hint, icon: TileIcon, trend, className, ...props }: StatTileProps): React.JSX.Element;
+export declare function StatTile({ label, value, hint, icon: TileIcon, change, trend, className, ...props }: StatTileProps): React.JSX.Element;

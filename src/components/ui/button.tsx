@@ -9,15 +9,16 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        danger: "bg-danger text-danger-foreground hover:bg-danger/90 focus-visible:ring-danger/40",
+        default: "bg-primary-button text-primary-button-foreground hover:brightness-95",
+        danger:
+          "bg-danger-button text-danger-button-foreground hover:brightness-95 focus-visible:ring-danger/40",
         success:
-          "bg-success text-success-foreground hover:bg-success/90 focus-visible:ring-success/40",
+          "bg-success-button text-success-button-foreground hover:brightness-95 focus-visible:ring-success/40",
         warning:
-          "bg-warning text-warning-foreground hover:bg-warning/90 focus-visible:ring-warning/40",
+          "bg-warning-button text-warning-button-foreground hover:brightness-95 focus-visible:ring-warning/40",
         /** @deprecated use `danger`. */
         destructive:
-          "bg-danger text-danger-foreground hover:bg-danger/90 focus-visible:ring-danger/40",
+          "bg-danger-button text-danger-button-foreground hover:brightness-95 focus-visible:ring-danger/40",
         // The unlayered [data-variant="outline"] rules in globals.css set the fill and
         // border consistently across the library.
         outline: "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground",
