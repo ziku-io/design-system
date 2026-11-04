@@ -929,7 +929,7 @@ export function DataTable<T extends RowData>({
                   aria-pressed={state.mode === m}
                   onClick={() => setLayout(m)}
                   className={cn(
-                    "px-2 py-1 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
+                    "px-2 py-1 outline-none focus-visible:ring-[1.5px] focus-visible:ring-ring/80",
                     state.mode === m
                       ? "bg-accent text-accent-foreground"
                       : "text-muted-foreground hover:text-foreground",
@@ -1236,7 +1236,7 @@ export function DataTable<T extends RowData>({
                             onClick={h.column.getToggleSortingHandler()}
                             className={cn(
                               "inline-flex items-center gap-1.5 rounded-sm outline-none select-none",
-                              "hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50",
+                              "hover:text-foreground focus-visible:ring-[1.5px] focus-visible:ring-ring/80",
                             )}
                           >
                             {label}
@@ -1276,7 +1276,7 @@ export function DataTable<T extends RowData>({
                         type="button"
                         onClick={row.getToggleExpandedHandler()}
                         aria-expanded={row.getIsExpanded()}
-                        className="inline-flex items-center gap-1.5 rounded-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                        className="inline-flex items-center gap-1.5 rounded-sm outline-none focus-visible:ring-[1.5px] focus-visible:ring-ring/80"
                       >
                         {row.getIsExpanded() ? (
                           <CaretDownIcon className="size-3.5" />
@@ -1319,7 +1319,7 @@ export function DataTable<T extends RowData>({
                     }
                     className={
                       onRowClick
-                        ? "cursor-pointer outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                        ? "cursor-pointer outline-none focus-visible:ring-[1.5px] focus-visible:ring-ring/80"
                         : undefined
                     }
                   >

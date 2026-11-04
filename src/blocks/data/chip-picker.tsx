@@ -64,7 +64,7 @@ export function ChipPicker({
         disabled={disabled}
         aria-label={placeholder}
         className={cn(
-          "flex h-9 w-full min-w-0 items-center gap-1 rounded-md border border-transparent bg-transparent px-2 text-sm hover:border-input focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
+          "flex h-9 w-full min-w-0 items-center gap-1 rounded-md border border-transparent bg-transparent px-2 text-sm hover:border-input focus-visible:border-ring focus-visible:ring-[1.5px] focus-visible:ring-ring/80 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
           className,
         )}
       >

@@ -88,6 +88,11 @@ zoom store (`useZoom`) and `antiFlashScript`,
 the import-free string a consumer's build inlines into `index.html`. Both keys
 go through `storageKey()`. Nothing in the library may hardcode an app's name.
 
+**Controls share two heights.** `size="sm"` is h-8 and the default is h-9 on
+Button, Input, SelectTrigger and Toggle alike, so a toolbar row lines up with
+no override. On `Input`, `size` is that height, not the HTML attribute: width
+always comes from CSS here.
+
 **Three fields share two variants.** `Input`, `Textarea` and `SelectTrigger`
 each take `variant="ghost" | "cell"`, and all three read the same strings from
 `src/lib/field-variants.ts`. They sit next to each other on one form, so a

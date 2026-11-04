@@ -133,7 +133,7 @@ function wt({ people: e, max: t = 4, size: n, className: r, ...i }) {
 }
 //#endregion
 //#region src/components/ui/badge.tsx
-var Tt = t("inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-full border border-transparent px-2 py-0.5 text-xs font-medium whitespace-nowrap transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 [&>svg]:pointer-events-none [&>svg]:size-3", {
+var Tt = t("inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-full border border-transparent px-2 py-0.5 text-xs font-medium whitespace-nowrap transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[1.5px] focus-visible:ring-ring/80 aria-invalid:border-destructive aria-invalid:ring-destructive/20 [&>svg]:pointer-events-none [&>svg]:size-3", {
 	variants: { variant: {
 		default: "bg-primary-button text-primary-button-foreground [a&]:hover:brightness-95",
 		secondary: "bg-secondary text-secondary-foreground [a&]:hover:brightness-95",
@@ -439,7 +439,7 @@ function Ut({ className: e, ...t }) {
 }
 //#endregion
 //#region src/components/ui/button.tsx
-var K = t("inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-[color,background-color,border-color,box-shadow,transform] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 active:scale-[0.98] active:brightness-90", {
+var K = t("inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-[color,background-color,border-color,box-shadow,transform] outline-none focus-visible:border-ring focus-visible:ring-[1.5px] focus-visible:ring-ring/80 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 active:scale-[0.98] active:brightness-90", {
 	variants: {
 		variant: {
 			default: "bg-primary-button text-primary-button-foreground hover:brightness-95",
@@ -505,7 +505,7 @@ function Wt({ className: e, classNames: t, showOutsideDays: n = !0, captionLayou
 			button_next: B(K({ variant: i }), "size-(--cell-size) p-0 select-none aria-disabled:opacity-50", u.button_next),
 			month_caption: B("flex h-(--cell-size) w-full items-center justify-center px-(--cell-size)", u.month_caption),
 			dropdowns: B("flex h-(--cell-size) w-full items-center justify-center gap-1.5 text-sm font-medium", u.dropdowns),
-			dropdown_root: B("relative rounded-md border border-input shadow-xs has-focus:border-ring has-focus:ring-[3px] has-focus:ring-ring/50", u.dropdown_root),
+			dropdown_root: B("relative rounded-md border border-input shadow-xs has-focus:border-ring has-focus:ring-[1.5px] has-focus:ring-ring/80", u.dropdown_root),
 			dropdown: B("absolute inset-0 bg-popover opacity-0", u.dropdown),
 			caption_label: B("font-medium select-none", r === "label" ? "text-sm" : "flex h-8 items-center gap-1 rounded-md pr-1 pl-2 text-sm [&>svg]:size-3.5 [&>svg]:text-muted-foreground", u.caption_label),
 			month_grid: B("w-full border-collapse", u.month_grid),
@@ -561,7 +561,7 @@ function Gt({ className: t, day: n, modifiers: r, ...i }) {
 		"data-range-start": r.range_start,
 		"data-range-end": r.range_end,
 		"data-range-middle": r.range_middle,
-		className: B("flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-[3px] group-data-[focused=true]/day:ring-ring/50 data-[range-end=true]:rounded-md data-[range-end=true]:rounded-r-md data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground data-[range-middle=true]:rounded-none data-[range-middle=true]:bg-accent data-[range-middle=true]:text-accent-foreground data-[range-start=true]:rounded-md data-[range-start=true]:rounded-l-md data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground [&>span]:text-xs [&>span]:opacity-70", o.day, t),
+		className: B("flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-[1.5px] group-data-[focused=true]/day:ring-ring/80 data-[range-end=true]:rounded-md data-[range-end=true]:rounded-r-md data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground data-[range-middle=true]:rounded-none data-[range-middle=true]:bg-accent data-[range-middle=true]:text-accent-foreground data-[range-start=true]:rounded-md data-[range-start=true]:rounded-l-md data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground [&>span]:text-xs [&>span]:opacity-70", o.day, t),
 		...i
 	});
 }
@@ -737,7 +737,7 @@ function dn({ className: e, ...t }) {
 function fn({ className: e, ...t }) {
 	return /* @__PURE__ */ a(c.Root, {
 		"data-slot": "checkbox",
-		className: B("peer relative size-4 shrink-0 rounded-xs border border-input shadow-xs transition-shadow outline-none before:absolute before:-inset-1 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground", e),
+		className: B("peer relative size-4 shrink-0 rounded-xs border border-input shadow-xs transition-shadow outline-none before:absolute before:-inset-1 focus-visible:border-ring focus-visible:ring-[1.5px] focus-visible:ring-ring/80 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground", e),
 		...t,
 		children: /* @__PURE__ */ a(c.Indicator, {
 			"data-slot": "checkbox-indicator",
@@ -788,7 +788,7 @@ function vn({ className: e, children: t, showCloseButton: n = !0, ...r }) {
 			...r,
 			children: [t, n && /* @__PURE__ */ o(l.Close, {
 				"data-slot": "dialog-close",
-				className: "absolute top-4 right-4 -m-3.5 rounded-md p-3.5 text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-hidden disabled:pointer-events-none sm:-m-2 sm:p-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+				className: "absolute top-4 right-4 -m-3.5 rounded-md p-3.5 text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-[1.5px] focus-visible:ring-ring/80 focus-visible:outline-hidden disabled:pointer-events-none sm:-m-2 sm:p-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
 				children: [/* @__PURE__ */ a(Be, {}), /* @__PURE__ */ a("span", {
 					className: "sr-only",
 					children: G().ui.close
@@ -1031,21 +1031,38 @@ function Jn({ className: e, ...t }) {
 var Yn = {
 	ghost: "rounded-md border border-transparent bg-muted shadow-none transition-colors hover:bg-accent focus-visible:border-ring focus-visible:bg-field",
 	cell: "rounded-none border-0 bg-transparent shadow-none focus-visible:bg-accent focus-visible:ring-inset"
-}, Xn = t(B("h-9 w-full min-w-0 rounded-md px-3 py-1 text-base transition-[color,box-shadow] outline-none selection:bg-primary selection:text-primary-foreground file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 md:text-sm", "focus-visible:ring-[3px] focus-visible:ring-ring/50", "aria-invalid:border-destructive aria-invalid:ring-destructive/20"), {
-	variants: { variant: {
-		default: "border border-input bg-transparent shadow-xs focus-visible:border-ring",
-		ghost: Yn.ghost,
-		cell: `h-8 px-2 ${Yn.cell}`
-	} },
-	defaultVariants: { variant: "default" }
+}, Xn = t(B("w-full min-w-0 rounded-md py-1 text-base transition-[color,box-shadow] outline-none selection:bg-primary selection:text-primary-foreground file:inline-flex file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 md:text-sm", "focus-visible:ring-[1.5px] focus-visible:ring-ring/80", "aria-invalid:border-destructive aria-invalid:ring-destructive/20"), {
+	variants: {
+		variant: {
+			default: "border border-input bg-transparent shadow-xs focus-visible:border-ring",
+			ghost: Yn.ghost,
+			cell: `px-2 ${Yn.cell}`
+		},
+		size: {
+			default: "h-9 px-3 file:h-7",
+			sm: "h-8 px-2.5 file:h-6"
+		}
+	},
+	compoundVariants: [{
+		variant: "cell",
+		className: "h-8 px-2"
+	}],
+	defaultVariants: {
+		variant: "default",
+		size: "default"
+	}
 });
-function J({ className: e, type: t, variant: n, ...r }) {
+function J({ className: e, type: t, variant: n, size: r, ...i }) {
 	return /* @__PURE__ */ a("input", {
 		type: t,
 		"data-slot": "input",
 		"data-variant": n ?? "default",
-		className: B(Xn({ variant: n }), e),
-		...r
+		"data-size": r ?? "default",
+		className: B(Xn({
+			variant: n,
+			size: r
+		}), e),
+		...i
 	});
 }
 //#endregion
@@ -1200,7 +1217,7 @@ function fr({ className: e, ...t }) {
 function pr({ className: e, ...t }) {
 	return /* @__PURE__ */ a(m.Item, {
 		"data-slot": "radio-group-item",
-		className: B("relative aspect-square size-4 shrink-0 rounded-full border border-input data-[state=checked]:border-primary shadow-xs transition-[color,box-shadow] outline-none before:absolute before:-inset-1 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20", e),
+		className: B("relative aspect-square size-4 shrink-0 rounded-full border border-input data-[state=checked]:border-primary shadow-xs transition-[color,box-shadow] outline-none before:absolute before:-inset-1 focus-visible:border-ring focus-visible:ring-[1.5px] focus-visible:ring-ring/80 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20", e),
 		...t,
 		children: /* @__PURE__ */ a(m.Indicator, {
 			"data-slot": "radio-group-indicator",
@@ -1234,11 +1251,11 @@ function _r({ className: e, size: t = "default", children: n, variant: r, ...i }
 		"data-slot": "select-trigger",
 		"data-size": t,
 		"data-variant": r ?? "default",
-		className: B("flex w-fit items-center justify-between gap-2 rounded-md px-3 py-2 text-sm whitespace-nowrap transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 data-[placeholder]:text-muted-foreground data-[size=default]:h-9 data-[size=sm]:h-8 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground", r ? Yn[r] : "border border-input bg-transparent shadow-xs focus-visible:border-ring", e),
+		className: B("flex w-fit items-center justify-between gap-2 rounded-md px-3 py-2 text-sm whitespace-nowrap transition-[color,box-shadow] outline-none focus-visible:ring-[1.5px] focus-visible:ring-ring/80 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 data-[placeholder]:text-muted-foreground data-[size=default]:h-9 data-[size=sm]:h-8 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground", r ? Yn[r] : "border border-input bg-transparent shadow-xs focus-visible:border-ring", e),
 		...i,
 		children: [n, /* @__PURE__ */ a(h.Icon, {
 			asChild: !0,
-			children: /* @__PURE__ */ a(T, { className: "size-4 opacity-50" })
+			children: /* @__PURE__ */ a(T, { className: "size-4 text-muted-foreground" })
 		})]
 	});
 }
@@ -1354,7 +1371,7 @@ function Ar({ className: e, children: t, side: n = "right", showCloseButton: r =
 			className: "flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain",
 			children: t
 		}), r && /* @__PURE__ */ o(l.Close, {
-			className: "absolute top-4 right-4 -m-3.5 rounded-md p-3.5 text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-hidden disabled:pointer-events-none sm:-m-2 sm:p-2",
+			className: "absolute top-4 right-4 -m-3.5 rounded-md p-3.5 text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-[1.5px] focus-visible:ring-ring/80 focus-visible:outline-hidden disabled:pointer-events-none sm:-m-2 sm:p-2",
 			children: [/* @__PURE__ */ a(Be, { className: "size-4" }), /* @__PURE__ */ a("span", {
 				className: "sr-only",
 				children: G().ui.close
@@ -1639,7 +1656,7 @@ function oi({ className: e, asChild: t = !1, ...n }) {
 	return /* @__PURE__ */ a(r, {
 		"data-slot": "sidebar-group-label",
 		"data-sidebar": "group-label",
-		className: B("flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 ring-ring/50 outline-hidden transition-opacity duration-200 ease-settle focus-visible:ring-[3px] [&>svg]:size-4 [&>svg]:shrink-0", "group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0", e),
+		className: B("flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 ring-ring/80 outline-hidden transition-opacity duration-200 ease-settle focus-visible:ring-[1.5px] [&>svg]:size-4 [&>svg]:shrink-0", "group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0", e),
 		...n
 	});
 }
@@ -1648,7 +1665,7 @@ function si({ className: e, asChild: t = !1, ...n }) {
 	return /* @__PURE__ */ a(r, {
 		"data-slot": "sidebar-group-action",
 		"data-sidebar": "group-action",
-		className: B("absolute top-3.5 right-3 flex size-6 items-center justify-center rounded-md p-0 text-sidebar-foreground ring-ring/50 outline-hidden transition-transform hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-[3px] [&>svg]:size-4 [&>svg]:shrink-0", "after:absolute after:-inset-2 md:after:hidden", "group-data-[collapsible=icon]:hidden", e),
+		className: B("absolute top-3.5 right-3 flex size-6 items-center justify-center rounded-md p-0 text-sidebar-foreground ring-ring/80 outline-hidden transition-transform hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-[1.5px] [&>svg]:size-4 [&>svg]:shrink-0", "after:absolute after:-inset-2 md:after:hidden", "group-data-[collapsible=icon]:hidden", e),
 		...n
 	});
 }
@@ -1676,7 +1693,7 @@ function ui({ className: e, ...t }) {
 		...t
 	});
 }
-var di = t("peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm ring-ring/50 outline-hidden transition-[width,height] group-has-data-[sidebar=menu-action]/menu-item:pr-8 group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-[3px] active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0", {
+var di = t("peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm ring-ring/80 outline-hidden transition-[width,height] group-has-data-[sidebar=menu-action]/menu-item:pr-8 group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-[1.5px] active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0", {
 	variants: {
 		variant: {
 			default: "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
@@ -1722,7 +1739,7 @@ function pi({ className: e, asChild: t = !1, showOnHover: n = !1, ...r }) {
 	return /* @__PURE__ */ a(i, {
 		"data-slot": "sidebar-menu-action",
 		"data-sidebar": "menu-action",
-		className: B("absolute top-1.5 right-1 flex size-6 items-center justify-center rounded-md p-0 text-sidebar-foreground ring-ring/50 outline-hidden transition-transform peer-hover/menu-button:text-sidebar-accent-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-[3px] [&>svg]:size-4 [&>svg]:shrink-0", "after:absolute after:-inset-2 md:after:hidden", "peer-data-[size=sm]/menu-button:top-1", "peer-data-[size=default]/menu-button:top-1.5", "peer-data-[size=lg]/menu-button:top-2.5", "group-data-[collapsible=icon]:hidden", n && "group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 peer-data-[active=true]/menu-button:text-sidebar-accent-foreground data-[state=open]:opacity-100 md:opacity-0", e),
+		className: B("absolute top-1.5 right-1 flex size-6 items-center justify-center rounded-md p-0 text-sidebar-foreground ring-ring/80 outline-hidden transition-transform peer-hover/menu-button:text-sidebar-accent-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-[1.5px] [&>svg]:size-4 [&>svg]:shrink-0", "after:absolute after:-inset-2 md:after:hidden", "peer-data-[size=sm]/menu-button:top-1", "peer-data-[size=default]/menu-button:top-1.5", "peer-data-[size=lg]/menu-button:top-2.5", "group-data-[collapsible=icon]:hidden", n && "group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 peer-data-[active=true]/menu-button:text-sidebar-accent-foreground data-[state=open]:opacity-100 md:opacity-0", e),
 		...r
 	});
 }
@@ -1778,7 +1795,7 @@ function vi({ asChild: e = !1, size: t = "md", isActive: n = !1, className: r, .
 		"data-sidebar": "menu-sub-button",
 		"data-size": t,
 		"data-active": n,
-		className: B("flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 text-sidebar-foreground ring-ring/50 outline-hidden hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-[3px] active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-sidebar-accent-foreground", "data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground", t === "sm" && "text-xs", t === "md" && "text-sm", "group-data-[collapsible=icon]:hidden", r),
+		className: B("flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 text-sidebar-foreground ring-ring/80 outline-hidden hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-[1.5px] active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-sidebar-accent-foreground", "data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground", t === "sm" && "text-xs", t === "md" && "text-sm", "group-data-[collapsible=icon]:hidden", r),
 		...i
 	});
 }
@@ -1808,7 +1825,7 @@ function yi({ className: t, defaultValue: n, value: r, min: i = 0, max: s = 100,
 			})
 		}), Array.from({ length: l.length }, (e, t) => /* @__PURE__ */ a(_.Thumb, {
 			"data-slot": "slider-thumb",
-			className: "block size-4 shrink-0 rounded-full border border-primary bg-card ring-ring/50 transition-[color,box-shadow] hover:ring-[3px] focus-visible:ring-[3px] focus-visible:outline-hidden"
+			className: "block size-4 shrink-0 rounded-full border border-primary bg-card ring-ring/80 transition-[color,box-shadow] hover:ring-[1.5px] focus-visible:ring-[1.5px] focus-visible:outline-hidden"
 		}, t))]
 	});
 }
@@ -1839,7 +1856,7 @@ function xi({ className: e, size: t = "default", ...n }) {
 	return /* @__PURE__ */ a(y.Root, {
 		"data-slot": "switch",
 		"data-size": t,
-		className: B("peer group/switch relative inline-flex shrink-0 items-center rounded-full border border-transparent shadow-xs transition-[background-color,border-color,box-shadow] outline-none before:absolute before:-inset-1 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 data-[size=default]:h-[1.15rem] data-[size=default]:w-8 data-[size=sm]:h-3.5 data-[size=sm]:w-6 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input", e),
+		className: B("peer group/switch relative inline-flex shrink-0 items-center rounded-full border border-transparent shadow-xs transition-[background-color,border-color,box-shadow] outline-none before:absolute before:-inset-1 focus-visible:border-ring focus-visible:ring-[1.5px] focus-visible:ring-ring/80 disabled:cursor-not-allowed disabled:opacity-50 data-[size=default]:h-[1.15rem] data-[size=default]:w-8 data-[size=sm]:h-3.5 data-[size=sm]:w-6 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input", e),
 		...n,
 		children: /* @__PURE__ */ a(y.Thumb, {
 			"data-slot": "switch-thumb",
@@ -1939,7 +1956,7 @@ function ji({ className: e, variant: t = "default", ...n }) {
 function Mi({ className: e, ...t }) {
 	return /* @__PURE__ */ a(b.Trigger, {
 		"data-slot": "tabs-trigger",
-		className: B("relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap text-foreground/60 transition-[color,background-color,border-color,box-shadow] group-data-[orientation=vertical]/tabs:w-full group-data-[orientation=vertical]/tabs:justify-start hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 group-data-[variant=default]/tabs-list:data-[state=active]:shadow-sm group-data-[variant=line]/tabs-list:data-[state=active]:shadow-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4", "group-data-[variant=line]/tabs-list:bg-transparent group-data-[variant=line]/tabs-list:data-[state=active]:bg-transparent", "data-[state=active]:bg-background data-[state=active]:text-foreground", "after:absolute after:bg-foreground after:opacity-0 after:transition-opacity group-data-[orientation=horizontal]/tabs:after:inset-x-0 group-data-[orientation=horizontal]/tabs:after:bottom-[-5px] group-data-[orientation=horizontal]/tabs:after:h-0.5 group-data-[orientation=vertical]/tabs:after:inset-y-0 group-data-[orientation=vertical]/tabs:after:-right-1 group-data-[orientation=vertical]/tabs:after:w-0.5 group-data-[variant=line]/tabs-list:data-[state=active]:after:opacity-100", e),
+		className: B("relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap text-foreground/60 transition-[color,background-color,border-color,box-shadow] group-data-[orientation=vertical]/tabs:w-full group-data-[orientation=vertical]/tabs:justify-start hover:text-foreground focus-visible:border-ring focus-visible:ring-[1.5px] focus-visible:ring-ring/80 disabled:pointer-events-none disabled:opacity-50 group-data-[variant=default]/tabs-list:data-[state=active]:shadow-sm group-data-[variant=line]/tabs-list:data-[state=active]:shadow-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4", "group-data-[variant=line]/tabs-list:bg-transparent group-data-[variant=line]/tabs-list:data-[state=active]:bg-transparent", "data-[state=active]:bg-background data-[state=active]:text-foreground", "after:absolute after:bg-foreground after:opacity-0 after:transition-opacity group-data-[orientation=horizontal]/tabs:after:inset-x-0 group-data-[orientation=horizontal]/tabs:after:bottom-[-5px] group-data-[orientation=horizontal]/tabs:after:h-0.5 group-data-[orientation=vertical]/tabs:after:inset-y-0 group-data-[orientation=vertical]/tabs:after:-right-1 group-data-[orientation=vertical]/tabs:after:w-0.5 group-data-[variant=line]/tabs-list:data-[state=active]:after:opacity-100", e),
 		...t
 	});
 }
@@ -1956,13 +1973,13 @@ function Pi({ className: e, variant: t, ...n }) {
 	return /* @__PURE__ */ a("textarea", {
 		"data-slot": "textarea",
 		"data-variant": t ?? "default",
-		className: B("flex field-sizing-content min-h-16 w-full rounded-md px-3 py-2 text-base transition-[color,box-shadow] outline-none placeholder:text-muted-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 md:text-sm", t ? Yn[t] : "border border-input bg-transparent shadow-xs focus-visible:border-ring", e),
+		className: B("flex field-sizing-content min-h-16 w-full rounded-md px-3 py-2 text-base transition-[color,box-shadow] outline-none placeholder:text-muted-foreground focus-visible:ring-[1.5px] focus-visible:ring-ring/80 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 md:text-sm", t ? Yn[t] : "border border-input bg-transparent shadow-xs focus-visible:border-ring", e),
 		...n
 	});
 }
 //#endregion
 //#region src/components/ui/toggle.tsx
-var Fi = t("inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-[color,box-shadow] outline-none hover:bg-muted hover:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4", {
+var Fi = t("inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-[color,box-shadow] outline-none hover:bg-muted hover:text-muted-foreground focus-visible:border-ring focus-visible:ring-[1.5px] focus-visible:ring-ring/80 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4", {
 	variants: {
 		variant: {
 			default: "bg-transparent",
@@ -2493,7 +2510,7 @@ function aa({ placeholder: e, shortcut: t, className: n, ...r }) {
 	return /* @__PURE__ */ o("button", {
 		type: "button",
 		"data-slot": "search-trigger",
-		className: B("inline-flex h-8 w-full items-center gap-2 rounded-md border border-input bg-field px-3 text-sm text-muted-foreground transition-colors outline-none select-none sm:w-56", "hover:bg-accent focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50", n),
+		className: B("inline-flex h-8 w-full items-center gap-2 rounded-md border border-input bg-field px-3 text-sm text-muted-foreground transition-colors outline-none select-none sm:w-56", "hover:bg-accent focus-visible:border-ring focus-visible:ring-[1.5px] focus-visible:ring-ring/80", n),
 		...r,
 		children: [
 			/* @__PURE__ */ a(be, {
@@ -3961,7 +3978,7 @@ function oo({ columns: t, data: n, loading: r, error: s, onRetry: c, empty: l, r
 								"aria-label": n,
 								"aria-pressed": N.mode === e,
 								onClick: () => rt(e),
-								className: B("px-2 py-1 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50", N.mode === e ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:text-foreground"),
+								className: B("px-2 py-1 outline-none focus-visible:ring-[1.5px] focus-visible:ring-ring/80", N.mode === e ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:text-foreground"),
 								children: /* @__PURE__ */ a(t, { className: "size-4" })
 							}, e))
 						}),
@@ -4164,7 +4181,7 @@ function oo({ columns: t, data: n, loading: r, error: s, onRetry: c, empty: l, r
 								children: e.column.getCanSort() ? /* @__PURE__ */ o("button", {
 									type: "button",
 									onClick: e.column.getToggleSortingHandler(),
-									className: B("inline-flex items-center gap-1.5 rounded-sm outline-none select-none", "hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50"),
+									className: B("inline-flex items-center gap-1.5 rounded-sm outline-none select-none", "hover:text-foreground focus-visible:ring-[1.5px] focus-visible:ring-ring/80"),
 									children: [c, /* @__PURE__ */ a(s, { className: B("size-3.5", n ? "text-foreground" : "text-muted-foreground") })]
 								}) : /* @__PURE__ */ a("span", {
 									className: "inline-flex items-center gap-1.5",
@@ -4194,7 +4211,7 @@ function oo({ columns: t, data: n, loading: r, error: s, onRetry: c, empty: l, r
 									type: "button",
 									onClick: e.getToggleExpandedHandler(),
 									"aria-expanded": e.getIsExpanded(),
-									className: "inline-flex items-center gap-1.5 rounded-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
+									className: "inline-flex items-center gap-1.5 rounded-sm outline-none focus-visible:ring-[1.5px] focus-visible:ring-ring/80",
 									children: [
 										e.getIsExpanded() ? /* @__PURE__ */ a(w, { className: "size-3.5" }) : /* @__PURE__ */ a(ie, { className: "size-3.5" }),
 										lt(Q(e.getValue(P))),
@@ -4215,7 +4232,7 @@ function oo({ columns: t, data: n, loading: r, error: s, onRetry: c, empty: l, r
 							onKeyDown: m ? (t) => {
 								(t.key === "Enter" || t.key === " ") && (t.preventDefault(), m(e.original));
 							} : void 0,
-							className: m ? "cursor-pointer outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50" : void 0,
+							className: m ? "cursor-pointer outline-none focus-visible:ring-[1.5px] focus-visible:ring-ring/80" : void 0,
 							children: e.getVisibleCells().map((e) => /* @__PURE__ */ a(Di, {
 								className: k[e.column.id]?.className,
 								children: /* @__PURE__ */ a(F.FlexRender, { cell: e })
@@ -4290,7 +4307,7 @@ function vo({ options: e, value: t, onChange: n, placeholder: r, max: i = 3, dis
 		type: "button",
 		disabled: s,
 		"aria-label": r,
-		className: B("flex h-9 w-full min-w-0 items-center gap-1 rounded-md border border-transparent bg-transparent px-2 text-sm hover:border-input focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50", c),
+		className: B("flex h-9 w-full min-w-0 items-center gap-1 rounded-md border border-transparent bg-transparent px-2 text-sm hover:border-input focus-visible:border-ring focus-visible:ring-[1.5px] focus-visible:ring-ring/80 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50", c),
 		children: [/* @__PURE__ */ o("span", {
 			className: "flex min-w-0 flex-1 flex-wrap items-center gap-1",
 			children: [d.length === 0 ? /* @__PURE__ */ a("span", {
@@ -5101,7 +5118,7 @@ function cs({ accept: t, maxSize: n, maxFiles: r, onFiles: i, onReject: s, disab
 			"data-slot": "file-drop",
 			"data-dragging": f,
 			"data-disabled": c,
-			className: "flex cursor-pointer flex-col items-center gap-2 rounded-lg border border-dashed bg-card p-6 text-center transition-colors focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50 hover:bg-accent/50 data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 data-[dragging=true]:border-primary data-[dragging=true]:bg-accent",
+			className: "flex cursor-pointer flex-col items-center gap-2 rounded-lg border border-dashed bg-card p-6 text-center transition-colors focus-within:border-ring focus-within:ring-[1.5px] focus-within:ring-ring/80 hover:bg-accent/50 data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 data-[dragging=true]:border-primary data-[dragging=true]:bg-accent",
 			onDragOver: (e) => {
 				e.preventDefault(), c || p(!0);
 			},

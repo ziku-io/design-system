@@ -42,6 +42,11 @@ const RULES: [name: string, pattern: RegExp][] = [
   ["dark: variant", /\bdark:/],
   // Neutrals are tinted tokens, never raw black or white.
   ["raw black or white utility", /\b(?:bg|text|border|ring|from|to)-(?:black|white)\b/],
+  // One focus ring: 1.5px of the ring colour at 80%, which is 3:1 against a
+  // card and the page (WCAG 1.4.11). Thinner reads as subtle; paler fails. The
+  // old 3px at 50% was thick and still only 1.96:1.
+  ["focus ring width other than 1.5px", /(?:focus|has-focus|focus-visible|focus-within|hover)[^\s"]*:ring-(?:\[(?!1\.5px\])[^\]]+\]|[0-9]\b)/],
+  ["focus ring opacity other than 80%", /\bring-ring\/(?!80\b)\d+/],
   // The fill is tuned for text on top of it; `text-link` is for reading.
   ["text-primary used as text", /\btext-primary\b(?!-)/],
 ]

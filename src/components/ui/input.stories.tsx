@@ -3,6 +3,8 @@ import { Input } from "./input"
 import { Textarea } from "./textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./select"
 import { Label } from "./label"
+import { Button } from "./button"
+import { Toggle } from "./toggle"
 
 const meta: Meta<typeof Input> = {
   title: "Components/Input",
@@ -62,6 +64,29 @@ export const Variants: Story = {
           <Input variant="cell" defaultValue="1,240.00" />
         </div>
       </div>
+    </div>
+  ),
+}
+
+/** `size="sm"` on every control in a toolbar: input, select, toggle and button
+ *  all land on h-8, so the row lines up with no height override. */
+export const Small: Story = {
+  render: () => (
+    <div className="flex flex-wrap items-center gap-2">
+      <Input size="sm" placeholder="Filter by name…" aria-label="Filter by name" className="w-48" />
+      <Select defaultValue="open">
+        <SelectTrigger size="sm" aria-label="Status">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="open">Open</SelectItem>
+          <SelectItem value="closed">Closed</SelectItem>
+        </SelectContent>
+      </Select>
+      <Toggle size="sm" variant="outline" aria-label="Mine only">
+        Mine
+      </Toggle>
+      <Button size="sm">Apply</Button>
     </div>
   ),
 }

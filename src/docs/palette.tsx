@@ -56,7 +56,7 @@ export function Swatch({ token, size = 40 }: { token: string; size?: number }) {
         display: "inline-block",
         width: size,
         height: size,
-        borderRadius: 6,
+        borderRadius: 10,
         background: `var(--${token})`,
         border: "1px solid var(--border)",
         flexShrink: 0,
@@ -114,7 +114,7 @@ export function TokenTable({ rows }: { rows: TokenRow[] }) {
                   justifyContent: "center",
                   width: 44,
                   height: 30,
-                  borderRadius: 6,
+                  borderRadius: 10,
                   background: `var(--${row.token})`,
                   color: `var(--${row.on})`,
                   border: "1px solid var(--border)",
@@ -173,16 +173,17 @@ export function StatusPalette() {
             style={{
               display: "inline-flex",
               alignItems: "center",
-              height: 32,
-              padding: "0 14px",
-              borderRadius: 6,
-              background: `var(--${status})`,
-              color: `var(--${status}-foreground)`,
-              fontSize: 13,
+              height: 22,
+              padding: "0 8px",
+              borderRadius: 999,
+              border: `1px solid var(--${status}-border)`,
+              background: `var(--${status}-subtle)`,
+              color: `var(--${status}-fg)`,
+              fontSize: 12,
               fontWeight: 500,
             }}
           >
-            Button
+            Badge
           </span>
 
           <span style={{ color: `var(--${status}-fg)`, fontSize: 13, minWidth: 96 }}>
@@ -194,7 +195,7 @@ export function StatusPalette() {
               flex: 1,
               minWidth: 220,
               padding: "8px 12px",
-              borderRadius: 6,
+              borderRadius: 10,
               background: `var(--${status}-subtle)`,
               border: `1px solid var(--${status}-border)`,
               color: `var(--${status}-fg)`,
@@ -224,9 +225,9 @@ export function AccentPalette() {
           alignItems: "center",
           height: 40,
           padding: "0 18px",
-          borderRadius: 6,
-          background: "var(--primary)",
-          color: "var(--primary-foreground)",
+          borderRadius: 10,
+          background: "var(--primary-button)",
+          color: "var(--primary-button-foreground)",
           fontWeight: 500,
         }}
       >
@@ -251,10 +252,11 @@ export function AccentPalette() {
           alignItems: "center",
           height: 40,
           padding: "0 14px",
-          borderRadius: 6,
+          borderRadius: 10,
           background: "var(--field)",
           border: "1px solid var(--ring)",
-          boxShadow: "0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent)",
+          // What `focus-visible:ring-[1.5px] ring-ring/80` draws on a field.
+          boxShadow: "0 0 0 1.5px color-mix(in oklab, var(--ring) 80%, transparent)",
           fontSize: 13,
         }}
       >
@@ -266,7 +268,7 @@ export function AccentPalette() {
           alignItems: "center",
           height: 40,
           padding: "0 14px",
-          borderRadius: 6,
+          borderRadius: 10,
           background: "var(--accent)",
           color: "var(--accent-foreground)",
           fontSize: 13,

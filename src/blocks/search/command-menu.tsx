@@ -158,7 +158,7 @@ export function SearchTrigger({ placeholder, shortcut, className, ...props }: Se
       data-slot="search-trigger"
       className={cn(
         "inline-flex h-8 w-full items-center gap-2 rounded-md border border-input bg-field px-3 text-sm text-muted-foreground transition-colors outline-none select-none sm:w-56",
-        "hover:bg-accent focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
+        "hover:bg-accent focus-visible:border-ring focus-visible:ring-[1.5px] focus-visible:ring-ring/80",
         className,
       )}
       {...props}
