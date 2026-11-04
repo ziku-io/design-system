@@ -20,7 +20,7 @@ export const TOKENS = {
 } as const
 
 const sans =
-  '"Inter Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif'
+  '"Geist Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif'
 
 export const theme = create({
   base: "light",
@@ -37,7 +37,8 @@ export const theme = create({
   appBorderRadius: 10,
 
   fontBase: sans,
-  fontCode: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
+  fontCode:
+    '"Geist Mono Variable", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
 
   textColor: TOKENS.foreground,
   textMutedColor: TOKENS["muted-foreground"],

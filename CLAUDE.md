@@ -120,10 +120,12 @@ The Storybook chrome is themed from `.storybook/theme.ts`. It copies a handful
 of tokens as hex, because the manager page never loads `globals.css`;
 `theme.test.ts` fails if a copy drifts.
 
-**Type is Inter Variable**, self-hosted via `@fontsource-variable/inter`, a
-runtime dependency imported by `globals.css` like `tw-animate-css`. Icon,
-type and colour conventions are written down in `src/docs/foundations.mdx`;
-change that page when you change a convention.
+**Type is Geist, with Geist Mono**, self-hosted via
+`@fontsource-variable/geist` and `@fontsource-variable/geist-mono`, runtime
+dependencies imported by `globals.css` like `tw-animate-css`. Not Inter: the
+house design rule bans it as a default. Icon, type and colour conventions are
+written down in `src/docs/foundations.mdx`; change that page when you change a
+convention.
 
 **The two sidebar collapse modes animate differently.** `offcanvas` slides the
 fixed pane on `transform` and leaves the spacer's width unanimated; `icon`

@@ -9,13 +9,14 @@ in `@ziku/ui/styles.css` and the package itself; an app adds nothing to get it.
 
 ## Type
 
-**Inter Variable**, self-hosted through `@fontsource-variable/inter`, which is a
-dependency of this package. `styles.css` imports it. No Google Fonts link, no
-`@font-face` in the app. The system stack sits behind it in `--font-sans` for
-the moment before the file arrives.
+**Geist** for text and **Geist Mono** for code, self-hosted through
+`@fontsource-variable/geist` and `@fontsource-variable/geist-mono`, both
+dependencies of this package. `styles.css` imports them. No Google Fonts link,
+no `@font-face` in the app. The system stacks sit behind them in `--font-sans`
+and `--font-mono` for the moment before the files arrive.
 
-Monospace is the platform's (`--font-mono`): SF Mono, Menlo, Consolas. Use
-`font-mono` for IDs, amounts in a ledger, keyboard keys.
+Use `font-mono` for IDs, amounts in a ledger, keyboard keys. Numbers that sit
+in prose or a tile stay in the sans with `tabular-nums`.
 
 <table>
   <thead>
@@ -34,7 +35,7 @@ Monospace is the platform's (`--font-mono`): SF Mono, Menlo, Consolas. Use
 </table>
 
 Weights in use: 400, 500 (controls: buttons, toggles, tabs, badges), 600
-(titles). Nothing bolder: 700 on Inter next to 600 reads
+(titles). Nothing bolder: 700 next to 600 reads
 as a mistake, not a hierarchy.
 
 ## Icons
