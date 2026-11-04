@@ -53,7 +53,7 @@ export function ForgotPasswordForm({
     return (
       <Card>
         <CardHeader className="items-center text-center">
-          <EnvelopeSimpleIcon className="size-8 text-primary" />
+          <EnvelopeSimpleIcon aria-hidden className="size-6 text-success-fg" />
           <CardTitle className="text-xl">{t.sentTitle}</CardTitle>
           <CardDescription>
             {t.sentDescription(form.getValues("email") || t.thatEmail)}

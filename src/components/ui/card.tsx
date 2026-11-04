@@ -1,6 +1,7 @@
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
+import { SURFACE } from "@/lib/surfaces"
 
 function Card({
   className,
@@ -12,7 +13,8 @@ function Card({
       data-slot="card"
       data-variant={variant}
       className={cn(
-        "flex flex-col gap-6 rounded-xl border bg-card py-6 text-card-foreground shadow-sm",
+        SURFACE,
+        "flex flex-col gap-6 py-6",
         variant === "glass" &&
           "border-[var(--surface-glass-border)] bg-[var(--surface-glass)] shadow-[var(--surface-shadow)] backdrop-blur-xl",
         className,

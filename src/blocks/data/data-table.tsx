@@ -52,10 +52,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
+import { LABEL_CLASS } from "@/blocks/page/stat-tile"
 import { downloadCsv, toCsv, type CsvDecimal } from "./csv"
 import { useStrings } from "@/lib/strings"
 
@@ -639,9 +640,12 @@ export function DataTable<T extends RowData>({
               type="button"
               onClick={() => removeFilter(f.id)}
               aria-label={t.removeFilterFor(col.header)}
-              className="shrink-0 rounded-md p-1 text-muted-foreground hover:bg-danger/10 hover:text-danger-fg"
+              className={cn(
+                buttonVariants({ variant: "ghost", size: "icon-xs" }),
+                "shrink-0 text-muted-foreground hover:text-danger-fg",
+              )}
             >
-              <XIcon className="size-3" weight="bold" />
+              <XIcon className="size-3.5" />
             </button>
           </div>
         )
@@ -839,8 +843,11 @@ export function DataTable<T extends RowData>({
           <NameForm
             align="start"
             title={t.saveView}
-            className="shrink-0 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-            trigger={<PlusIcon className="size-4" weight="bold" />}
+            className={cn(
+              buttonVariants({ variant: "ghost", size: "icon-sm" }),
+              "shrink-0 text-muted-foreground",
+            )}
+            trigger={<PlusIcon className="size-4" />}
             defaultValue={t.newView}
             confirmLabel={t.createView}
             onSubmit={store.add}
@@ -929,10 +936,13 @@ export function DataTable<T extends RowData>({
           <PopoverPanel
             align="end"
             width="w-72"
-            className="ml-1 rounded-md p-1.5 text-muted-foreground outline-none hover:bg-accent hover:text-foreground"
+            className={cn(
+              buttonVariants({ variant: "ghost", size: "icon-sm" }),
+              "ml-1 text-muted-foreground",
+            )}
             trigger={
               <span aria-label={t.viewSettings}>
-                <DotsThreeIcon className="size-4" weight="bold" />
+                <DotsThreeIcon className="size-4" />
               </span>
             }
           >
@@ -966,7 +976,7 @@ export function DataTable<T extends RowData>({
                           store.remove()
                           close()
                         }}
-                        className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-danger-fg hover:bg-danger/10"
+                        className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-danger-fg hover:bg-danger-subtle"
                       >
                         <TrashIcon className="size-4" /> {t.deleteView}
                       </button>
@@ -990,11 +1000,11 @@ export function DataTable<T extends RowData>({
               className={CHIP_ON}
               trigger={
                 <span className="flex items-center gap-1.5">
-                  <SortAscendingIcon className="size-3.5" weight="bold" />
+                  <SortAscendingIcon className="size-3.5" />
                   {state.sorting.length === 1
                     ? `${byKey[state.sorting[0].id]?.header ?? state.sorting[0].id} ${state.sorting[0].desc ? "↓" : "↑"}`
                     : t.sortCount(state.sorting.length)}
-                  <CaretDownIcon className="size-2.5 opacity-60" weight="bold" />
+                  <CaretDownIcon className="size-3.5 text-muted-foreground" />
                 </span>
               }
             >
@@ -1007,9 +1017,9 @@ export function DataTable<T extends RowData>({
               className={CHIP_ON}
               trigger={
                 <span className="flex items-center gap-1.5">
-                  <RowsIcon className="size-3.5" weight="bold" />
+                  <RowsIcon className="size-3.5" />
                   {t.groupedBy(byKey[group]?.header.toLowerCase() ?? "")}
-                  <CaretDownIcon className="size-2.5 opacity-60" weight="bold" />
+                  <CaretDownIcon className="size-3.5 text-muted-foreground" />
                 </span>
               }
             >
@@ -1027,9 +1037,9 @@ export function DataTable<T extends RowData>({
                 className={isBlankFilter(f.value) ? CHIP_OFF : CHIP_ON}
                 trigger={
                   <span className="flex items-center gap-1.5">
-                    <Ic className="size-3.5" weight="bold" />
+                    <Ic className="size-3.5" />
                     <span className="max-w-56 truncate">{chipLabel(col, f.value)}</span>
-                    <CaretDownIcon className="size-2.5 opacity-60" weight="bold" />
+                    <CaretDownIcon className="size-3.5 text-muted-foreground" />
                   </span>
                 }
               >
@@ -1057,7 +1067,7 @@ export function DataTable<T extends RowData>({
             className="rounded-md px-2 py-1.5 text-sm text-muted-foreground hover:bg-card hover:text-foreground"
             trigger={
               <span className="flex items-center gap-1">
-                <PlusIcon className="size-3" weight="bold" /> {t.addFilter}
+                <PlusIcon className="size-3.5" /> {t.addFilter}
               </span>
             }
           >
@@ -1078,7 +1088,7 @@ export function DataTable<T extends RowData>({
               onClick={store.reset}
               className="ml-auto flex items-center gap-1 text-xs text-link hover:underline"
             >
-              <XIcon className="size-3" weight="bold" /> {t.clearFilters}
+              <XIcon className="size-3.5" /> {t.clearFilters}
             </button>
           )}
         </div>
@@ -1124,7 +1134,7 @@ export function DataTable<T extends RowData>({
             <div className="flex flex-col items-center gap-3">
               <span>{t.noMatches}</span>
               <Button variant="outline" size="sm" onClick={store.reset}>
-                <XIcon className="size-3.5" weight="bold" />
+                <XIcon className="size-3.5" />
                 {t.clearAllFilters}
               </Button>
             </div>
@@ -1167,7 +1177,7 @@ export function DataTable<T extends RowData>({
                           : SortAscendingIcon
                     const label = (
                       <>
-                        {Ic && <Ic className="size-3.5" weight="bold" />}
+                        {Ic && <Ic className="size-3.5" />}
                         <table.FlexRender header={h} />
                       </>
                     )
@@ -1212,8 +1222,10 @@ export function DataTable<T extends RowData>({
                           >
                             {label}
                             <Sort
-                              className={cn("size-3", dir ? "text-foreground" : "opacity-40")}
-                              weight="bold"
+                              className={cn(
+                                "size-3.5",
+                                dir ? "text-foreground" : "text-muted-foreground",
+                              )}
                             />
                           </button>
                         ) : (
@@ -1240,10 +1252,7 @@ export function DataTable<T extends RowData>({
                     aria-rowindex={index + 2}
                     className="hover:bg-transparent"
                   >
-                    <TableHead
-                      colSpan={visibleCount}
-                      className="bg-muted/50 text-xs font-semibold tracking-wide uppercase"
-                    >
+                    <TableHead colSpan={visibleCount} className={cn("bg-muted/50", LABEL_CLASS)}>
                       <button
                         type="button"
                         onClick={row.getToggleExpandedHandler()}
@@ -1251,9 +1260,9 @@ export function DataTable<T extends RowData>({
                         className="inline-flex items-center gap-1.5 rounded-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
                       >
                         {row.getIsExpanded() ? (
-                          <CaretDownIcon className="size-3" weight="bold" />
+                          <CaretDownIcon className="size-3.5" />
                         ) : (
-                          <CaretRightIcon className="size-3" weight="bold" />
+                          <CaretRightIcon className="size-3.5" />
                         )}
                         {groupLabel(str(row.getValue(group)))}
                         <span className="rounded-full bg-card px-1.5 py-0.5 text-[0.65rem] font-normal">
@@ -1327,7 +1336,7 @@ export function DataTable<T extends RowData>({
       )}
 
       {paginated && !loading && filtered.length > 0 && (
-        <div className="flex items-center justify-between gap-4 border-t px-3 py-2 text-sm text-muted-foreground">
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t px-3 py-2 text-sm text-muted-foreground">
           <span role="status" aria-live="polite">
             {t.rowCount(filtered.length)}
           </span>

@@ -13,7 +13,7 @@ export declare const FIELD_VARIANTS: {
      * should read as a list. An empty one still shows where to type, which is
      * what a fully transparent field loses.
      */
-    readonly ghost: "rounded-sm border border-transparent bg-muted shadow-none transition-colors hover:bg-accent focus-visible:border-ring focus-visible:bg-field";
+    readonly ghost: "rounded-md border border-transparent bg-muted shadow-none transition-colors hover:bg-accent focus-visible:border-ring focus-visible:bg-field";
     /**
      * A cell of an editable table: no box of its own, because the grid already
      * draws the lines. It fills the cell, so nothing moves when a row goes from

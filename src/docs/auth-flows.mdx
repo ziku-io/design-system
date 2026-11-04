@@ -7,11 +7,16 @@ import * as Auth from "../blocks/auth/auth.stories";
 
 Every app uses the same three screens. Routes are conventions the blocks link to by default; override with props if an app differs.
 
-| Route              | Block                | Links to                        |
-| ------------------ | -------------------- | ------------------------------- |
-| `/login`           | `LoginForm`          | `/register`, `/forgot-password` |
-| `/register`        | `RegisterForm`       | `/login`                        |
-| `/forgot-password` | `ForgotPasswordForm` | `/login`                        |
+<table>
+  <thead>
+    <tr><th>Route</th><th>Block</th><th>Links to</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>/login</code></td><td><code>LoginForm</code></td><td><code>/register</code>, <code>/forgot-password</code></td></tr>
+    <tr><td><code>/register</code></td><td><code>RegisterForm</code></td><td><code>/login</code></td></tr>
+    <tr><td><code>/forgot-password</code></td><td><code>ForgotPasswordForm</code></td><td><code>/login</code></td></tr>
+  </tbody>
+</table>
 
 All three sit inside `AuthLayout` (centered card, optional logo and footer).
 

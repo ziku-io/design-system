@@ -113,7 +113,7 @@ export function ChipPicker({
                   <span className="min-w-0 flex-1 truncate">{option.label}</span>
                 )}
                 {option.className && <span className="min-w-0 flex-1" />}
-                {on && <CheckIcon className="size-3.5 shrink-0" weight="bold" />}
+                {on && <CheckIcon className="size-3.5 shrink-0" />}
               </button>
             )
           })}

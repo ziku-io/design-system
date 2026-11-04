@@ -14,7 +14,7 @@ export const FIELD_VARIANTS = {
    * what a fully transparent field loses.
    */
   ghost:
-    "rounded-sm border border-transparent bg-muted shadow-none transition-colors hover:bg-accent focus-visible:border-ring focus-visible:bg-field",
+    "rounded-md border border-transparent bg-muted shadow-none transition-colors hover:bg-accent focus-visible:border-ring focus-visible:bg-field",
   /**
    * A cell of an editable table: no box of its own, because the grid already
    * draws the lines. It fills the cell, so nothing moves when a row goes from

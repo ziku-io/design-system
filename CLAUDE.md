@@ -98,6 +98,13 @@ field must not have the box's background painted back under it.
 
 **The library is light-only.** Tokens live on `:root`.
 
+**Two materials, both in `src/lib/surfaces.ts`.** `OVERLAY` for anything that
+floats (dialog, popover, menus, listboxes, chart tooltip), `SURFACE` for
+anything on the page (card, stat tile, dashboard panel). Neither is glass: a
+translucent dialog let the page behind show through its body. The blur stays
+only on chrome content scrolls under, the shell header and the sidebar. The
+scrim behind a dialog is `bg-overlay`, never `bg-black/50`.
+
 **The palette is soft on purpose.** Text is a gray (`#44484e`, about 8:1 on the
 page), not black, and no token goes past OKLCH chroma 0.12: brand 0.12, status
 fills 0.06 to 0.10, chart series 0.09, slots 0.09. A new colour stays under
@@ -107,8 +114,7 @@ contrast check is the wrong fix; move lightness instead.
 Filled buttons do not use the solid fills. `default`, `danger`, `success` and
 `warning` read `--{x}-button` (a light tint) with `--{x}-button-foreground`
 (dark text in the same hue), and hover with `brightness-95`. The solid
-`--primary` is for small marks: checkboxes, switches, progress, the sidebar's
-active item.
+`--primary` is for small marks: checkboxes, switches, progress, a calendar day.
 
 The Storybook chrome is themed from `.storybook/theme.ts`. It copies a handful
 of tokens as hex, because the manager page never loads `globals.css`;
@@ -126,7 +132,8 @@ it still animates `width`. They shared one model until #27, and a collapse
 re-laid-out the whole document for 200ms. Do not merge them back.
 
 **One brand accent, a muted blue-purple** (`#706cbb`). It drives `--primary`,
-`--ring`, `--link` and the sidebar active state. Use `text-link` for inline
+`--ring` and `--link`. The sidebar's active item and every other
+"selected" row use `bg-accent`, a tint, not the solid fill. Use `text-link` for inline
 links, never `text-primary`: the fill is tuned for white text on top of it, the
 link colour for reading against the page. A link inside a sentence also needs
 `underline underline-offset-4` — colour alone fails WCAG 1.4.1 and the a11y

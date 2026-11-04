@@ -2,6 +2,7 @@ import * as React from "react"
 
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
+import { OVERLAY } from "@/lib/surfaces"
 import { useStrings } from "@/lib/strings"
 
 export interface ComboboxItem {
@@ -155,7 +156,10 @@ export function Combobox({
         role="listbox"
         aria-label={label}
         hidden={!showList}
-        className="absolute z-50 mt-1 max-h-64 w-full overflow-y-auto overscroll-contain rounded-md border bg-popover p-1 text-popover-foreground shadow-md"
+        className={cn(
+          OVERLAY,
+          "absolute z-50 mt-1 max-h-64 w-full overflow-y-auto overscroll-contain rounded-lg p-1",
+        )}
       >
         {items.map((item, i) => (
           <li

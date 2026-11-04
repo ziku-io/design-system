@@ -71,7 +71,7 @@ export function UploadSlots({
                 )}
               </Label>
               {slot.description && (
-                <p className="text-xs text-muted-foreground">{slot.description}</p>
+                <p className="text-sm text-muted-foreground">{slot.description}</p>
               )}
             </div>
             {held ? (

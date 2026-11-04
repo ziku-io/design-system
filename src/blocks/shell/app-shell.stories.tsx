@@ -13,6 +13,7 @@ import {
 import { AppShell } from "./app-shell"
 import { PageHeader } from "@/blocks/page/page-header"
 import { EmptyState } from "@/blocks/page/empty-state"
+import { StatTile } from "@/blocks/page/stat-tile"
 import { Button } from "@/components/ui/button"
 import { CommandMenu, SearchTrigger } from "@/blocks/search/command-menu"
 import {
@@ -131,15 +132,12 @@ export const Dashboard: StoryObj<typeof AppShell> = {
             </Button>
           }
         />
-        <div className="grid gap-4 md:grid-cols-3">
-          {["Active projects", "Members", "Requests / day"].map((t, i) => (
-            <div key={t} className="rounded-xl border bg-card p-5">
-              <div className="text-sm text-muted-foreground">{t}</div>
-              <div className="mt-1 text-2xl font-semibold">{[12, 8, "4.2k"][i]}</div>
-            </div>
-          ))}
+        <div className="grid gap-3 md:grid-cols-3">
+          <StatTile label="Active projects" value="12" />
+          <StatTile label="Members" value="8" />
+          <StatTile label="Requests / day" value="4.2k" />
         </div>
-        <div className="min-h-64 flex-1 rounded-xl border bg-card" />
+        <div className="min-h-64 flex-1 rounded-lg border bg-card" />
       </>
     ),
   },

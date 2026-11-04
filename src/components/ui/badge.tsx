@@ -9,18 +9,21 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground [a&]:hover:bg-primary/90",
-        secondary: "bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90",
-        danger: "bg-danger text-danger-foreground [a&]:hover:bg-danger/90",
-        warning: "bg-warning text-warning-foreground [a&]:hover:bg-warning/90",
-        success: "bg-success text-success-foreground [a&]:hover:bg-success/90",
-        info: "bg-info text-info-foreground [a&]:hover:bg-info/90",
+        default: "bg-primary-button text-primary-button-foreground [a&]:hover:brightness-95",
+        secondary: "bg-secondary text-secondary-foreground [a&]:hover:brightness-95",
+        // Status badges are the banner recipe in miniature: tint, border, `-fg`
+        // text. A solid fill made a column of them the heaviest thing on a page.
+        danger: "border-danger-border bg-danger-subtle text-danger-fg [a&]:hover:brightness-95",
+        warning: "border-warning-border bg-warning-subtle text-warning-fg [a&]:hover:brightness-95",
+        success: "border-success-border bg-success-subtle text-success-fg [a&]:hover:brightness-95",
+        info: "border-info-border bg-info-subtle text-info-fg [a&]:hover:brightness-95",
         /** @deprecated use `danger`. */
-        destructive: "bg-danger text-danger-foreground [a&]:hover:bg-danger/90",
+        destructive:
+          "border-danger-border bg-danger-subtle text-danger-fg [a&]:hover:brightness-95",
         outline:
           "border-border text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
         ghost: "[a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 [a&]:hover:underline",
+        link: "text-link underline-offset-4 [a&]:hover:underline",
       },
     },
     defaultVariants: {

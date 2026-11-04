@@ -2,6 +2,7 @@ import * as React from "react"
 import type { Icon } from "@phosphor-icons/react"
 
 import { cn } from "@/lib/utils"
+import { SURFACE } from "@/lib/surfaces"
 import { useStrings } from "@/lib/strings"
 
 /**
@@ -11,7 +12,8 @@ import { useStrings } from "@/lib/strings"
  * fifteen places in one app, which is what a missing primitive looks like from
  * the outside. Small caps need the extra space; this is the amount.
  */
-const LABEL = "text-xs font-medium tracking-wider text-muted-foreground uppercase"
+export const LABEL_CLASS = "text-xs font-medium tracking-wider text-muted-foreground uppercase"
+const LABEL = LABEL_CLASS
 
 export interface SectionLabelProps extends React.ComponentProps<"h2"> {
   /** `h2` by default. Pass the level the page's outline actually needs — a
@@ -63,17 +65,10 @@ export function StatTile({
   const t = useStrings().dashboard
   const tone = trend ?? (change === undefined || change === 0 ? "flat" : change > 0 ? "up" : "down")
   return (
-    <div
-      data-slot="stat-tile"
-      className={cn(
-        "rounded-lg border border-[var(--surface-glass-border)] bg-[var(--surface-glass)] p-4 shadow-[var(--surface-shadow)] backdrop-blur-xl",
-        className,
-      )}
-      {...props}
-    >
+    <div data-slot="stat-tile" className={cn(SURFACE, "p-4", className)} {...props}>
       <div className="flex items-center justify-between gap-2">
         <span className={LABEL}>{label}</span>
-        {TileIcon && <TileIcon className="size-4 shrink-0 text-muted-foreground" />}
+        {TileIcon && <TileIcon aria-hidden className="size-4 shrink-0 text-muted-foreground" />}
       </div>
       {/* `tabular-nums`: a column of these should not shuffle sideways when a
        *  digit changes, and a dashboard that polls changes them constantly. */}

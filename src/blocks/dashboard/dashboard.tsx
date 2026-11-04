@@ -2,6 +2,7 @@ import * as React from "react"
 import type { Icon } from "@phosphor-icons/react"
 
 import { cn } from "@/lib/utils"
+import { SURFACE } from "@/lib/surfaces"
 import { useStrings } from "@/lib/strings"
 import { PageHeader } from "@/blocks/page/page-header"
 
@@ -80,18 +81,19 @@ export function DashboardPanel({
       data-slot="dashboard-panel"
       aria-labelledby={id}
       className={cn(
-        "flex min-w-0 flex-col gap-3 rounded-lg border border-[var(--surface-glass-border)] bg-card p-4",
+        SURFACE,
+        "flex min-w-0 flex-col gap-3 p-4",
         span === "full" && "lg:col-span-2",
         className,
       )}
       {...props}
     >
       <div className="flex flex-wrap items-start justify-between gap-2">
-        <div className="grid gap-0.5">
+        <div className="grid gap-1">
           <h2 id={id} className="text-sm font-semibold">
             {title}
           </h2>
-          {description && <p className="text-xs text-muted-foreground">{description}</p>}
+          {description && <p className="text-sm text-muted-foreground">{description}</p>}
         </div>
         {action && <div className="text-sm">{action}</div>}
       </div>

@@ -163,7 +163,7 @@ export function SearchTrigger({ placeholder, shortcut, className, ...props }: Se
       )}
       {...props}
     >
-      <MagnifyingGlassIcon className="size-4 shrink-0" />
+      <MagnifyingGlassIcon aria-hidden className="size-4 shrink-0" />
       <span className="flex-1 text-left">{placeholder ?? t.placeholder}</span>
       {hint && (
         <kbd className="pointer-events-none hidden h-5 items-center gap-1 rounded border border-border px-1.5 font-sans text-[10px] font-medium sm:inline-flex">

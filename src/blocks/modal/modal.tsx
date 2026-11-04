@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
+import { buttonVariants } from "@/components/ui/button"
 import { useStrings } from "@/lib/strings"
 
 const SIZES = {
@@ -78,9 +79,12 @@ export function Modal({
           </div>
           <DialogClose
             aria-label={t.close}
-            className="-mr-1 rounded-md p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+            className={cn(
+              buttonVariants({ variant: "ghost", size: "icon-xs" }),
+              "-mr-1 text-muted-foreground",
+            )}
           >
-            <XIcon className="size-4" weight="bold" />
+            <XIcon className="size-4" />
           </DialogClose>
         </div>
 

@@ -50,7 +50,7 @@ export function ErrorState({
   if (variant === "alert") {
     return (
       <Alert variant="danger" className={className}>
-        <AlertDescription className="flex items-center justify-between gap-4">
+        <AlertDescription className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
           {what}
           {doing}
         </AlertDescription>

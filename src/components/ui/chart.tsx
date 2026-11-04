@@ -1,5 +1,6 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
+import { OVERLAY } from "@/lib/surfaces"
 import { useStrings } from "@/lib/strings"
 import * as RechartsPrimitive from "recharts"
 import type { TooltipValueType } from "recharts"
@@ -148,7 +149,8 @@ function ChartTooltipContent({
   return (
     <div
       className={cn(
-        "grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl",
+        OVERLAY,
+        "grid min-w-[8rem] items-start gap-1.5 rounded-lg px-2.5 py-1.5 text-xs",
         className,
       )}
     >

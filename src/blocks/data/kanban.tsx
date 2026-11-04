@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useStrings } from "@/lib/strings"
 import { cn } from "@/lib/utils"
+import { LABEL_CLASS } from "@/blocks/page/stat-tile"
 
 /** What the drag carries, under our own type so a link's own `text/plain`
  *  (its URL) cannot be mistaken for a card. */
@@ -143,80 +144,78 @@ export function Kanban<T>({
         col.tile ? (
           <Tile key={col.key} col={col} state={state(col.key)} drop={dropProps(col.key)} />
         ) : (
-        <div
-          key={col.key}
-          {...dropProps(col.key)}
-          // ponytail: a runtime number, so it cannot be a Tailwind class
-          style={{ maxHeight }}
-          className={cn(
-            "flex w-64 shrink-0 flex-col rounded-md border-2 p-2 transition-colors",
-            {
-              idle: "border-border bg-muted/50",
-              // The border carries the signal and the fill stays quiet.
-              ready: "border-ring/50 bg-muted/50",
-              over: "border-ring bg-accent",
-            }[state(col.key)],
-          )}
-        >
-          <div className="flex items-baseline justify-between px-2 py-1.5">
-            <span className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-              {col.title}
-            </span>
-            <span className="text-xs text-muted-foreground">
-              {col.subtitle ? `${col.items.length} · ${col.subtitle}` : col.items.length}
-            </span>
+          <div
+            key={col.key}
+            {...dropProps(col.key)}
+            // ponytail: a runtime number, so it cannot be a Tailwind class
+            style={{ maxHeight }}
+            className={cn(
+              "flex w-64 shrink-0 flex-col rounded-md border-2 p-2 transition-colors",
+              {
+                idle: "border-border bg-muted/50",
+                // The border carries the signal and the fill stays quiet.
+                ready: "border-ring/50 bg-muted/50",
+                over: "border-ring bg-accent",
+              }[state(col.key)],
+            )}
+          >
+            <div className="flex items-baseline justify-between px-2 py-1.5">
+              <span className={LABEL_CLASS}>{col.title}</span>
+              <span className="text-xs text-muted-foreground">
+                {col.subtitle ? `${col.items.length} · ${col.subtitle}` : col.items.length}
+              </span>
+            </div>
+            {/* Each column scrolls on its own — dozens of cards don't stretch the page. */}
+            <div className="min-h-10 space-y-2 overflow-y-auto">
+              {col.items.map((item) => {
+                const id = itemKey(item)
+                const draggable = Boolean(onDrop) && (canDrag ? canDrag(item) : true)
+                return (
+                  <div
+                    key={id}
+                    draggable={draggable}
+                    onDragStart={(e) => {
+                      if (!draggable) return
+                      setDragKey(id)
+                      e.dataTransfer.setData(DRAG_TYPE, id)
+                      e.dataTransfer.effectAllowed = "move"
+                      // A card containing a link would otherwise be dragged as
+                      // that link, showing the browser's own chip. Hand it the
+                      // card instead, held where the cursor grabbed it.
+                      const box = e.currentTarget.getBoundingClientRect()
+                      e.dataTransfer.setDragImage(
+                        e.currentTarget,
+                        e.clientX - box.left,
+                        e.clientY - box.top,
+                      )
+                    }}
+                    onDragEnd={() => {
+                      setDragKey(null)
+                      setOverCol(null)
+                    }}
+                    className={cn(
+                      "group/card relative transition-opacity",
+                      draggable ? "cursor-grab active:cursor-grabbing" : "cursor-default",
+                      // Without this a drag selects the card's own title text and
+                      // drags a blue smear along with it.
+                      dragging && "select-none",
+                      // The card left behind: a faint outline of where it was.
+                      dragKey === id && "opacity-30",
+                    )}
+                  >
+                    {renderCard(item)}
+                    {draggable && (
+                      <MoveMenu
+                        columns={columns}
+                        from={col.key}
+                        onPick={(to) => onDrop?.(item, to)}
+                      />
+                    )}
+                  </div>
+                )
+              })}
+            </div>
           </div>
-          {/* Each column scrolls on its own — dozens of cards don't stretch the page. */}
-          <div className="min-h-10 space-y-2 overflow-y-auto">
-            {col.items.map((item) => {
-              const id = itemKey(item)
-              const draggable = Boolean(onDrop) && (canDrag ? canDrag(item) : true)
-              return (
-                <div
-                  key={id}
-                  draggable={draggable}
-                  onDragStart={(e) => {
-                    if (!draggable) return
-                    setDragKey(id)
-                    e.dataTransfer.setData(DRAG_TYPE, id)
-                    e.dataTransfer.effectAllowed = "move"
-                    // A card containing a link would otherwise be dragged as
-                    // that link, showing the browser's own chip. Hand it the
-                    // card instead, held where the cursor grabbed it.
-                    const box = e.currentTarget.getBoundingClientRect()
-                    e.dataTransfer.setDragImage(
-                      e.currentTarget,
-                      e.clientX - box.left,
-                      e.clientY - box.top,
-                    )
-                  }}
-                  onDragEnd={() => {
-                    setDragKey(null)
-                    setOverCol(null)
-                  }}
-                  className={cn(
-                    "group/card relative transition-opacity",
-                    draggable ? "cursor-grab active:cursor-grabbing" : "cursor-default",
-                    // Without this a drag selects the card's own title text and
-                    // drags a blue smear along with it.
-                    dragging && "select-none",
-                    // The card left behind: a faint outline of where it was.
-                    dragKey === id && "opacity-30",
-                  )}
-                >
-                  {renderCard(item)}
-                  {draggable && (
-                    <MoveMenu
-                      columns={columns}
-                      from={col.key}
-                      onPick={(to) => onDrop?.(item, to)}
-                    />
-                  )}
-                </div>
-              )
-            })}
-          </div>
-        </div>
         ),
       )}
     </div>
@@ -265,7 +264,7 @@ function MoveMenu<T>({
         onDragStart={(e) => e.preventDefault()}
         onClick={(e) => e.stopPropagation()}
       >
-        <ArrowsOutCardinalIcon size={14} />
+        <ArrowsOutCardinalIcon className="size-3.5" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         {targets.map((c) => (
@@ -300,9 +299,10 @@ function Tile<T>({
         state === "over" ? cn("border-solid", tone.over) : cn("border-dashed", tone.idle),
       )}
     >
-      <tile.icon size={22} weight="duotone" />
-      <span className="text-xs font-semibold tracking-wide uppercase">{col.title}</span>
-      <span className="text-lg leading-none font-bold">{col.items.length}</span>
+      <tile.icon aria-hidden className="size-6" />
+      {/* text-current: the label takes the tile's tone, not the muted grey. */}
+      <span className={cn(LABEL_CLASS, "text-current")}>{col.title}</span>
+      <span className="text-lg leading-none font-semibold tabular-nums">{col.items.length}</span>
       {col.subtitle && <span className="text-xs opacity-80">{col.subtitle}</span>}
     </div>
   )

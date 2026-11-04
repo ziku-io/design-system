@@ -1,5 +1,13 @@
 import { Icon } from '@phosphor-icons/react';
 import * as React from "react";
+/**
+ * One tracking value for every uppercase label in the library.
+ *
+ * The same treatment had drifted to five different letter-spacings across
+ * fifteen places in one app, which is what a missing primitive looks like from
+ * the outside. Small caps need the extra space; this is the amount.
+ */
+export declare const LABEL_CLASS = "text-xs font-medium tracking-wider text-muted-foreground uppercase";
 export interface SectionLabelProps extends React.ComponentProps<"h2"> {
     /** `h2` by default. Pass the level the page's outline actually needs — a
      *  heading that is only styled small is still a heading to a screen reader. */

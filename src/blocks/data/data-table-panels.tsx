@@ -19,7 +19,7 @@ import {
 } from "@phosphor-icons/react"
 import type { SortingState } from "@tanstack/react-table"
 
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -98,7 +98,8 @@ export function Control({
       align="end"
       width={width}
       className={cn(
-        "relative shrink-0 rounded-md p-1.5 outline-none transition-colors hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/50",
+        buttonVariants({ variant: "ghost", size: "icon-sm" }),
+        "relative shrink-0",
         active ? "text-link" : "text-muted-foreground hover:text-foreground",
       )}
       trigger={
@@ -188,7 +189,10 @@ export function FilterPanel<T>({
           type="button"
           onClick={onRemove}
           title={t.removeFilter}
-          className="rounded-md p-1 text-muted-foreground hover:bg-danger/10 hover:text-danger-fg"
+          className={cn(
+            buttonVariants({ variant: "ghost", size: "icon-xs" }),
+            "text-muted-foreground hover:text-danger-fg",
+          )}
         >
           <TrashIcon className="size-3.5" />
         </button>
@@ -300,9 +304,12 @@ export function SortPanel<T>({
             type="button"
             title={t.removeSort}
             onClick={() => onChange(sorting.filter((_, n) => n !== i))}
-            className="shrink-0 rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-danger-fg"
+            className={cn(
+              buttonVariants({ variant: "ghost", size: "icon-xs" }),
+              "shrink-0 text-muted-foreground hover:text-danger-fg",
+            )}
           >
-            <XIcon className="size-3.5" weight="bold" />
+            <XIcon className="size-3.5" />
           </button>
         </div>
       ))}
@@ -312,14 +319,14 @@ export function SortPanel<T>({
           onClick={() => onChange([...sorting, { id: free[0].key, desc: false }])}
           className={cn(ROW, "text-muted-foreground")}
         >
-          <PlusIcon className="size-3.5" weight="bold" /> {t.addSort}
+          <PlusIcon className="size-3.5" /> {t.addSort}
         </button>
       )}
       {sorting.length > 0 && (
         <button
           type="button"
           onClick={() => onChange([])}
-          className={cn(ROW, "text-danger-fg hover:bg-danger/10")}
+          className={cn(ROW, "text-danger-fg hover:bg-danger-subtle")}
         >
           <TrashIcon className="size-3.5" /> {t.removeSorting}
         </button>
@@ -508,9 +515,12 @@ export function ViewSettings({
             type="button"
             onClick={() => setOpenKey(null)}
             aria-label={t.back}
-            className="rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
+            className={cn(
+              buttonVariants({ variant: "ghost", size: "icon-xs" }),
+              "text-muted-foreground",
+            )}
           >
-            <CaretLeftIcon className="size-3.5" weight="bold" />
+            <CaretLeftIcon className="size-3.5" />
           </button>
           <span className="text-xs font-medium text-muted-foreground">{open.label}</span>
         </div>
@@ -529,7 +539,7 @@ export function ViewSettings({
           aria-label={common.close}
           className="rounded-full p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
         >
-          <XIcon className="size-3" weight="bold" />
+          <XIcon className="size-3.5" />
         </button>
       </div>
 
@@ -581,7 +591,7 @@ export function ViewSettings({
           {r.value && (
             <span className="shrink-0 truncate text-xs text-muted-foreground">{r.value}</span>
           )}
-          <CaretRightIcon className="size-3 shrink-0 text-muted-foreground" />
+          <CaretRightIcon className="size-3.5 shrink-0 text-muted-foreground" />
         </button>
       ))}
 

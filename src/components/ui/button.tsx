@@ -5,7 +5,7 @@ import { Slot } from "radix-ui"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-semibold whitespace-nowrap transition-[color,background-color,border-color,box-shadow,transform] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 active:scale-[0.98] active:shadow-[inset_0_0_0_100vmax_rgb(0_0_0/0.08)]",
+  "inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-[color,background-color,border-color,box-shadow,transform] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 active:scale-[0.98] active:brightness-90",
   {
     variants: {
       variant: {
@@ -19,14 +19,14 @@ const buttonVariants = cva(
         /** @deprecated use `danger`. */
         destructive:
           "bg-danger-button text-danger-button-foreground hover:brightness-95 focus-visible:ring-danger/40",
-        // The unlayered [data-variant="outline"] rules in globals.css set the fill and
-        // border consistently across the library.
-        outline: "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground",
+        // Card-white with a border: lighter than the primary tint beside it, so
+        // "Sign in" reads before "Continue with Google".
+        outline: "border bg-card hover:bg-accent hover:text-accent-foreground",
         glass:
           "border border-[var(--surface-glass-border)] bg-[var(--surface-glass)] text-foreground shadow-[var(--surface-shadow)] backdrop-blur-xl hover:bg-[var(--surface-glass)]/90",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        secondary: "bg-secondary text-secondary-foreground hover:brightness-95",
         ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline active:shadow-none",
+        link: "text-link underline-offset-4 hover:underline active:scale-100 active:brightness-100",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

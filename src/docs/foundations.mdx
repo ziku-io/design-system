@@ -17,16 +17,24 @@ the moment before the file arrives.
 Monospace is the platform's (`--font-mono`): SF Mono, Menlo, Consolas. Use
 `font-mono` for IDs, amounts in a ledger, keyboard keys.
 
-| Use                 | Class                                   |
-| ------------------- | --------------------------------------- |
-| Page title          | `text-2xl font-semibold tracking-tight` (`PageHeader`) |
-| Panel title         | `text-sm font-semibold` (`DashboardPanel`) |
-| Body                | `text-sm`                               |
-| Secondary text      | `text-sm text-muted-foreground`         |
-| Small label         | `SectionLabel` — never hand-rolled uppercase |
-| A number that changes | add `tabular-nums`                    |
+<table>
+  <thead>
+    <tr><th>Use</th><th>Class</th><th>Where</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Page title</td><td><code>text-2xl font-semibold tracking-tight</code></td><td><code>PageHeader</code>, the <code>h1</code></td></tr>
+    <tr><td>Surface title</td><td><code>text-base font-semibold</code></td><td>Dialog, Modal, Sheet, <code>EmptyState</code></td></tr>
+    <tr><td>Panel title</td><td><code>text-sm font-semibold</code></td><td><code>DashboardPanel</code>, Card</td></tr>
+    <tr><td>Body</td><td><code>text-sm</code></td><td>Everywhere</td></tr>
+    <tr><td>Secondary text</td><td><code>text-sm text-muted-foreground</code></td><td>Any description under a title</td></tr>
+    <tr><td>Row meta</td><td><code>text-xs text-muted-foreground</code></td><td>The second line of a list row, a timestamp</td></tr>
+    <tr><td>Small label</td><td><code>SectionLabel</code> or <code>LABEL_CLASS</code></td><td>Never hand-rolled uppercase</td></tr>
+    <tr><td>A number that changes</td><td>add <code>tabular-nums</code></td><td>Tiles, tables, counters</td></tr>
+  </tbody>
+</table>
 
-Weights in use: 400, 500, 600. Nothing bolder: 700 on Inter next to 600 reads
+Weights in use: 400, 500 (controls: buttons, toggles, tabs, badges), 600
+(titles). Nothing bolder: 700 on Inter next to 600 reads
 as a mistake, not a hierarchy.
 
 ## Icons
@@ -38,10 +46,13 @@ as a mistake, not a hierarchy.
   regular twin (a starred item, the active tab icon). No `duotone`, no `bold`.
 - **Size** follows the text it sits next to, set with a class, not the `size`
   prop:
-  - `size-4` (16px) inline with `text-sm`, in buttons, menus, table cells,
-    tiles. Buttons and menu items apply it already.
-  - `size-5` (20px) in a toolbar or the command palette.
-  - `size-6` inside `EmptyState`'s circle. Nothing larger in product UI.
+  - `size-3.5` (14px) beside `text-xs`: chips, filter pills, badges. Nothing
+    smaller; a filled dot (a radio's indicator) is a mark, not an icon.
+  - `size-4` (16px) inline with `text-sm`, in buttons, menus, the command
+    palette, table cells, tiles. Buttons and menu items apply it already.
+  - `size-6` inside `EmptyState`'s circle and on a status screen. Nothing
+    larger in product UI.
+- **Muted** is `text-muted-foreground`, never `opacity-*`.
 - **Colour:** inherits `currentColor`. A decorative icon beside a label is
   `text-muted-foreground`. An icon that is the only content of a button needs
   an `aria-label` from the dictionary; one beside text gets `aria-hidden`.
@@ -80,3 +91,10 @@ import { ptPT, UIStringsProvider } from "@ziku/ui"
   locale, so `StatTile`'s `change` and `ActivityList`'s times follow the language.
 - A component that renders a word not in the dictionary fails
   `no-literal-strings.test.ts`. That covers `blocks/` and `components/ui/`.
+
+## Enforced
+
+`src/design-rules.test.ts` reads every block and primitive and fails on a
+bold, duotone or numerically sized icon, an icon under `size-3.5`,
+`font-bold`, a `dark:` class, raw `black`/`white` utilities and
+`text-primary` used as text.

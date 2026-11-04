@@ -76,6 +76,9 @@
   --surface-glass: rgb(255 255 255 / 0.74);
   --surface-glass-border: rgb(255 255 255 / 0.7);
   --surface-shadow: none;
+  /* Behind a dialog or sheet: the text colour at a third, not black at a half.
+     Black on this palette turned the page behind a modal into flat grey. */
+  --overlay: rgb(68 72 78 / 0.32);
   --chart-1: #3e598d;
   --chart-2: #3b9ba7;
   --chart-3: #9f8141;
@@ -104,6 +107,8 @@
 
 @theme inline {
   --radius: 12px;
+  /* 4px: only a 16px checkbox. Anything larger at 8px reads as a pill. */
+  --radius-xs: 4px;
   --radius-sm: 8px;
   --radius-md: 10px;
   --radius-lg: 12px;
@@ -159,6 +164,10 @@
   --color-tooltip: var(--tooltip);
   --color-tooltip-foreground: var(--tooltip-foreground);
   --color-ring: var(--ring);
+  --color-overlay: var(--overlay);
+  /* Floating surfaces only. Tinted with the text grey, under 0.05 opacity: a
+     menu should lift off the page, not cast a shadow onto it. */
+  --shadow-overlay: 0 1px 2px rgb(68 72 78 / 0.04), 0 8px 24px rgb(68 72 78 / 0.05);
   --color-link: var(--link);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
@@ -220,22 +229,9 @@
 [data-slot="select-trigger"][data-variant="default"] {
   background-color: var(--field);
 }
-/* GitHub's neutral button: filled, bordered, not transparent */
-[data-slot="button"][data-variant="outline"] {
-  background-color: var(--secondary);
-  border-color: var(--border);
-}
-[data-slot="button"][data-variant="outline"]:hover {
-  background-color: var(--accent);
-}
 /* The field background above wins over any utility, so the hover has to live here too */
 [data-slot="select-trigger"][data-variant="default"]:not([disabled]):hover {
   background-color: var(--accent);
-}
-/* Links use their own violet, one step off the primary fill */
-[data-slot="button"][data-variant="link"],
-[data-slot="badge"][data-variant="link"] {
-  color: var(--link);
 }
 
 /* Unlayered for the same reason as the block above, plus one of its own: an
