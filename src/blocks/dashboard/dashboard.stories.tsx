@@ -218,3 +218,26 @@ export const Translated: StoryObj = {
     </UIStringsProvider>
   ),
 }
+
+/** Every state a dashboard passes through: tiles and panels loading, one tile
+ *  and one panel failed with a retry, and the rest arrived. */
+export const States: StoryObj = {
+  render: () => (
+    <Dashboard
+      title="Overview"
+      stats={
+        <>
+          <StatTile label="Open dossiers" value={undefined} loading icon={FolderIcon} />
+          <StatTile label="Clients" value={undefined} loading icon={UsersIcon} />
+          <StatTile label="To refund" value={undefined} error icon={WalletIcon} />
+          <StatTile label="Overdue" value="4" change={-50} trend="up" icon={WarningIcon} />
+        </>
+      }
+    >
+      <DashboardPanel title="Recent activity">
+        <ActivityList items={undefined} loading />
+      </DashboardPanel>
+      <DashboardPanel title="Dossiers per week" error onRetry={() => {}} />
+    </Dashboard>
+  ),
+}

@@ -30,6 +30,9 @@ export interface UIStrings {
         crashed: string;
         /** The yes of `confirm()`. A caller with a verb passes `confirmLabel`. */
         confirm: string;
+        /** Read to a screen reader over a skeleton, and shown in a list that is
+         *  still fetching. */
+        loading: string;
     };
     auth: {
         /** Login */

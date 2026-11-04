@@ -33,6 +33,7 @@ export const ptPT: UIStrings = {
     retry: "Tentar novamente",
     crashed: "Algo correu mal neste ecrã.",
     confirm: "Confirmar",
+    loading: "A carregar…",
   },
   auth: {
     loginTitle: "Bem-vindo de volta",

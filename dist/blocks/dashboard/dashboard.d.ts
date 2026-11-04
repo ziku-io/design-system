@@ -1,4 +1,5 @@
 import { Icon } from '@phosphor-icons/react';
+import { AsyncStateProps } from '../page/error-state';
 import * as React from "react";
 export interface DashboardProps extends Omit<React.ComponentProps<"div">, "title"> {
     title: React.ReactNode;
@@ -18,7 +19,7 @@ export interface DashboardProps extends Omit<React.ComponentProps<"div">, "title
  * panels in, the same contract as every other block.
  */
 export declare function Dashboard({ title, description, actions, stats, children, className, ...props }: DashboardProps): React.JSX.Element;
-export interface DashboardPanelProps extends Omit<React.ComponentProps<"section">, "title"> {
+export interface DashboardPanelProps extends Omit<React.ComponentProps<"section">, "title">, AsyncStateProps {
     title: React.ReactNode;
     description?: React.ReactNode;
     /** Right of the title, usually a "View all" link. */
@@ -28,7 +29,7 @@ export interface DashboardPanelProps extends Omit<React.ComponentProps<"section"
 }
 /** One titled section of a dashboard. A `section` with its own heading, so the
  *  page outline reads as the list of panels. */
-export declare function DashboardPanel({ title, description, action, span, className, children, ...props }: DashboardPanelProps): React.JSX.Element;
+export declare function DashboardPanel({ title, description, action, span, loading, error, onRetry, className, children, ...props }: DashboardPanelProps): React.JSX.Element;
 export interface ActivityItem {
     id: string;
     /** What happened: "Ana approved dossier 214". */
@@ -37,8 +38,10 @@ export interface ActivityItem {
     at: Date;
     icon?: Icon;
 }
-export interface ActivityListProps extends React.ComponentProps<"ol"> {
-    items: ActivityItem[];
+export interface ActivityListProps extends React.ComponentProps<"ol">, AsyncStateProps {
+    /** `undefined` only while `loading` or with an `error`: a list that has
+     *  arrived and is empty is `[]`, and says so. */
+    items: ActivityItem[] | undefined;
 }
 /** What happened lately, newest first as given. The caller sorts. */
-export declare function ActivityList({ items, className, ...props }: ActivityListProps): React.JSX.Element;
+export declare function ActivityList({ items, loading, error, onRetry, className, ...props }: ActivityListProps): React.JSX.Element;

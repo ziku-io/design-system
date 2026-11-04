@@ -1,4 +1,5 @@
 import { Icon } from '@phosphor-icons/react';
+import { AsyncStateProps } from '../page/error-state';
 import * as React from "react";
 /**
  * A column that is an ending rather than a stage: Won, Lost, Archived.
@@ -30,7 +31,7 @@ export interface KanbanColumn<T> {
     /** Render as an ending rather than a stage. See `KanbanTile`. */
     tile?: KanbanTile;
 }
-export interface KanbanProps<T> {
+export interface KanbanProps<T> extends AsyncStateProps {
     columns: KanbanColumn<T>[];
     renderCard: (item: T) => React.ReactNode;
     /** Stable key per item; also what the drag carries. */
@@ -58,4 +59,4 @@ export interface KanbanProps<T> {
  * revealed on hover on a fine pointer and shown outright on a coarse one, where
  * there is no hover to reveal it with.
  */
-export declare function Kanban<T>({ columns, renderCard, itemKey, onDrop, canDrag, maxHeight, className, }: KanbanProps<T>): React.JSX.Element;
+export declare function Kanban<T>({ columns, renderCard, itemKey, onDrop, canDrag, maxHeight, loading, error, onRetry, className, }: KanbanProps<T>): React.JSX.Element;

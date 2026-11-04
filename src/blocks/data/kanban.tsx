@@ -10,6 +10,8 @@ import {
 import { useStrings } from "@/lib/strings"
 import { cn } from "@/lib/utils"
 import { LABEL_CLASS } from "@/blocks/page/stat-tile"
+import { ErrorState, errorTitle, type AsyncStateProps } from "@/blocks/page/error-state"
+import { Skeleton } from "@/components/ui/skeleton"
 
 /** What the drag carries, under our own type so a link's own `text/plain`
  *  (its URL) cannot be mistaken for a card. */
@@ -63,7 +65,7 @@ const TILE_TONES: Record<KanbanTile["tone"], { idle: string; over: string }> = {
   },
 }
 
-export interface KanbanProps<T> {
+export interface KanbanProps<T> extends AsyncStateProps {
   columns: KanbanColumn<T>[]
   renderCard: (item: T) => React.ReactNode
   /** Stable key per item; also what the drag carries. */
@@ -99,8 +101,12 @@ export function Kanban<T>({
   onDrop,
   canDrag,
   maxHeight,
+  loading,
+  error,
+  onRetry,
   className,
 }: KanbanProps<T>) {
+  const t = useStrings().common
   const [dragKey, setDragKey] = React.useState<string | null>(null)
   const [overCol, setOverCol] = React.useState<string | null>(null)
   const all = columns.flatMap((c) => c.items)
@@ -138,11 +144,30 @@ export function Kanban<T>({
     },
   })
 
+  if (error && !loading)
+    return (
+      <ErrorState
+        variant="alert"
+        title={errorTitle(error)}
+        onRetry={onRetry}
+        className={className}
+      />
+    )
+
   return (
-    <div className={cn("flex items-start gap-4 overflow-x-auto pb-4", className)}>
+    <div
+      className={cn("flex items-start gap-4 overflow-x-auto pb-4", className)}
+      aria-busy={loading || undefined}
+    >
       {columns.map((col) =>
         col.tile ? (
-          <Tile key={col.key} col={col} state={state(col.key)} drop={dropProps(col.key)} />
+          <Tile
+            key={col.key}
+            col={col}
+            state={state(col.key)}
+            drop={dropProps(col.key)}
+            loading={loading}
+          />
         ) : (
           <div
             key={col.key}
@@ -162,58 +187,71 @@ export function Kanban<T>({
             <div className="flex items-baseline justify-between px-2 py-1.5">
               <span className={LABEL_CLASS}>{col.title}</span>
               <span className="text-xs text-muted-foreground">
-                {col.subtitle ? `${col.items.length} · ${col.subtitle}` : col.items.length}
+                {loading
+                  ? null
+                  : col.subtitle
+                    ? `${col.items.length} · ${col.subtitle}`
+                    : col.items.length}
               </span>
             </div>
             {/* Each column scrolls on its own — dozens of cards don't stretch the page. */}
             <div className="min-h-10 space-y-2 overflow-y-auto">
-              {col.items.map((item) => {
-                const id = itemKey(item)
-                const draggable = Boolean(onDrop) && (canDrag ? canDrag(item) : true)
-                return (
-                  <div
-                    key={id}
-                    draggable={draggable}
-                    onDragStart={(e) => {
-                      if (!draggable) return
-                      setDragKey(id)
-                      e.dataTransfer.setData(DRAG_TYPE, id)
-                      e.dataTransfer.effectAllowed = "move"
-                      // A card containing a link would otherwise be dragged as
-                      // that link, showing the browser's own chip. Hand it the
-                      // card instead, held where the cursor grabbed it.
-                      const box = e.currentTarget.getBoundingClientRect()
-                      e.dataTransfer.setDragImage(
-                        e.currentTarget,
-                        e.clientX - box.left,
-                        e.clientY - box.top,
-                      )
-                    }}
-                    onDragEnd={() => {
-                      setDragKey(null)
-                      setOverCol(null)
-                    }}
-                    className={cn(
-                      "group/card relative transition-opacity",
-                      draggable ? "cursor-grab active:cursor-grabbing" : "cursor-default",
-                      // Without this a drag selects the card's own title text and
-                      // drags a blue smear along with it.
-                      dragging && "select-none",
-                      // The card left behind: a faint outline of where it was.
-                      dragKey === id && "opacity-30",
-                    )}
-                  >
-                    {renderCard(item)}
-                    {draggable && (
-                      <MoveMenu
-                        columns={columns}
-                        from={col.key}
-                        onPick={(to) => onDrop?.(item, to)}
-                      />
-                    )}
-                  </div>
-                )
-              })}
+              {/* The columns are known before the cards are, so the board keeps
+               *  its shape and only the cards are placeholders. */}
+              {loading && (
+                <div role="status" aria-label={t.loading} className="space-y-2">
+                  <Skeleton className="h-16 w-full" />
+                  <Skeleton className="h-16 w-full" />
+                </div>
+              )}
+              {!loading &&
+                col.items.map((item) => {
+                  const id = itemKey(item)
+                  const draggable = Boolean(onDrop) && (canDrag ? canDrag(item) : true)
+                  return (
+                    <div
+                      key={id}
+                      draggable={draggable}
+                      onDragStart={(e) => {
+                        if (!draggable) return
+                        setDragKey(id)
+                        e.dataTransfer.setData(DRAG_TYPE, id)
+                        e.dataTransfer.effectAllowed = "move"
+                        // A card containing a link would otherwise be dragged as
+                        // that link, showing the browser's own chip. Hand it the
+                        // card instead, held where the cursor grabbed it.
+                        const box = e.currentTarget.getBoundingClientRect()
+                        e.dataTransfer.setDragImage(
+                          e.currentTarget,
+                          e.clientX - box.left,
+                          e.clientY - box.top,
+                        )
+                      }}
+                      onDragEnd={() => {
+                        setDragKey(null)
+                        setOverCol(null)
+                      }}
+                      className={cn(
+                        "group/card relative transition-opacity",
+                        draggable ? "cursor-grab active:cursor-grabbing" : "cursor-default",
+                        // Without this a drag selects the card's own title text and
+                        // drags a blue smear along with it.
+                        dragging && "select-none",
+                        // The card left behind: a faint outline of where it was.
+                        dragKey === id && "opacity-30",
+                      )}
+                    >
+                      {renderCard(item)}
+                      {draggable && (
+                        <MoveMenu
+                          columns={columns}
+                          from={col.key}
+                          onPick={(to) => onDrop?.(item, to)}
+                        />
+                      )}
+                    </div>
+                  )
+                })}
             </div>
           </div>
         ),
@@ -282,10 +320,12 @@ function Tile<T>({
   col,
   state,
   drop,
+  loading,
 }: {
   col: KanbanColumn<T>
   state: "idle" | "ready" | "over"
   drop: Record<string, unknown>
+  loading?: boolean
 }) {
   const tile = col.tile!
   const tone = TILE_TONES[tile.tone]
@@ -302,7 +342,11 @@ function Tile<T>({
       <tile.icon aria-hidden className="size-6" />
       {/* text-current: the label takes the tile's tone, not the muted grey. */}
       <span className={cn(LABEL_CLASS, "text-current")}>{col.title}</span>
-      <span className="text-lg leading-none font-semibold tabular-nums">{col.items.length}</span>
+      {loading ? (
+        <Skeleton className="h-5 w-6" />
+      ) : (
+        <span className="text-lg leading-none font-semibold tabular-nums">{col.items.length}</span>
+      )}
       {col.subtitle && <span className="text-xs opacity-80">{col.subtitle}</span>}
     </div>
   )

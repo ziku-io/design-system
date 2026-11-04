@@ -232,6 +232,25 @@ export const Paginated: Story = {
 export const Loading: Story = {
   render: () => <DataTable columns={columns} data={[]} loading />,
 }
+/** The read failed. The toolbar stays, the band says so, and Retry is the way out. */
+export const Failed: Story = {
+  render: () => <DataTable columns={columns} data={undefined} error onRetry={() => {}} />,
+}
+/** Grouped by a column with a declared `order`, the board keeps its columns
+ *  while the cards load. */
+export const BoardLoading: Story = {
+  render: () => (
+    <DataTable
+      columns={columns}
+      data={[]}
+      rowId={(d) => String(d.id)}
+      renderCard={(d) => <div className="text-sm">{d.name}</div>}
+      defaultMode="board"
+      defaultGroup="stage"
+      loading
+    />
+  ),
+}
 export const Empty: Story = {
   render: () => <DataTable columns={columns} data={[]} empty="No deals yet." />,
 }

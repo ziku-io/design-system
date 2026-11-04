@@ -5,6 +5,8 @@ import { cn } from "@/lib/utils"
 import { SURFACE } from "@/lib/surfaces"
 import { useStrings } from "@/lib/strings"
 import { PageHeader } from "@/blocks/page/page-header"
+import { ErrorState, errorTitle, type AsyncStateProps } from "@/blocks/page/error-state"
+import { Skeleton } from "@/components/ui/skeleton"
 
 export interface DashboardProps extends Omit<React.ComponentProps<"div">, "title"> {
   title: React.ReactNode
@@ -55,7 +57,8 @@ export function Dashboard({
   )
 }
 
-export interface DashboardPanelProps extends Omit<React.ComponentProps<"section">, "title"> {
+export interface DashboardPanelProps
+  extends Omit<React.ComponentProps<"section">, "title">, AsyncStateProps {
   title: React.ReactNode
   description?: React.ReactNode
   /** Right of the title, usually a "View all" link. */
@@ -71,11 +74,15 @@ export function DashboardPanel({
   description,
   action,
   span = "half",
+  loading,
+  error,
+  onRetry,
   className,
   children,
   ...props
 }: DashboardPanelProps) {
   const id = React.useId()
+  const t = useStrings()
   return (
     <section
       data-slot="dashboard-panel"
@@ -97,7 +104,19 @@ export function DashboardPanel({
         </div>
         {action && <div className="text-sm">{action}</div>}
       </div>
-      {children}
+      {/* The title stays in every state: the reader still needs to know which
+       *  panel is loading or which one failed. */}
+      {loading ? (
+        <div role="status" aria-label={t.common.loading} className="grid gap-2.5">
+          <Skeleton className="h-4 w-3/4" />
+          <Skeleton className="h-4 w-1/2" />
+          <Skeleton className="h-4 w-2/3" />
+        </div>
+      ) : error ? (
+        <ErrorState variant="alert" title={errorTitle(error)} onRetry={onRetry} />
+      ) : (
+        children
+      )}
     </section>
   )
 }
@@ -111,13 +130,46 @@ export interface ActivityItem {
   icon?: Icon
 }
 
-export interface ActivityListProps extends React.ComponentProps<"ol"> {
-  items: ActivityItem[]
+export interface ActivityListProps extends React.ComponentProps<"ol">, AsyncStateProps {
+  /** `undefined` only while `loading` or with an `error`: a list that has
+   *  arrived and is empty is `[]`, and says so. */
+  items: ActivityItem[] | undefined
 }
 
 /** What happened lately, newest first as given. The caller sorts. */
-export function ActivityList({ items, className, ...props }: ActivityListProps) {
+export function ActivityList({
+  items,
+  loading,
+  error,
+  onRetry,
+  className,
+  ...props
+}: ActivityListProps) {
   const t = useStrings()
+  if (loading)
+    return (
+      <div role="status" aria-label={t.common.loading} className={cn("grid gap-4", className)}>
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="flex items-center gap-3">
+            <Skeleton className="size-4 shrink-0" />
+            <Skeleton className="h-4 flex-1" />
+            <Skeleton className="h-3 w-20 shrink-0" />
+          </div>
+        ))}
+      </div>
+    )
+  if (error)
+    return (
+      <ErrorState
+        variant="alert"
+        title={errorTitle(error)}
+        onRetry={onRetry}
+        className={className}
+      />
+    )
+  // Neither loading nor failed, and still nothing: the caller dropped the data.
+  if (items === undefined)
+    throw new Error("ActivityList: items is undefined but the list is neither loading nor failed")
   if (items.length === 0)
     return <p className="py-4 text-sm text-muted-foreground">{t.dashboard.noActivity}</p>
   return (

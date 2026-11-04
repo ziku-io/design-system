@@ -15,6 +15,22 @@ export interface ErrorStateProps {
     className?: string;
 }
 /**
+ * The three props every block that shows fetched data takes, so a page wires
+ * a query to any of them the same way.
+ *
+ * Precedence: `loading` over `error` over content. A retry in flight is
+ * loading, so the error band does not sit there while the request runs.
+ */
+export interface AsyncStateProps {
+    loading?: boolean;
+    /** `true` says the dictionary's sentence; a string or node says its own.
+     *  Falsy is no error. */
+    error?: React.ReactNode;
+    onRetry?: () => void;
+}
+/** `error` as `ErrorState` wants its `title`: `true` means "use the default". */
+export declare function errorTitle(error: React.ReactNode): React.ReactNode;
+/**
  * A read that failed, said plainly, with the way out beside it.
  *
  * Not `EmptyState`: a client whose documents did not load must not be told they

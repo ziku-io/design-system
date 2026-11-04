@@ -155,6 +155,7 @@ export function Combobox({
         id={`${id}-list`}
         role="listbox"
         aria-label={label}
+        aria-busy={loading || undefined}
         hidden={!showList}
         className={cn(
           OVERLAY,
@@ -184,6 +185,11 @@ export function Combobox({
             {item.hint && <div className="truncate text-xs text-muted-foreground">{item.hint}</div>}
           </li>
         ))}
+        {/* The prop existed and drew nothing: a slow search looked like one
+         *  with no results until the first item arrived. */}
+        {loading && items.length === 0 && (
+          <li className="px-2 py-1.5 text-sm text-muted-foreground">{t.loading}</li>
+        )}
         {!loading && items.length === 0 && (
           <li className="px-2 py-1.5 text-sm text-muted-foreground">{empty ?? t.noResults}</li>
         )}

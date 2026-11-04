@@ -4,6 +4,8 @@ import type { Icon } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { SURFACE } from "@/lib/surfaces"
 import { useStrings } from "@/lib/strings"
+import { Skeleton } from "@/components/ui/skeleton"
+import { errorTitle, type AsyncStateProps } from "@/blocks/page/error-state"
 
 /**
  * One tracking value for every uppercase label in the library.
@@ -26,7 +28,7 @@ export function SectionLabel({ as: Tag = "h2", className, ...props }: SectionLab
   return <Tag data-slot="section-label" className={cn(LABEL, className)} {...props} />
 }
 
-export interface StatTileProps extends Omit<React.ComponentProps<"div">, "title"> {
+export interface StatTileProps extends Omit<React.ComponentProps<"div">, "title">, TileState {
   label: React.ReactNode
   value: React.ReactNode
   /** A line under the value: a comparison, a period, a breakdown. */
@@ -39,6 +41,10 @@ export interface StatTileProps extends Omit<React.ComponentProps<"div">, "title"
    *  with `change` when falling is the good direction, e.g. churn or cost. */
   trend?: "up" | "down" | "flat"
 }
+
+// No `onRetry`: a tile is too small for a button. The panel or page that
+// fetched the row of tiles carries the retry.
+type TileState = Pick<AsyncStateProps, "loading" | "error">
 
 const TREND = {
   up: "text-success-fg",
@@ -59,10 +65,13 @@ export function StatTile({
   icon: TileIcon,
   change,
   trend,
+  loading,
+  error,
   className,
   ...props
 }: StatTileProps) {
-  const t = useStrings().dashboard
+  const strings = useStrings()
+  const t = strings.dashboard
   const tone = trend ?? (change === undefined || change === 0 ? "flat" : change > 0 ? "up" : "down")
   return (
     <div data-slot="stat-tile" className={cn(SURFACE, "p-4", className)} {...props}>
@@ -72,8 +81,25 @@ export function StatTile({
       </div>
       {/* `tabular-nums`: a column of these should not shuffle sideways when a
        *  digit changes, and a dashboard that polls changes them constantly. */}
-      <div className="mt-2 text-2xl font-semibold tabular-nums">{value}</div>
-      {(hint || change !== undefined) && (
+      {loading ? (
+        // The same two lines the tile will have, so the row does not jump.
+        <div role="status" aria-label={strings.common.loading}>
+          <Skeleton className="mt-2 h-8 w-24" />
+          <Skeleton className="mt-1.5 h-3 w-32" />
+        </div>
+      ) : error ? (
+        <>
+          <div className="mt-2 text-2xl font-semibold text-muted-foreground" aria-hidden>
+            —
+          </div>
+          <div className="mt-1 text-xs text-danger-fg">
+            {errorTitle(error) ?? strings.common.loadFailed}
+          </div>
+        </>
+      ) : (
+        <div className="mt-2 text-2xl font-semibold tabular-nums">{value}</div>
+      )}
+      {!loading && !error && (hint || change !== undefined) && (
         <div className={cn("mt-1 flex flex-wrap gap-x-1 text-xs", TREND[tone])}>
           {change !== undefined && (
             <span className="font-medium tabular-nums">{t.change(change)}</span>

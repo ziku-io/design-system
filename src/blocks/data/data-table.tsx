@@ -57,6 +57,7 @@ import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 import { LABEL_CLASS } from "@/blocks/page/stat-tile"
+import { ErrorState, errorTitle } from "@/blocks/page/error-state"
 import { downloadCsv, toCsv, type CsvDecimal } from "./csv"
 import { useStrings } from "@/lib/strings"
 
@@ -131,6 +132,10 @@ export interface DataTableProps<T extends RowData> {
   columns: DataTableColumn<T>[]
   data: T[] | null | undefined
   loading?: boolean
+  /** The read failed. `true` says the dictionary's sentence; a node says its
+   *  own. The toolbar stays, so a view switch or a filter change can retry. */
+  error?: React.ReactNode
+  onRetry?: () => void
   empty?: React.ReactNode
   /** Stable key per row. Required for the board; the table falls back to index. */
   rowId?: (row: T) => string
@@ -217,6 +222,8 @@ export function DataTable<T extends RowData>({
   columns,
   data,
   loading,
+  error,
+  onRetry,
   empty,
   rowId,
   search = true,
@@ -919,11 +926,12 @@ export function DataTable<T extends RowData>({
                   key={m}
                   title={label}
                   aria-label={label}
+                  aria-pressed={state.mode === m}
                   onClick={() => setLayout(m)}
                   className={cn(
-                    "px-2 py-1",
+                    "px-2 py-1 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
                     state.mode === m
-                      ? "bg-foreground text-background"
+                      ? "bg-accent text-accent-foreground"
                       : "text-muted-foreground hover:text-foreground",
                   )}
                 >
@@ -1094,7 +1102,10 @@ export function DataTable<T extends RowData>({
         </div>
       )}
 
-      {loading ? (
+      {/* A board whose columns are declared (`order`) keeps them and loads
+       *  its cards in place; one that only learns its columns from the rows
+       *  has nothing to draw yet, so it takes the table's skeleton. */}
+      {loading && (!board || boardColumns.length === 0) ? (
         // The columns that are about to arrive, not five bars: a skeleton of a
         // different shape moves the whole page when the real table lands.
         <div className="overflow-auto" role="status" aria-live="polite" aria-busy="true">
@@ -1120,6 +1131,14 @@ export function DataTable<T extends RowData>({
               ))}
             </TableBody>
           </Table>
+        </div>
+      ) : loading ? (
+        <div className="p-3">
+          <Kanban columns={boardColumns} itemKey={rowId!} renderCard={renderCard!} loading />
+        </div>
+      ) : error ? (
+        <div className="p-3">
+          <ErrorState variant="alert" title={errorTitle(error)} onRetry={onRetry} />
         </div>
       ) : filtered.length === 0 ? (
         <div
@@ -1335,7 +1354,7 @@ export function DataTable<T extends RowData>({
         </div>
       )}
 
-      {paginated && !loading && filtered.length > 0 && (
+      {paginated && !loading && !error && filtered.length > 0 && (
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t px-3 py-2 text-sm text-muted-foreground">
           <span role="status" aria-live="polite">
             {t.rowCount(filtered.length)}

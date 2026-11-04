@@ -92,6 +92,29 @@ import { ptPT, UIStringsProvider } from "@ziku/ui"
 - A component that renders a word not in the dictionary fails
   `no-literal-strings.test.ts`. That covers `blocks/` and `components/ui/`.
 
+## States
+
+Every block that shows fetched data takes the same three props, so a page
+wires a query to any of them the same way:
+
+```tsx
+<DashboardPanel title="Recent activity" loading={q.isPending} error={q.isError} onRetry={q.refetch}>
+  <ActivityList items={q.data} />
+</DashboardPanel>
+```
+
+- `loading` wins over `error`, which wins over content. A retry in flight is
+  loading, so the error band does not sit there while the request runs.
+- `error={true}` says the dictionary's sentence; a string says its own.
+- The block keeps its outline while it loads: a tile keeps its label, a board
+  its declared columns, a table its headers. Only the data is a placeholder.
+- Empty and failed are different states. A list that never arrived is never
+  drawn as a list with nothing in it.
+
+`StatTile` takes no `onRetry`: a tile is too small for a button, so the panel
+or page that fetched the row carries it. `DataTable`, `Kanban`,
+`DashboardPanel` and `ActivityList` take all three; `Combobox` takes `loading`.
+
 ## Enforced
 
 `src/design-rules.test.ts` reads every block and primitive and fails on a

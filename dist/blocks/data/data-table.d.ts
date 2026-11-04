@@ -39,6 +39,10 @@ export interface DataTableProps<T extends RowData> {
     columns: DataTableColumn<T>[];
     data: T[] | null | undefined;
     loading?: boolean;
+    /** The read failed. `true` says the dictionary's sentence; a node says its
+     *  own. The toolbar stays, so a view switch or a filter change can retry. */
+    error?: React.ReactNode;
+    onRetry?: () => void;
     empty?: React.ReactNode;
     /** Stable key per row. Required for the board; the table falls back to index. */
     rowId?: (row: T) => string;
@@ -123,4 +127,4 @@ export interface DataTableProps<T extends RowData> {
  * and saved views — the Notion-style list every product needs. Built on
  * TanStack Table v9.
  */
-export declare function DataTable<T extends RowData>({ columns, data, loading, empty, rowId, search, searchPlaceholder, toolbar, onRowClick, pageSize, defaultSort, defaultHidden, defaultFilters, defaultGroup, defaultMode, renderCard, boardSubtitle, presets, viewKey, onStateChange, view, viewsBackend, paged, csv, className, }: DataTableProps<T>): React.JSX.Element;
+export declare function DataTable<T extends RowData>({ columns, data, loading, error, onRetry, empty, rowId, search, searchPlaceholder, toolbar, onRowClick, pageSize, defaultSort, defaultHidden, defaultFilters, defaultGroup, defaultMode, renderCard, boardSubtitle, presets, viewKey, onStateChange, view, viewsBackend, paged, csv, className, }: DataTableProps<T>): React.JSX.Element;

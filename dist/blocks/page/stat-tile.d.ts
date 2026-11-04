@@ -1,4 +1,5 @@
 import { Icon } from '@phosphor-icons/react';
+import { AsyncStateProps } from './error-state';
 import * as React from "react";
 /**
  * One tracking value for every uppercase label in the library.
@@ -15,7 +16,7 @@ export interface SectionLabelProps extends React.ComponentProps<"h2"> {
 }
 /** The small uppercase heading above a group of fields or cards. */
 export declare function SectionLabel({ as: Tag, className, ...props }: SectionLabelProps): React.JSX.Element;
-export interface StatTileProps extends Omit<React.ComponentProps<"div">, "title"> {
+export interface StatTileProps extends Omit<React.ComponentProps<"div">, "title">, TileState {
     label: React.ReactNode;
     value: React.ReactNode;
     /** A line under the value: a comparison, a period, a breakdown. */
@@ -28,10 +29,12 @@ export interface StatTileProps extends Omit<React.ComponentProps<"div">, "title"
      *  with `change` when falling is the good direction, e.g. churn or cost. */
     trend?: "up" | "down" | "flat";
 }
+type TileState = Pick<AsyncStateProps, "loading" | "error">;
 /**
  * A number with its name over it, on the same card as every other number.
  *
  * Not a `Card`: a row of these is a row of tiles, and `CardHeader`'s padding
  * makes each one twice the height it needs.
  */
-export declare function StatTile({ label, value, hint, icon: TileIcon, change, trend, className, ...props }: StatTileProps): React.JSX.Element;
+export declare function StatTile({ label, value, hint, icon: TileIcon, change, trend, loading, error, className, ...props }: StatTileProps): React.JSX.Element;
+export {};
