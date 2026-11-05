@@ -1,0 +1,85 @@
+# Which block for which job
+
+Find the job, take the block, then read its props in
+`node_modules/@ziku/ui/dist/index.d.ts`. Primitives (Button, Card, Input,
+Select, Tabs, Dialog, DropdownMenu, Popover, Tooltip, Table…) are shadcn's API
+with Ziku tokens, so upstream shadcn docs apply to them.
+
+## Conventions every data block shares
+
+- **Async state:** `loading`, `error` (`true` uses the dictionary's sentence, a
+  string or node its own), `onRetry`. Loading beats error beats content. A
+  block keeps its outline while loading: headers, labels, declared columns.
+- **Empty and failed are different states.** Data that never arrived is
+  `ErrorState`, never an empty list. `ActivityList items={undefined}` means
+  loading or error; `[]` means empty.
+- **Writes:** the block never mutates `data`. Callbacks (`onSave`, `onAddRow`,
+  `onReschedule`, `onDrop`) may return a promise; reject it and the block
+  restores the user's input or the item's position. New values return through
+  props.
+
+## Page frame
+
+| Job                   | Block                                                        | Notes                                                                                                                                                        |
+| --------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Signed-in layout      | `AppShell`                                                   | `nav: NavGroup[]`, ≤ 7 items per group, every item has an icon, account group and sign-out last. Counts go in `NavItem.badge`. `bleed` for full-width pages. |
+| Page title + actions  | `PageHeader`                                                 | `title`, `description`, `actions`. One per page.                                                                                                             |
+| Home screen           | `Dashboard` + `DashboardPanel` + `StatTile` + `ActivityList` | `stats` takes tiles; panels take `span="half"\|"full"` and the async props. A tile has no retry; its panel does.                                             |
+| Theme, zoom, language | `PreferencesMenu`                                            | `LanguagePicker` throws when `value` is not in `options`; the app swaps the dictionary.                                                                      |
+| Product name as logo  | `Wordmark`                                                   | Also what `AppShell brand="…"` and `AuthLayout logo="…"` render.                                                                                             |
+| ⌘K palette            | `CommandMenu` + `SearchTrigger`                              | One per app, navigation group first, every item has an icon. Binds ⌘K itself. `onQueryChange` for server results.                                            |
+
+## States
+
+| Job                      | Block                    | Notes                                                                                                         |
+| ------------------------ | ------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| Loaded, nothing there    | `EmptyState`             | `icon`, `title`, `description`, one `action`.                                                                 |
+| Read failed              | `ErrorState`             | `onRetry`; `variant="panel"\|"alert"`.                                                                        |
+| Render crashed           | `ErrorBoundary`          | `resetKeys={[pathname]}` or the fallback outlives navigation. `onError` to report; it reports nothing itself. |
+| Short-lived confirmation | `toast` from the package | Past tense: "Invoice sent."                                                                                   |
+
+## Lists and records
+
+| Job                                | Block                                                                   | Notes                                                                                                                                                                                                                                                                                                                                                                          |
+| ---------------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Any list of records                | `DataTable`                                                             | `columns`, `data`, `rowId`. `facet` on a column adds filter and group. `viewKey` saves views (none = nothing saved). Board: `renderCard` + a column's `onSet`. Timeline/calendar: `dates` (+ `onReschedule`). `csv` adds export, `onAddRow` an add line, `pageSize` a pager, `paged` server paging (columns then need `sortKey`/`filterKey`). Over 100 rows it windows itself. |
+| Table state in the URL             | `parseListUrl`, `listUrlProps`, `listUrlOf`, `toListUrl`, `sameListUrl` | Owns six params (`LIST_PARAMS`). Parse once, keep the result.                                                                                                                                                                                                                                                                                                                  |
+| Saved views on a server            | `viewsBackend` prop / `useDataTableViews`                               | A failing `list` falls back to browser-stored views.                                                                                                                                                                                                                                                                                                                           |
+| Standalone board                   | `Kanban`                                                                | `columns` (end states as `tile`), `renderCard`, `itemKey`, `onDrop`. Cards have a "move to" menu for touch and keyboard.                                                                                                                                                                                                                                                       |
+| Gantt / deadlines grid             | `Timeline` / `CalendarView`                                             | `items`, `itemKey`, `start`, `end`, `label`, `onReschedule`. No `end` = milestone.                                                                                                                                                                                                                                                                                             |
+| Summary or spec sheet, not records | `Table` primitive                                                       | Add rows with `TableAddRow`.                                                                                                                                                                                                                                                                                                                                                   |
+| CSV export                         | `toCsv` + `downloadCsv`                                                 | Handles delimiter, BOM and formula injection.                                                                                                                                                                                                                                                                                                                                  |
+
+## Forms and inputs
+
+| Job                                 | Block                                                                                            | Notes                                                                                                               |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
+| Form fields                         | `Form`, `FormField`, `Input`, `Textarea`, `Select`, `Checkbox`, `RadioGroup`, `Switch`, `Slider` | react-hook-form + zod, already dependencies.                                                                        |
+| Pick one from a searchable set      | `Combobox`                                                                                       | `label` required. It does not filter; the caller filters on `query`.                                                |
+| Pick several from a short fixed set | `ChipPicker`                                                                                     | No search; long sets belong in a `DataTable` facet.                                                                 |
+| Date / range                        | `DatePicker` / `DateRangePicker`                                                                 | Controlled; throws if `min > max`. Range has `presets`.                                                             |
+| Rename in place                     | `EditableText`                                                                                   | `onSave` gets the trimmed value, only when changed. Blur does not save.                                             |
+| Pick files                          | `FileDrop` + `UploadList`                                                                        | Picks only; the app uploads. `maxFiles` is how many are left. `validateFiles` for the same checks outside the zone. |
+| Named document checklist            | `UploadSlots`                                                                                    | `slots`, `value` by slot id, `onFile` per file.                                                                     |
+
+## Overlays
+
+| Job                                    | Block                                | Notes                                                                                                          |
+| -------------------------------------- | ------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| Focused task over the page             | `Modal`                              | `open`, `onOpenChange`, `title`, `footer`, `size`. Body scrolls, footer stays. Focus lands on the first field. |
+| Record detail, long filters, side work | `Drawer`                             | Modal's API plus `side`.                                                                                       |
+| Yes/no, or one short value             | `useConfirm()`                       | `confirm({ title, danger })` → `boolean`; `prompt({ label })` → `string \| null`. Needs `ConfirmProvider`.     |
+| Small anchored panel                   | `Popover`, `DropdownMenu`, `Tooltip` | Primitives; they cap to the viewport themselves.                                                               |
+
+## Auth
+
+| Job                  | Block                                                              | Notes                                                                                                                                                                                                                                                 |
+| -------------------- | ------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Sign in / up / reset | `AuthLayout` + `LoginForm` / `RegisterForm` / `ForgotPasswordForm` | `onSubmit` async (spinner while it runs), `error` for the server's message. `registerHref`/`forgotPasswordHref`/`loginHref` accept `null` to hide the link when the app has no sign-up or no mailer. `ForgotPasswordForm sent` shows the inbox state. |
+| OAuth buttons        | `SocialButton` in `providers`                                      | google, github, apple, microsoft. The app owns the redirect.                                                                                                                                                                                          |
+
+## Helpers worth knowing
+
+`SectionLabel` / `LABEL_CLASS` (small uppercase label), `cn`, `initials`,
+`storageKey` (namespaced localStorage key), `useTheme`, `useZoom`,
+`useIsMobile`, `Link` (routes through `LinkProvider`).

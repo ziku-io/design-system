@@ -30,6 +30,20 @@ your router's link component, and pass any subset — the rest stays English:
 </LinkProvider>
 ```
 
+## Agent skills
+
+The package ships three skills for coding agents working in an app:
+`ziku-ui` (setup, rules, which block for which job), `ziku-design` (build a
+screen from blocks) and `ziku-review` (find drift from the system). They
+describe the version you pinned. Link them once per app and commit the links:
+
+```bash
+mkdir -p .claude/skills
+for s in ziku-ui ziku-design ziku-review; do
+  ln -sfn "../../node_modules/@ziku/ui/skills/$s" ".claude/skills/$s"
+done
+```
+
 ## Zoom
 
 ```tsx

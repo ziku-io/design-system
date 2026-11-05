@@ -6,6 +6,7 @@
   "license": "UNLICENSED",
   "files": [
     "dist",
+    "skills",
     "src/styles"
   ],
   "sideEffects": [

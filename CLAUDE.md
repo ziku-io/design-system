@@ -196,6 +196,14 @@ Shipping the build removes all of that. **Run `pnpm build` and commit `dist/`
 with any source change** — CI fails if it is stale. The build is reproducible,
 so a clean tree means it is current.
 
+**`skills/` is what app agents read.** `ziku-ui`, `ziku-design` and
+`ziku-review` ship in the package and tell an app's agent how to wire the
+library, which block does which job, and what counts as drift. They are for
+app authors, so they say nothing about building this library. Change them in
+the same commit as the convention or block they describe; `src/skills.test.ts`
+fails when they name an export that no longer exists, but it cannot see a rule
+that went stale.
+
 ## Releasing
 
 Apps pin a tag, so a tag is a promise: once pushed, someone's lockfile points at
