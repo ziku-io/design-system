@@ -9,53 +9,72 @@ import { create } from "storybook/theming"
  * token it copies.
  */
 export const TOKENS = {
-  background: "#f4f6f8",
-  card: "#fdfdff",
-  foreground: "#44484e",
-  "muted-foreground": "#676b72",
-  border: "#dde0e4",
-  primary: "#706cbb",
-  accent: "#ebebf9",
-  link: "#6063aa",
+  light: {
+    background: "#f4f6f8",
+    card: "#fdfdff",
+    foreground: "#44484e",
+    "muted-foreground": "#676b72",
+    border: "#dde0e4",
+    primary: "#706cbb",
+    accent: "#ebebf9",
+    link: "#6063aa",
+  },
+  dark: {
+    background: "#14161a",
+    card: "#1c1e22",
+    foreground: "#d5d8db",
+    "muted-foreground": "#a1a5aa",
+    border: "#33363a",
+    primary: "#9794e0",
+    accent: "#2e2e42",
+    link: "#acb1f0",
+  },
 } as const
+
+type Mode = keyof typeof TOKENS
 
 const sans =
   '"Geist Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif'
 
-export const theme = create({
-  base: "light",
-  brandTitle: "Ziku UI",
-  brandTarget: "_self",
+const build = (mode: Mode) => {
+  const t = TOKENS[mode]
+  return create({
+    base: mode,
+    brandTitle: "Ziku UI",
+    brandTarget: "_self",
 
-  colorPrimary: TOKENS.primary,
-  colorSecondary: TOKENS.primary,
+    colorPrimary: t.primary,
+    colorSecondary: t.primary,
 
-  appBg: TOKENS.background,
-  appContentBg: TOKENS.card,
-  appPreviewBg: TOKENS.background,
-  appBorderColor: TOKENS.border,
-  appBorderRadius: 10,
+    appBg: t.background,
+    appContentBg: t.card,
+    appPreviewBg: t.background,
+    appBorderColor: t.border,
+    appBorderRadius: 10,
 
-  fontBase: sans,
-  fontCode:
-    '"Geist Mono Variable", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
+    fontBase: sans,
+    fontCode:
+      '"Geist Mono Variable", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
 
-  textColor: TOKENS.foreground,
-  textMutedColor: TOKENS["muted-foreground"],
-  textInverseColor: TOKENS.card,
+    textColor: t.foreground,
+    textMutedColor: t["muted-foreground"],
+    textInverseColor: t.card,
 
-  barBg: TOKENS.card,
-  barTextColor: TOKENS["muted-foreground"],
-  barSelectedColor: TOKENS.primary,
-  barHoverColor: TOKENS.primary,
+    barBg: t.card,
+    barTextColor: t["muted-foreground"],
+    barSelectedColor: t.primary,
+    barHoverColor: t.primary,
 
-  buttonBg: TOKENS.card,
-  buttonBorder: TOKENS.border,
-  booleanBg: TOKENS.background,
-  booleanSelectedBg: TOKENS.card,
+    buttonBg: t.card,
+    buttonBorder: t.border,
+    booleanBg: t.background,
+    booleanSelectedBg: t.card,
 
-  inputBg: TOKENS.card,
-  inputBorder: TOKENS.border,
-  inputTextColor: TOKENS.foreground,
-  inputBorderRadius: 8,
-})
+    inputBg: t.card,
+    inputBorder: t.border,
+    inputTextColor: t.foreground,
+    inputBorderRadius: 8,
+  })
+}
+
+export const themes = { light: build("light"), dark: build("dark") }
