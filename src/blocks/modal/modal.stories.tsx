@@ -19,8 +19,8 @@ function Demo({
   label,
   ...props
 }: { label: string } & Omit<React.ComponentProps<typeof Modal>, "open" | "onOpenChange">) {
-  // Open from the start so the story is the modal, not the button that opens it.
-  const [open, setOpen] = useState(true)
+  // Closed until the button is pressed, the way a page uses it.
+  const [open, setOpen] = useState(false)
   return (
     <>
       <Button variant="outline" onClick={() => setOpen(true)}>

@@ -1,4 +1,4 @@
-import type { DataTableState } from "./types"
+import { DATA_TABLE_MODES, type DataTableMode, type DataTableState } from "./types"
 
 /**
  * A table's toolbar, in the address bar.
@@ -37,9 +37,10 @@ export interface ListUrlState {
   filters: Record<string, string[]>
   /** The column rows are grouped under, if any. */
   group?: string
-  /** The board, where a table offers one. `table` is the default and is never
-   *  written: a URL says what differs from the plain list, and nothing else. */
-  mode?: "table" | "board"
+  /** The layout, where a table offers more than one. `table` is the default and
+   *  is never written: a URL says what differs from the plain list, and
+   *  nothing else. */
+  mode?: DataTableMode
   /** The saved view this state belongs to, as `onStateChange` reports it. */
   view?: string
 }
@@ -80,7 +81,10 @@ export function parseListUrl(search: string | URLSearchParams): ListUrlState {
 
   const group = params.get("group")
   if (group) state.group = group
-  if (params.get("mode") === "board") state.mode = "board"
+  // Allowlisted: an unknown mode is a hand-edited link, read as the plain list.
+  const mode = params.get("mode")
+  const known = DATA_TABLE_MODES.find((m) => m === mode)
+  if (known && known !== "table") state.mode = known
   const view = params.get("view")
   if (view) state.view = view
   return state
@@ -114,7 +118,7 @@ export function toListUrl(
     .join(";")
   if (filter) params.set("filter", filter)
   if (state.group) params.set("group", state.group)
-  if (state.mode === "board") params.set("mode", "board")
+  if (state.mode && state.mode !== "table") params.set("mode", state.mode)
   // "default" is the built-in "All" view, which is where a table opens anyway.
   if (state.view && state.view !== "default") params.set("view", state.view)
   return params
@@ -143,7 +147,7 @@ export function listUrlOf(state: DataTableState, view?: string): ListUrlState {
       state.columnFilters.map((f) => [f.id, (Array.isArray(f.value) ? f.value : []) as string[]]),
     ),
     group: state.grouping[0],
-    mode: state.mode === "board" ? "board" : undefined,
+    mode: state.mode === "table" ? undefined : state.mode,
     view,
   }
 }
@@ -164,7 +168,7 @@ export function listUrlProps(state: ListUrlState): {
   defaultSort?: { key: string; dir: "asc" | "desc" }
   defaultFilters: DataTableState["columnFilters"]
   defaultGroup?: string
-  defaultMode: "table" | "board"
+  defaultMode: DataTableMode
   view?: string
 } {
   return {

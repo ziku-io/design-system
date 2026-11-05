@@ -38,19 +38,19 @@ export interface UIStrings {
   }
   auth: {
     /** Login */
-    loginTitle: string
-    loginDescription: string
     email: string
     emailPlaceholder: string
     password: string
     forgotPassword: string
     signIn: string
-    orContinueWith: string
+    /** Between the social buttons and the email fields. */
+    or: string
+    /** A social sign-in button: `continueWith("Google")`. */
+    continueWith: (provider: string) => string
     noAccount: string
     createOne: string
     /** Register */
     registerTitle: string
-    registerDescription: string
     name: string
     namePlaceholder: string
     passwordHint: string
@@ -77,11 +77,24 @@ export interface UIStrings {
     signOut: string
     /** The first thing a keyboard user reaches, jumping the sidebar nav. */
     skipToContent: string
+    /** The avatar button in the top bar that opens the account menu. */
+    accountMenu: string
   }
   preferences: {
+    /** The top-bar button that opens the panel. */
+    title: string
+    appearance: string
+    themes: { light: string; dark: string; system: string }
+    language: string
     zoom: string
-    /** An item in the zoom menu: `zoomLevel(125)` reads "125%". */
-    zoomLevel: (percent: number) => string
+    zoomIn: string
+    zoomOut: string
+    /** The zoom field's name: it holds the figure, the % sits beside it. */
+    zoomPercent: string
+    /** After the figure in the zoom field. */
+    percentSign: string
+    /** The icon that puts zoom back to 100%. */
+    resetZoom: string
   }
   dataTable: {
     /** The view every table starts on. */
@@ -97,6 +110,28 @@ export interface UIStrings {
     layout: string
     table: string
     board: string
+    /** The Gantt layout: bars from start to end. */
+    timeline: string
+    /** The month-grid layout: rows on the day they fall. */
+    calendar: string
+    /** The zoom control's accessible name on the timeline. */
+    timelineScale: string
+    scales: { week: string; month: string; quarter: string }
+    /** Rows a timeline or calendar left off: `undated(3)` reads "3 without a date". */
+    undated: (count: number) => string
+    /** A calendar day's overflow: `moreItems(2)` reads "+2 more". */
+    moreItems: (count: number) => string
+    previousMonth: string
+    nextMonth: string
+    previousYear: string
+    nextYear: string
+    /** The calendar's Month / Year switch. */
+    calendarScale: string
+    calendarScales: { month: string; year: string }
+    /** Read after a draggable timeline bar's name, for keyboard users. */
+    rescheduleHint: string
+    /** The same, for a calendar chip. */
+    calendarRescheduleHint: string
     visibleColumns: string
     hidden: (count: number) => string
     filters: string
@@ -207,6 +242,12 @@ export interface UIStrings {
     fileSize: (bytes: number) => string
     /** A share out of 100, unsigned: `percent(62)` reads "62%". */
     percent: (value: number) => string
+    /** A calendar's title and a timeline's month band: "November 2026". */
+    month: (date: Date) => string
+    /** A month card's title in the calendar's year view: "January". */
+    monthName: (date: Date) => string
+    /** A calendar column heading: "Mon". */
+    weekday: (date: Date) => string
   }
   dashboard: {
     /** `StatTile`'s `change`: `change(12.5)` reads "+12.5%". */
@@ -262,6 +303,27 @@ export interface UIStrings {
     retry: string
     /** Beside an `UploadSlots` slot the form can be sent without. */
     optional: string
+    /** `UploadSlots`: the label over the picker beside the drop zone. */
+    thisFileIs: string
+    /** The picker with nothing picked. */
+    pickDocument: string
+    /** The checklist's heading. */
+    documents: string
+    /** Over the checklist: `uploadedCount(2, 4)` reads "2 of 4". */
+    uploadedCount: (done: number, total: number) => string
+    /** A document in the checklist with no file yet. */
+    missing: string
+    /** In place of the drop zone once every document has a file. */
+    allIn: string
+    /** The question behind the cross: `removeConfirm("a.pdf")` reads
+     *  "Remove a.pdf? This cannot be undone." */
+    removeConfirm: (name: string) => string
+    /** The button that answers it. */
+    removeAction: string
+    /** The download button's name: `download("a.pdf")`. */
+    download: (name: string) => string
+    /** Beside a saved file: `uploadedOn(date)` reads "Uploaded 3 Nov 2026". */
+    uploadedOn: (date: Date) => string
   }
 }
 
@@ -281,6 +343,9 @@ const percents = new Intl.NumberFormat(undefined, {
   signDisplay: "exceptZero",
 })
 const shares = new Intl.NumberFormat(undefined, { style: "percent", maximumFractionDigits: 0 })
+const months = new Intl.DateTimeFormat(undefined, { month: "long", year: "numeric" })
+const monthNames = new Intl.DateTimeFormat(undefined, { month: "long" })
+const weekdays = new Intl.DateTimeFormat(undefined, { weekday: "short" })
 const days = new Intl.DateTimeFormat(undefined, { dateStyle: "medium" })
 const moments = new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" })
 
@@ -319,18 +384,16 @@ export const defaultStrings: UIStrings = {
     loading: "Loading…",
   },
   auth: {
-    loginTitle: "Welcome back",
-    loginDescription: "Sign in to your account",
     email: "Email",
     emailPlaceholder: "you@company.com",
     password: "Password",
     forgotPassword: "Forgot password?",
     signIn: "Sign in",
-    orContinueWith: "or continue with",
+    or: "or",
+    continueWith: (provider) => `Continue with ${provider}`,
     noAccount: "No account?",
     createOne: "Create one",
     registerTitle: "Create an account",
-    registerDescription: "Get started in under a minute",
     name: "Name",
     namePlaceholder: "Ada Lovelace",
     passwordHint: "At least 8 characters",
@@ -353,10 +416,19 @@ export const defaultStrings: UIStrings = {
   shell: {
     signOut: "Sign out",
     skipToContent: "Skip to content",
+    accountMenu: "Account menu",
   },
   preferences: {
+    title: "Preferences",
+    appearance: "Appearance",
+    themes: { light: "Light", dark: "Dark", system: "System" },
+    language: "Language",
     zoom: "Zoom",
-    zoomLevel: (percent) => `${num(percent)}%`,
+    zoomIn: "Zoom in",
+    zoomOut: "Zoom out",
+    zoomPercent: "Zoom, percent",
+    percentSign: "%",
+    resetZoom: `Reset to ${num(100)}%`,
   },
   dataTable: {
     allView: "All",
@@ -371,6 +443,20 @@ export const defaultStrings: UIStrings = {
     layout: "Layout",
     table: "Table",
     board: "Board",
+    timeline: "Timeline",
+    calendar: "Calendar",
+    timelineScale: "Zoom",
+    scales: { week: "Week", month: "Month", quarter: "Quarter" },
+    undated: (count) => `${num(count)} without a date`,
+    moreItems: (count) => `+${num(count)} more`,
+    previousMonth: "Previous month",
+    nextMonth: "Next month",
+    previousYear: "Previous year",
+    nextYear: "Next year",
+    calendarScale: "Calendar scale",
+    calendarScales: { month: "Month", year: "Year" },
+    rescheduleHint: "Left and right arrows move it by a day. With Shift they move the end.",
+    calendarRescheduleHint: "Arrow keys move it: left and right by a day, up and down by a week.",
     visibleColumns: "Visible columns",
     hidden: (count) => `${num(count)} hidden`,
     filters: "Filters",
@@ -446,6 +532,9 @@ export const defaultStrings: UIStrings = {
     dateTime: (date) => moments.format(date),
     fileSize: (value) => bytes(value, num),
     percent: (value) => shares.format(value / 100),
+    month: (date) => months.format(date),
+    monthName: (date) => monthNames.format(date),
+    weekday: (date) => weekdays.format(date),
   },
   dashboard: {
     change: (percent) => percents.format(percent / 100),
@@ -491,6 +580,16 @@ export const defaultStrings: UIStrings = {
     failed: "Upload failed",
     retry: "Retry",
     optional: "Optional",
+    thisFileIs: "This file is",
+    pickDocument: "Choose a document",
+    documents: "Documents",
+    uploadedCount: (done, total) => `${num(done)} of ${num(total)}`,
+    missing: "Not uploaded yet",
+    allIn: "Every document is in.",
+    removeConfirm: (name) => `Remove ${name}? This cannot be undone.`,
+    removeAction: "Remove",
+    download: (name) => `Download ${name}`,
+    uploadedOn: (date) => `Uploaded ${days.format(date)}`,
   },
 }
 

@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Link } from "@/lib/link"
+import { AuthFooter, AuthLogo } from "./auth-layout"
 import { useStrings, type UIStrings } from "@/lib/strings"
 
 /** A factory, not a constant: the messages are the app's, from `UIStringsProvider`. */
@@ -86,12 +87,23 @@ export function RegisterForm({
   return (
     <Card>
       <CardHeader className="text-center">
+        <AuthLogo />
         <CardTitle className="text-xl">{title ?? t.registerTitle}</CardTitle>
-        <CardDescription>{description ?? t.registerDescription}</CardDescription>
+        {description && <CardDescription>{description}</CardDescription>}
       </CardHeader>
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-5" noValidate>
+            {/* First: one click beats two fields, and it is what most
+             *  people who have a choice pick. */}
+            {providers && (
+              <>
+                <div className="grid gap-2">{providers}</div>
+                <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
+                  <span className="relative z-10 bg-card px-2 text-muted-foreground">{t.or}</span>
+                </div>
+              </>
+            )}
             {error && (
               <Alert variant="danger">
                 <AlertDescription>{error}</AlertDescription>
@@ -120,16 +132,6 @@ export function RegisterForm({
               {busy && <SpinnerIcon className="animate-spin" />}
               {t.createAccount}
             </Button>
-            {providers && (
-              <>
-                <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
-                  <span className="relative z-10 bg-card px-2 text-muted-foreground">
-                    {t.orContinueWith}
-                  </span>
-                </div>
-                <div className="grid gap-2">{providers}</div>
-              </>
-            )}
             {loginHref && (
               <p className="text-center text-sm text-muted-foreground">
                 {t.haveAccount}{" "}
@@ -140,6 +142,7 @@ export function RegisterForm({
             )}
           </form>
         </Form>
+        <AuthFooter />
       </CardContent>
     </Card>
   )

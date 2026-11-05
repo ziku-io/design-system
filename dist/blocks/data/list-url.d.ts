@@ -1,4 +1,4 @@
-import { DataTableState } from './types';
+import { DataTableMode, DataTableState } from './types';
 /**
  * A table's toolbar, in the address bar.
  *
@@ -37,9 +37,10 @@ export interface ListUrlState {
     filters: Record<string, string[]>;
     /** The column rows are grouped under, if any. */
     group?: string;
-    /** The board, where a table offers one. `table` is the default and is never
-     *  written: a URL says what differs from the plain list, and nothing else. */
-    mode?: "table" | "board";
+    /** The layout, where a table offers more than one. `table` is the default and
+     *  is never written: a URL says what differs from the plain list, and
+     *  nothing else. */
+    mode?: DataTableMode;
     /** The saved view this state belongs to, as `onStateChange` reports it. */
     view?: string;
 }
@@ -93,6 +94,6 @@ export declare function listUrlProps(state: ListUrlState): {
     };
     defaultFilters: DataTableState["columnFilters"];
     defaultGroup?: string;
-    defaultMode: "table" | "board";
+    defaultMode: DataTableMode;
     view?: string;
 };

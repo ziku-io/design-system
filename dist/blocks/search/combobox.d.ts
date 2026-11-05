@@ -33,9 +33,12 @@ export interface ComboboxProps {
  * what is highlighted, and the highlight is clamped when the list shrinks under
  * it rather than pointing past the end.
  *
- * ponytail: the list is absolutely positioned, not portalled. It is a field in
- * a form, so it scrolls with the form; a portal would need collision detection
- * and would take focus management away from the input, which is the one thing a
- * combobox cannot delegate.
+ * The list is a portalled `Popover` anchored to the input. It used to be
+ * absolutely positioned inside the field, which any `overflow` ancestor (a
+ * card, a modal body, a scrolling form) clipped, so the results sat below the
+ * fold of their own container. The popover opens below, flips above when there
+ * is no room, and caps its height to what is on screen. Focus never leaves the
+ * input: the popover is told not to take it, and the options are reached
+ * through `aria-activedescendant`, as before.
  */
 export declare function Combobox({ items, onSelect, label, placeholder, query, onQueryChange, empty, loading, autoFocus, disabled, className, }: ComboboxProps): React.JSX.Element;

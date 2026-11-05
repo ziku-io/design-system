@@ -22,6 +22,7 @@ import { TrophyIcon, XCircleIcon } from "@phosphor-icons/react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { UIStringsProvider } from "@/lib/strings"
+import { Drawer } from "@/blocks/drawer/drawer"
 
 const meta: Meta = {
   title: "Blocks/DataTable",
@@ -620,6 +621,268 @@ export const PagedLarge: Story = {
           setQuery: () => {},
         }}
       />
+    )
+  },
+}
+
+interface Task {
+  id: string
+  title: string
+  owner: string
+  status: "Planned" | "In progress" | "Done"
+  start?: Date
+  /** Absent: a milestone, a single day. */
+  due?: Date
+}
+
+// Relative to the real today, so the timeline's today line is always in range.
+const on = (offset: number) => {
+  const d = new Date()
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate() + offset)
+}
+const tasks: Task[] = [
+  {
+    id: "t1",
+    title: "Discovery interviews",
+    owner: "Ada Lovelace",
+    status: "Done",
+    start: on(-24),
+    due: on(-12),
+  },
+  {
+    id: "t2",
+    title: "Brand refresh",
+    owner: "Grace Hopper",
+    status: "In progress",
+    start: on(-10),
+    due: on(8),
+  },
+  { id: "t3", title: "Design review", owner: "Alan Turing", status: "Planned", start: on(3) },
+  {
+    id: "t4",
+    title: "API v2",
+    owner: "Radia Perlman",
+    status: "In progress",
+    start: on(-6),
+    due: on(26),
+  },
+  {
+    id: "t5",
+    title: "Billing migration",
+    owner: "Ada Lovelace",
+    status: "Planned",
+    start: on(12),
+    due: on(40),
+  },
+  { id: "t6", title: "Beta launch", owner: "Grace Hopper", status: "Planned", start: on(30) },
+  {
+    id: "t7",
+    title: "Help centre articles",
+    owner: "Alan Turing",
+    status: "Planned",
+    start: on(14),
+    due: on(21),
+  },
+  {
+    id: "t8",
+    title: "Security audit",
+    owner: "Radia Perlman",
+    status: "Planned",
+    start: on(1),
+    due: on(4),
+  },
+  { id: "t9", title: "Quarterly report", owner: "Ada Lovelace", status: "Planned", start: on(5) },
+  { id: "t10", title: "Customer webinar", owner: "Grace Hopper", status: "Planned", start: on(5) },
+  { id: "t11", title: "Invoice run", owner: "Alan Turing", status: "Planned", start: on(5) },
+  { id: "t12", title: "Board pack", owner: "Radia Perlman", status: "Planned", start: on(5) },
+  { id: "t13", title: "Office move", owner: "Ada Lovelace", status: "Planned" },
+]
+
+const fmt = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short" })
+const taskColumns: DataTableColumn<Task>[] = [
+  { key: "title", header: "Task", className: "font-medium" },
+  { key: "owner", header: "Owner", icon: UserIcon, facet: true },
+  {
+    key: "status",
+    header: "Status",
+    icon: CircleDashedIcon,
+    facet: true,
+    order: ["Planned", "In progress", "Done"],
+  },
+  {
+    key: "start",
+    header: "Start",
+    value: (r) => r.start?.getTime(),
+    render: (r) => (r.start ? fmt.format(r.start) : "—"),
+  },
+  {
+    key: "due",
+    header: "Due",
+    value: (r) => r.due?.getTime(),
+    render: (r) => (r.due ? fmt.format(r.due) : "—"),
+  },
+]
+const taskDates = { start: (r: Task) => r.start, end: (r: Task) => r.due }
+
+/**
+ * Planning: one bar per task from start to due, a diamond for a task with no
+ * due date, a red line for today. Week, Month and Quarter change the zoom.
+ * Bars drag: the body moves the task, either end moves that date. With a bar
+ * focused, the arrow keys move it a day, and with Shift they move its end.
+ * The chips and sort in the toolbar apply here as in the table, and the layout
+ * switch on the right goes back to it. "Office move" has no date and is
+ * counted, not drawn.
+ */
+export const Timeline: StoryObj = {
+  render: function Timeline() {
+    const [rows, setRows] = useState(tasks)
+    return (
+      <DataTable
+        columns={taskColumns}
+        data={rows}
+        rowId={(r) => r.id}
+        dates={{
+          ...taskDates,
+          // Drag a bar, or either end of it. The table never moves the row:
+          // the page updates its data and the bar follows.
+          onReschedule: (row, { start, end }) =>
+            setRows((all) => all.map((r) => (r.id === row.id ? { ...r, start, due: end } : r))),
+        }}
+        defaultMode="timeline"
+        defaultSort={{ key: "start", dir: "asc" }}
+      />
+    )
+  },
+}
+
+/** Deadlines: the same tasks on a month grid, each on the day it is due (or
+ *  starts, with no due date). A day with more than three folds the rest into
+ *  "+N more". Drag a task to another day, or focus it and use the arrow keys:
+ *  sideways a day, up and down a week. */
+export const Calendar: StoryObj = {
+  render: function Calendar() {
+    const [rows, setRows] = useState(tasks)
+    return (
+      <DataTable
+        columns={taskColumns}
+        data={rows}
+        rowId={(r) => r.id}
+        dates={{
+          ...taskDates,
+          // Drag a task to another day; it keeps its length.
+          onReschedule: (row, { start, end }) =>
+            setRows((all) => all.map((r) => (r.id === row.id ? { ...r, start, due: end } : r))),
+        }}
+        defaultMode="calendar"
+      />
+    )
+  },
+}
+
+interface Deadline {
+  id: string
+  title: string
+  category: "Tax" | "Accounts" | "Contract" | "Licence" | "Insurance"
+  owner: string
+  due: Date
+}
+
+// A client's five-year filing calendar: what an accountant or a compliance
+// team actually tracks. Fixed years, so the story reads the same every day.
+const deadlines: Deadline[] = (() => {
+  const out: Deadline[] = []
+  const add = (title: string, category: Deadline["category"], owner: string, due: Date) =>
+    out.push({ id: `${title}-${due.getTime()}`, title, category, owner, due })
+  for (let y = 2026; y <= 2030; y++) {
+    ;[1, 4, 7, 10].forEach((m, q) =>
+      add(`VAT return Q${q === 0 ? 4 : q}`, "Tax", "Ana Silva", new Date(y, m, 15)),
+    )
+    add("Corporate tax (Modelo 22)", "Tax", "Ana Silva", new Date(y, 4, 31))
+    add("Annual accounts", "Accounts", "Rui Costa", new Date(y, 5, 30))
+    add("IES declaration", "Accounts", "Rui Costa", new Date(y, 6, 15))
+    add("Insurance renewal", "Insurance", "Marta Reis", new Date(y, 2, 1))
+    if (y % 2 === 0) add("Operating licence renewal", "Licence", "Marta Reis", new Date(y, 8, 30))
+  }
+  add("Supply contract: price review", "Contract", "Rui Costa", new Date(2027, 0, 31))
+  add("Supply contract: renewal notice", "Contract", "Rui Costa", new Date(2028, 9, 1))
+  add("Lease break option", "Contract", "Marta Reis", new Date(2029, 3, 30))
+  return out
+})()
+
+const longDate = new Intl.DateTimeFormat("en-GB", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+})
+const deadlineColumns: DataTableColumn<Deadline>[] = [
+  { key: "title", header: "Deadline", className: "font-medium" },
+  {
+    key: "category",
+    header: "Category",
+    icon: CircleDashedIcon,
+    facet: true,
+    order: ["Tax", "Accounts", "Contract", "Licence", "Insurance"],
+    render: (r) => <Badge variant="secondary">{r.category}</Badge>,
+  },
+  { key: "owner", header: "Owner", icon: UserIcon, facet: true },
+  {
+    key: "due",
+    header: "Due",
+    value: (r) => r.due.getTime(),
+    render: (r) => longDate.format(r.due),
+    className: "tabular-nums",
+  },
+]
+
+/**
+ * Deadlines over five years. "All" is the list; "By month" opens the calendar
+ * on its Year scale, twelve month cards with the deadlines in each, and the
+ * arrows step a year at a time. A month's name opens its day grid. Chips drag
+ * between months and keep their day.
+ *
+ * Every layout calls the same `onRowClick`, so the page decides what a click
+ * opens: here, a `Drawer` with the deadline's details. The table and the views
+ * render the item; the page composes what it opens.
+ */
+export const Deadlines: StoryObj = {
+  render: function Deadlines() {
+    const [rows, setRows] = useState(deadlines)
+    const [open, setOpen] = useState<Deadline | null>(null)
+    return (
+      <>
+        <DataTable
+          columns={deadlineColumns}
+          data={rows}
+          rowId={(r) => r.id}
+          defaultSort={{ key: "due", dir: "asc" }}
+          presets={[
+            { id: "by-month", name: "By month", icon: "calendar", state: { mode: "calendar" } },
+          ]}
+          dates={{
+            start: (r) => r.due,
+            calendarScale: "year",
+            onReschedule: (row, { start }) =>
+              setRows((all) => all.map((r) => (r.id === row.id ? { ...r, due: start } : r))),
+          }}
+          onRowClick={setOpen}
+        />
+        <Drawer
+          open={open !== null}
+          onOpenChange={(o) => !o && setOpen(null)}
+          title={open?.title}
+          description={open && longDate.format(open.due)}
+          footer={<Button onClick={() => setOpen(null)}>Done</Button>}
+        >
+          {open && (
+            <dl className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 text-sm">
+              <dt className="text-muted-foreground">Category</dt>
+              <dd>{open.category}</dd>
+              <dt className="text-muted-foreground">Owner</dt>
+              <dd>{open.owner}</dd>
+            </dl>
+          )}
+        </Drawer>
+      </>
     )
   },
 }

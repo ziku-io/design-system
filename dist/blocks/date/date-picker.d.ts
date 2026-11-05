@@ -26,6 +26,15 @@ export interface DateRangePreset {
 }
 /** "Last 7 days" includes today, so it starts six days back. */
 export declare function defaultRangePresets(t: UIStrings["datePicker"]): DateRangePreset[];
+/**
+ * The range after a click on `day`.
+ *
+ * react-day-picker's own rule edits whichever end is nearer: once a range is
+ * set, every click after its start moves the end, so the start could only ever
+ * move earlier. Here a click on a finished range starts a new one, and the
+ * next click finishes it, the two swapped if the second comes first.
+ */
+export declare function nextRange(current: DateRange | undefined, day: Date): DateRange;
 export interface DateRangePickerProps extends PickerBase {
     value: DateRange | undefined;
     onChange: (range: DateRange | undefined) => void;

@@ -111,6 +111,102 @@
   --sidebar-ring: #706cbb;
 }
 
+/* Dark. The same token names with new values, so no component carries a
+   `dark:` variant: `useTheme` (and `antiFlashScript` before first paint) sets
+   `data-theme` on <html>, and every class keeps meaning the same role. The
+   rules carry over: text a soft grey rather than white, no chroma past 0.12,
+   and every pair the light block promises at 4.5:1 is promised here too, by
+   the same palette.test.ts run against this block. Fills turn light and their
+   foregrounds dark, because a light fill on a dark page is what reads as
+   "filled". */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --background: #14161a;
+  --foreground: #d5d8db;
+  --card: #1c1e22;
+  --card-foreground: #d5d8db;
+  --popover: #1f2225;
+  --popover-foreground: #d5d8db;
+  --primary: #9794e0;
+  --primary-foreground: #151423;
+  --primary-button: #3a385b;
+  --primary-button-foreground: #d3d4f8;
+  --secondary: #26292d;
+  --secondary-foreground: #d5d8db;
+  --muted: #26292d;
+  --muted-foreground: #a1a5aa;
+  --accent: #2e2e42;
+  --accent-foreground: #d5d8db;
+  --danger: #d68582;
+  --danger-foreground: #221010;
+  --danger-fg: #eca19d;
+  --danger-subtle: #311e1d;
+  --danger-border: #553231;
+  --danger-button: #59302f;
+  --danger-button-foreground: #fdc9c6;
+  --warning: #bb9951;
+  --warning-foreground: #1c1505;
+  --warning-fg: #d2b373;
+  --warning-subtle: #2b2313;
+  --warning-border: #493b1c;
+  --warning-button: #4c3a13;
+  --warning-button-foreground: #ead5ab;
+  --success: #69b183;
+  --success-foreground: #0a1a10;
+  --success-fg: #88c99e;
+  --success-subtle: #18281e;
+  --success-border: #264531;
+  --success-button: #20462f;
+  --success-button-foreground: #b9e4c6;
+  --info: #4aadc9;
+  --info-foreground: #04191f;
+  --info-fg: #71c5df;
+  --info-subtle: #12272e;
+  --info-border: #1a434f;
+  --border: #33363a;
+  --input: #33363a;
+  --field: #171a1d;
+  --ring: #9794e0;
+  --link: #acb1f0;
+  --surface-glass: rgb(28 30 34 / 0.74);
+  --surface-glass-border: rgb(255 255 255 / 0.06);
+  /* Darker than the page, not lighter: a scrim that lightened would read as
+     fog over the content rather than the content stepping back. */
+  --overlay: rgb(6 8 10 / 0.56);
+  /* Each series keeps its light hue within 20deg (blue, teal, ochre, plum,
+     sage), so a chart means the same thing in both themes. Lightness found by
+     search against palette.test.ts: the light set simply lightened fell under
+     deltaE 20 for a deuteranope. */
+  --chart-1: #889bd7;
+  --chart-2: #7fdde6;
+  --chart-3: #bdb16d;
+  --chart-4: #af6c82;
+  --chart-5: #607132;
+  /* Five text colours, 4.5:1 on a dark card, 25deg clear of every status hue
+     and the brand: the hue room left is two narrow bands, and a search over
+     it tops out near deltaE 13 between the closest pair. palette.test.ts
+     holds dark slots to 12 rather than 20 for that reason. The tint behind
+     each (its -subtle) carries part of the difference the text cannot. */
+  --slot-1: #ffe9f8;
+  --slot-1-subtle: #30212b;
+  --slot-2: #d6e8a7;
+  --slot-2-subtle: #242918;
+  --slot-3: #bd93b3;
+  --slot-3-subtle: #30212c;
+  --slot-4: #e0c0d6;
+  --slot-4-subtle: #30212c;
+  --slot-5: #a6c597;
+  --slot-5-subtle: #202a1b;
+  --sidebar: #14161a;
+  --sidebar-foreground: #d5d8db;
+  --sidebar-primary: #9794e0;
+  --sidebar-primary-foreground: #151423;
+  --sidebar-accent: #2e2e42;
+  --sidebar-accent-foreground: #d5d8db;
+  --sidebar-border: #33363a;
+  --sidebar-ring: #9794e0;
+}
+
 @theme inline {
   --radius: 12px;
   /* 4px: only a 16px checkbox. Anything larger at 8px reads as a pill. */

@@ -132,7 +132,6 @@ export const Overview: StoryObj = {
     return (
       <Dashboard
         title="Overview"
-        description="12 open tasks across 9 dossiers."
         actions={
           <>
             <DateRangePicker value={period} onChange={setPeriod} />
@@ -184,7 +183,7 @@ export const Overview: StoryObj = {
         >
           <ActivityList items={activity} />
         </DashboardPanel>
-        <DashboardPanel title="Nothing yet" description="A panel whose list is empty.">
+        <DashboardPanel title="Approvals">
           <ActivityList items={[]} />
         </DashboardPanel>
       </Dashboard>

@@ -19,7 +19,6 @@ export const Header: StoryObj = {
   render: () => (
     <PageHeader
       title="Members"
-      description="People with access to this workspace."
       actions={
         <>
           <Button variant="outline">Export</Button>

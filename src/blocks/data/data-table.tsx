@@ -27,7 +27,9 @@ import { useVirtualizer } from "@tanstack/react-virtual"
 import {
   CaretDownIcon,
   CaretRightIcon,
-  CaretUpIcon,
+  ArrowDownIcon,
+  ArrowsDownUpIcon,
+  ArrowUpIcon,
   DotsThreeIcon,
   DownloadSimpleIcon,
   EyeIcon,
@@ -38,10 +40,13 @@ import {
   RowsIcon,
   SortAscendingIcon,
   SquaresFourIcon,
+  CalendarDotsIcon,
+  ChartBarHorizontalIcon,
   TableIcon,
   TrashIcon,
   UsersIcon,
   XIcon,
+  type Icon,
 } from "@phosphor-icons/react"
 
 import {
@@ -57,6 +62,8 @@ import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 import { LABEL_CLASS } from "@/blocks/page/stat-tile"
+import { Timeline, type DatedRows } from "./timeline"
+import { CalendarView, type CalendarScale } from "./calendar-view"
 import { ErrorState, errorTitle } from "@/blocks/page/error-state"
 import { downloadCsv, toCsv, type CsvDecimal } from "./csv"
 import { useStrings } from "@/lib/strings"
@@ -88,6 +95,7 @@ import {
   type DataTableColumn,
   type DataTableQuery,
   type DataTableState,
+  type DataTableMode,
   type DataTableView,
   type FilterValue,
 } from "./types"
@@ -153,7 +161,28 @@ export interface DataTableProps<T extends RowData> {
   /** Chips the "All" view starts with: `[{ id: "status", value: ["Active"] }]`. */
   defaultFilters?: DataTableState["columnFilters"]
   defaultGroup?: string
-  defaultMode?: "table" | "board"
+  defaultMode?: DataTableMode
+  /**
+   * Present → the timeline and calendar layouts become available.
+   *
+   * `start` places a row; a row without one is left off both and counted. `end`
+   * makes it a bar on the timeline and a run of days on the calendar; without
+   * one (or when it returns nothing) the row is a single day, a deadline, drawn
+   * as a diamond. The calendar puts each row on its end day, or its start
+   * when it has no end. An end before the start throws: a swapped pair of fields
+   * should be found, not drawn off the edge. `label` is the text on the bar,
+   * the first column's value by default.
+   */
+  dates?: {
+    start: (row: T) => Date | null | undefined
+    end?: (row: T) => Date | null | undefined
+    label?: (row: T) => string
+    /** The calendar's opening scale: `year` for deadlines spread over years. */
+    calendarScale?: CalendarScale
+    /** Makes timeline bars and calendar items draggable. See
+     *  `DatedRows.onReschedule`. */
+    onReschedule?: (row: T, span: { start: Date; end: Date | undefined }) => void | Promise<void>
+  }
   /** Present → the board layout becomes available. Dragging cards needs the
    *  grouped column to define `onSet`. */
   renderCard?: (row: T) => React.ReactNode
@@ -248,6 +277,7 @@ export function DataTable<T extends RowData>({
   defaultMode = "table",
   renderCard,
   boardSubtitle,
+  dates,
   presets = [],
   viewKey,
   onStateChange,
@@ -381,9 +411,26 @@ export function DataTable<T extends RowData>({
   const facets = columns.filter((c) => c.facet)
   const boardable = Boolean(renderCard && facets.length && rowId)
   const board = state.mode === "board" && boardable
+  // Timeline and calendar need a key per row too: both list rows by it.
+  const dated = Boolean(dates && rowId)
+  const timeline = state.mode === "timeline" && dated
+  const calendar = state.mode === "calendar" && dated
+  const layouts: (readonly [DataTableMode, Icon, string])[] = [
+    ["table", RowsIcon, t.table],
+    ...(boardable ? ([["board", SquaresFourIcon, t.board]] as const) : []),
+    ...(dated
+      ? ([
+          ["timeline", ChartBarHorizontalIcon, t.timeline],
+          ["calendar", CalendarDotsIcon, t.calendar],
+        ] as const)
+      : []),
+  ]
+  // A layout that is not on offer (a saved view from when it was, a URL)
+  // reads as the table rather than as nothing.
+  const mode: DataTableMode = layouts.some(([m]) => m === state.mode) ? state.mode : "table"
   // Grouping and the board show the whole set at once, and a paged list
   // scrolls: its next page arrives at the bottom, not behind a page number.
-  const paginated = pageSize > 0 && !group && !board && !server
+  const paginated = pageSize > 0 && !group && mode === "table" && !server
 
   // Chips the API cannot apply (a column with no `filterKey`) still filter
   // here, and so do grouping and the board — all three need rows that may not
@@ -397,7 +444,9 @@ export function DataTable<T extends RowData>({
     () => state.columnFilters.filter((f) => !isBlankFilter(f.value) && !byKey[f.id]?.filterKey),
     [state.columnFilters, byKey],
   )
-  const needsAll = server && (localFilters.length > 0 || state.grouping.length > 0 || board)
+  const needsAll =
+    server &&
+    (localFilters.length > 0 || state.grouping.length > 0 || board || timeline || calendar)
 
   // Grouping sorts by the grouped column first, so the groups come out in the
   // column's fixed `order` rather than the order rows happened to arrive in;
@@ -525,7 +574,36 @@ export function DataTable<T extends RowData>({
     // Back to the button that opened it, not to the top of the page.
     requestAnimationFrame(() => addButton.current?.focus())
   }
-  const addRowButton = onAddRow && !board && (
+  // What the timeline and the calendar are handed: the rows the toolbar left,
+  // in the order it sorted them. Group header rows are the table's and have no
+  // dates of their own.
+  const labelColumn = columns.find((c) => c.header)
+  const datedProps: DatedRows<T> | null =
+    dates && rowId && (timeline || calendar)
+      ? {
+          items: table
+            .getSortedRowModel()
+            .rows.filter((r) => !r.getIsGrouped())
+            .map((r) => r.original),
+          itemKey: rowId,
+          start: dates.start,
+          end: dates.end,
+          label:
+            dates.label ??
+            ((row: T) =>
+              labelColumn
+                ? str(
+                    labelColumn.value
+                      ? labelColumn.value(row)
+                      : (row as Record<string, unknown>)[labelColumn.key],
+                  )
+                : ""),
+          onItemClick: onRowClick,
+          onReschedule: dates.onReschedule,
+        }
+      : null
+
+  const addRowButton = onAddRow && mode === "table" && (
     <Button
       ref={addButton}
       type="button"
@@ -625,11 +703,11 @@ export function DataTable<T extends RowData>({
       }))
   }
 
-  const setLayout = (mode: "table" | "board") =>
+  const setLayout = (next: DataTableMode) =>
     patch({
-      mode,
+      mode: next,
       // The board has to be grouped by something; the first facet is the guess.
-      grouping: mode === "board" && !group ? [facets[0].key] : state.grouping,
+      grouping: next === "board" && !group ? [facets[0].key] : state.grouping,
     })
 
   const toggles = (
@@ -697,28 +775,23 @@ export function DataTable<T extends RowData>({
   )
 
   const settingsRows: SettingsRow[] = [
-    ...(boardable
+    ...(layouts.length > 1
       ? [
           {
             key: "layout",
             icon: TableIcon,
             label: t.layout,
-            value: state.mode === "board" ? t.board : t.table,
+            value: layouts.find(([m]) => m === mode)?.[2],
             panel: (
               <>
-                {(
-                  [
-                    ["table", RowsIcon, t.table],
-                    ["board", SquaresFourIcon, t.board],
-                  ] as const
-                ).map(([m, Ic, label]) => (
+                {layouts.map(([m, Ic, label]) => (
                   <button
                     type="button"
                     key={m}
                     onClick={() => setLayout(m)}
                     className={cn(
                       "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm hover:bg-accent",
-                      state.mode === m && "font-medium",
+                      mode === m && "font-medium",
                     )}
                   >
                     <Ic className="size-4 text-muted-foreground" /> {label}
@@ -947,24 +1020,19 @@ export function DataTable<T extends RowData>({
             {toggles}
           </Control>
 
-          {boardable && (
+          {layouts.length > 1 && (
             <div className="ml-1 flex overflow-hidden rounded-md border">
-              {(
-                [
-                  ["table", RowsIcon, t.table],
-                  ["board", SquaresFourIcon, t.board],
-                ] as const
-              ).map(([m, Ic, label]) => (
+              {layouts.map(([m, Ic, label]) => (
                 <button
                   type="button"
                   key={m}
                   title={label}
                   aria-label={label}
-                  aria-pressed={state.mode === m}
+                  aria-pressed={mode === m}
                   onClick={() => setLayout(m)}
                   className={cn(
                     "px-2 py-1 outline-none focus-visible:ring-[1.5px] focus-visible:ring-ring/80",
-                    state.mode === m
+                    mode === m
                       ? "bg-accent text-accent-foreground"
                       : "text-muted-foreground hover:text-foreground",
                   )}
@@ -1035,7 +1103,7 @@ export function DataTable<T extends RowData>({
       {/* Only there once something is set, so a clean table stays clean. Each
           chip opens the condition it describes. */}
       {(chips.length > 0 || state.sorting.length > 0 || group) && (
-        <div className="flex flex-wrap items-center gap-1.5 border-b bg-muted/50 px-3 py-2">
+        <div className="flex flex-wrap items-center gap-2 border-b px-3 py-2">
           {state.sorting.length > 0 && (
             <PopoverPanel
               width="w-88"
@@ -1106,9 +1174,9 @@ export function DataTable<T extends RowData>({
           })}
 
           <PopoverPanel
-            className="rounded-md px-2 py-1.5 text-sm text-muted-foreground hover:bg-card hover:text-foreground"
+            className={BAR_GHOST}
             trigger={
-              <span className="flex items-center gap-1">
+              <span className="flex items-center gap-1.5">
                 <PlusIcon className="size-3.5" /> {t.addFilter}
               </span>
             }
@@ -1125,11 +1193,7 @@ export function DataTable<T extends RowData>({
           </PopoverPanel>
 
           {dirty && (
-            <button
-              type="button"
-              onClick={store.reset}
-              className="ml-auto flex items-center gap-1 text-xs text-link hover:underline"
-            >
+            <button type="button" onClick={store.reset} className={cn(BAR_GHOST, "ml-auto")}>
               <XIcon className="size-3.5" /> {t.clearFilters}
             </button>
           )}
@@ -1145,9 +1209,9 @@ export function DataTable<T extends RowData>({
         <div className="overflow-auto" role="status" aria-live="polite" aria-busy="true">
           <Table>
             <TableHeader>
-              <TableRow className="bg-muted/50 hover:bg-muted/50">
+              <TableRow className="hover:bg-transparent">
                 {table.getVisibleLeafColumns().map((c) => (
-                  <TableHead key={c.id} className={cn("whitespace-nowrap", byKey[c.id]?.className)}>
+                  <TableHead key={c.id} className={cn(HEAD, byKey[c.id]?.className)}>
                     {byKey[c.id]?.header}
                   </TableHead>
                 ))}
@@ -1198,6 +1262,10 @@ export function DataTable<T extends RowData>({
             </div>
           )}
         </div>
+      ) : datedProps && timeline ? (
+        <Timeline {...datedProps} />
+      ) : datedProps && calendar ? (
+        <CalendarView {...datedProps} defaultScale={dates?.calendarScale} />
       ) : board ? (
         <div className="p-3">
           <Kanban
@@ -1220,20 +1288,20 @@ export function DataTable<T extends RowData>({
           >
             <TableHeader>
               {table.getHeaderGroups().map((hg) => (
-                <TableRow key={hg.id} aria-rowindex={1} className="bg-muted/50">
+                <TableRow key={hg.id} aria-rowindex={1} className="hover:bg-transparent">
                   {hg.headers.map((h) => {
                     const col = byKey[h.column.id]
                     const dir = h.column.getIsSorted()
                     const Ic = col?.icon
                     const Sort =
                       dir === "asc"
-                        ? CaretUpIcon
+                        ? ArrowUpIcon
                         : dir === "desc"
-                          ? CaretDownIcon
-                          : SortAscendingIcon
+                          ? ArrowDownIcon
+                          : ArrowsDownUpIcon
                     const label = (
                       <>
-                        {Ic && <Ic className="size-3.5" />}
+                        {Ic && <Ic className="size-3.5 opacity-70" />}
                         <table.FlexRender header={h} />
                       </>
                     )
@@ -1253,14 +1321,12 @@ export function DataTable<T extends RowData>({
                                 : undefined
                         }
                         className={cn(
-                          "whitespace-nowrap",
+                          HEAD,
+                          dir && "text-foreground",
                           // Sticky on the cells, not the row: `position:
                           // sticky` on a `<tr>` does nothing in WebKit and
-                          // Chromium. The colour is what `bg-muted/50` renders
-                          // as over the card — a sticky header has to be
-                          // opaque, or the rows scroll through it.
-                          windowed &&
-                            "sticky top-0 z-10 bg-[color-mix(in_oklab,var(--muted)_50%,var(--card))]",
+                          // Chromium. Opaque, or the rows scroll through it.
+                          windowed && "sticky top-0 z-10 bg-card",
                           col?.className,
                         )}
                       >
@@ -1272,15 +1338,20 @@ export function DataTable<T extends RowData>({
                             type="button"
                             onClick={h.column.getToggleSortingHandler()}
                             className={cn(
-                              "inline-flex items-center gap-1.5 rounded-sm outline-none select-none",
+                              "group/sort inline-flex items-center gap-1.5 rounded-sm outline-none select-none",
                               "hover:text-foreground focus-visible:ring-[1.5px] focus-visible:ring-ring/80",
                             )}
                           >
                             {label}
+                            {/* Only the sorted column shows its arrow. An icon
+                             *  on every header was noise; the rest show one on
+                             *  hover or focus, so a header still says it sorts. */}
                             <Sort
+                              aria-hidden
                               className={cn(
                                 "size-3.5",
-                                dir ? "text-foreground" : "text-muted-foreground",
+                                !dir &&
+                                  "opacity-0 group-hover/sort:opacity-100 group-focus-visible/sort:opacity-100",
                               )}
                             />
                           </button>
@@ -1463,10 +1534,17 @@ const WINDOW_ESTIMATE = 640
  *  back to knowing about the implementation. */
 const WINDOW_HEIGHT = "max-h-[70dvh]"
 
-// A condition on the bar: highlighted once it holds a value, plain while empty.
-const CHIP = "rounded-md border px-2 py-1.5 text-sm outline-none"
-const CHIP_ON = `${CHIP} border-ring/60 bg-accent font-medium text-foreground`
-const CHIP_OFF = `${CHIP} border-border bg-card text-muted-foreground`
+// A condition on the bar: the toolbar's own small outline button, so the bar
+// lines up with every other h-8 control. Tinted once it holds a value, dashed
+// while it is still empty.
+const CHIP = buttonVariants({ variant: "outline", size: "sm" })
+const CHIP_ON = cn(CHIP, "bg-accent text-accent-foreground")
+const CHIP_OFF = cn(CHIP, "border-dashed text-muted-foreground")
+const BAR_GHOST = cn(buttonVariants({ variant: "ghost", size: "sm" }), "text-muted-foreground")
+
+// The header reads as a label row, not a band: small muted text on the card,
+// the same treatment as `LABEL_CLASS` elsewhere minus the capitals.
+const HEAD = "h-9 text-xs font-medium whitespace-nowrap text-muted-foreground"
 
 /** How long the search box waits before it becomes a request. */
 const SEARCH_DEBOUNCE_MS = 300

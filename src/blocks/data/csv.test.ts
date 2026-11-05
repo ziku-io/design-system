@@ -81,9 +81,9 @@ describe("toCsv", () => {
   })
 
   it("does not quote a comma-free field just because the dialect uses semicolons", () => {
-    expect(toCsv([{ name: "Silva, Lda.", hours: 1, when: null }], columns, ",").split("\r\n")[1]).toBe(
-      "Silva, Lda.;1;",
-    )
+    expect(
+      toCsv([{ name: "Silva, Lda.", hours: 1, when: null }], columns, ",").split("\r\n")[1],
+    ).toBe("Silva, Lda.;1;")
   })
 
   it("defuses a field a spreadsheet would run as a formula", () => {
@@ -96,13 +96,18 @@ describe("toCsv", () => {
       { name: "@SUM(A1:A9)", hours: 1, when: null },
     ]
     const lines = toCsv(attacks, columns).split("\r\n").slice(1)
-    expect(lines.map((l) => l.split(",")[0])).toEqual(["'=1+1", "'+34 600 000 000", "'-5", "'@SUM(A1:A9)"])
+    expect(lines.map((l) => l.split(",")[0])).toEqual([
+      "'=1+1",
+      "'+34 600 000 000",
+      "'-5",
+      "'@SUM(A1:A9)",
+    ])
   })
 
   it("still quotes a defused field that also needs quoting", () => {
-    expect(toCsv([{ name: '=HYPERLINK("x")', hours: 1, when: null }], columns).split("\r\n")[1]).toBe(
-      '"\'=HYPERLINK(""x"")",1,',
-    )
+    expect(
+      toCsv([{ name: '=HYPERLINK("x")', hours: 1, when: null }], columns).split("\r\n")[1],
+    ).toBe('"\'=HYPERLINK(""x"")",1,')
   })
 
   it("writes a header-only document for no rows", () => {

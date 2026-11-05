@@ -79,6 +79,11 @@ export interface DataTableColumn<T> {
      */
     boardTile?: (label: string) => KanbanTile | undefined;
 }
+/** The layouts a list can be shown in. Which are offered depends on what the
+ *  page passed: `board` needs `renderCard`, `timeline` and `calendar` need
+ *  `dates`. `table` is always there. */
+export declare const DATA_TABLE_MODES: readonly ["table", "board", "timeline", "calendar"];
+export type DataTableMode = (typeof DATA_TABLE_MODES)[number];
 /** Everything a view remembers. */
 export interface DataTableState {
     sorting: SortingState;
@@ -86,7 +91,7 @@ export interface DataTableState {
     globalFilter: string;
     columnVisibility: ColumnVisibilityState;
     grouping: GroupingState;
-    mode: "table" | "board";
+    mode: DataTableMode;
 }
 export interface SavedView {
     id: string;

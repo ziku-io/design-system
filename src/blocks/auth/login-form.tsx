@@ -5,7 +5,7 @@ import { z } from "zod"
 import { SpinnerIcon } from "@phosphor-icons/react"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card"
 import {
   Form,
   FormControl,
@@ -17,6 +17,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Link } from "@/lib/link"
+import { AuthFooter, AuthLogo } from "./auth-layout"
 import { useStrings, type UIStrings } from "@/lib/strings"
 
 /** A factory, not a constant: the messages are the app's, from `UIStringsProvider`. */
@@ -37,7 +38,7 @@ export interface LoginFormProps {
   registerHref?: string | null
   /** `null` renders no "forgot password" link — for an app with no mailer. */
   forgotPasswordHref?: string | null
-  /** OAuth / SSO buttons rendered under a divider */
+  /** OAuth / SSO buttons, usually `SocialButton`s, above the email fields */
   providers?: React.ReactNode
 }
 
@@ -80,12 +81,27 @@ export function LoginForm({
   return (
     <Card>
       <CardHeader className="text-center">
-        <CardTitle className="text-xl">{title ?? t.loginTitle}</CardTitle>
-        <CardDescription>{description ?? t.loginDescription}</CardDescription>
+        <AuthLogo />
+        {/* No visible heading by default: the logo and the button say what the
+         *  page is. Screen readers still get one to land on. */}
+        <h1 className={title ? "text-xl leading-none font-semibold" : "sr-only"}>
+          {title ?? t.signIn}
+        </h1>
+        {description && <CardDescription>{description}</CardDescription>}
       </CardHeader>
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(submit)} className="grid gap-5" noValidate>
+            {/* First: one click beats two fields, and it is what most
+             *  people who have a choice pick. */}
+            {providers && (
+              <>
+                <div className="grid gap-2">{providers}</div>
+                <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
+                  <span className="relative z-10 bg-card px-2 text-muted-foreground">{t.or}</span>
+                </div>
+              </>
+            )}
             {error && (
               <Alert variant="danger" id={errorId}>
                 <AlertDescription>{error}</AlertDescription>
@@ -142,16 +158,6 @@ export function LoginForm({
               {busy && <SpinnerIcon className="animate-spin" />}
               {t.signIn}
             </Button>
-            {providers && (
-              <>
-                <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
-                  <span className="relative z-10 bg-card px-2 text-muted-foreground">
-                    {t.orContinueWith}
-                  </span>
-                </div>
-                <div className="grid gap-2">{providers}</div>
-              </>
-            )}
             {registerHref && (
               <p className="text-center text-sm text-muted-foreground">
                 {t.noAccount}{" "}
@@ -162,6 +168,7 @@ export function LoginForm({
             )}
           </form>
         </Form>
+        <AuthFooter />
       </CardContent>
     </Card>
   )

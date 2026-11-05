@@ -1,7 +1,9 @@
 import * as React from "react"
 import type { Icon } from "@phosphor-icons/react"
 import {
+  CalendarDotsIcon,
   CaretLeftIcon,
+  ChartBarHorizontalIcon,
   CaretRightIcon,
   ClockIcon,
   EyeIcon,
@@ -46,6 +48,8 @@ const VIEW_ICONS: Record<string, Icon> = {
   users: UsersIcon,
   tag: TagIcon,
   eye: EyeIcon,
+  calendar: CalendarDotsIcon,
+  timeline: ChartBarHorizontalIcon,
 }
 
 export function ViewIcon({ name, className }: { name: string; className?: string }) {

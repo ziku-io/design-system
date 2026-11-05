@@ -2,7 +2,6 @@ import * as React from "react"
 import { CaretDownIcon, CheckIcon } from "@phosphor-icons/react"
 
 import { Badge } from "@/components/ui/badge"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 import { useStrings } from "@/lib/strings"
@@ -103,8 +102,17 @@ export function ChipPicker({
                 className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent focus-visible:outline-none"
               >
                 {/* Decorative: the row is the control and carries the state in
-                 *  `aria-selected`, so a second announcement would double it. */}
-                <Checkbox checked={on} tabIndex={-1} aria-hidden className="pointer-events-none" />
+                 *  `aria-selected`, so a second announcement would double it.
+                 *  Drawn as a span with Checkbox's look, not a `Checkbox`: that
+                 *  is a <button>, and a button inside this one is invalid HTML
+                 *  that React reports on every open. */}
+                <span
+                  aria-hidden
+                  data-state={on ? "checked" : "unchecked"}
+                  className="grid size-4 shrink-0 place-content-center rounded-xs border border-input data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
+                >
+                  {on && <CheckIcon className="size-3.5" />}
+                </span>
                 {option.className ? (
                   <Badge variant="secondary" className={cn("truncate", option.className)}>
                     {option.label}

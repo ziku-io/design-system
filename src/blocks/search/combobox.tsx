@@ -1,8 +1,8 @@
 import * as React from "react"
 
 import { Input } from "@/components/ui/input"
+import { Popover, PopoverAnchor, PopoverContent } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
-import { OVERLAY } from "@/lib/surfaces"
 import { useStrings } from "@/lib/strings"
 
 export interface ComboboxItem {
@@ -41,10 +41,13 @@ export interface ComboboxProps {
  * what is highlighted, and the highlight is clamped when the list shrinks under
  * it rather than pointing past the end.
  *
- * ponytail: the list is absolutely positioned, not portalled. It is a field in
- * a form, so it scrolls with the form; a portal would need collision detection
- * and would take focus management away from the input, which is the one thing a
- * combobox cannot delegate.
+ * The list is a portalled `Popover` anchored to the input. It used to be
+ * absolutely positioned inside the field, which any `overflow` ancestor (a
+ * card, a modal body, a scrolling form) clipped, so the results sat below the
+ * fold of their own container. The popover opens below, flips above when there
+ * is no room, and caps its height to what is on screen. Focus never leaves the
+ * input: the popover is told not to take it, and the options are reached
+ * through `aria-activedescendant`, as before.
  */
 export function Combobox({
   items,
@@ -126,74 +129,95 @@ export function Combobox({
   }
 
   return (
-    <div className={cn("relative", className)}>
-      <Input
-        id={id}
-        role="combobox"
-        type="text"
-        autoComplete="off"
-        aria-label={label}
-        aria-expanded={showList}
-        aria-controls={`${id}-list`}
-        aria-autocomplete="list"
-        aria-activedescendant={showList ? activeId : undefined}
-        value={text}
-        placeholder={placeholder}
-        autoFocus={autoFocus}
-        disabled={disabled}
-        onChange={(event) => setText(event.target.value)}
-        onFocus={() => setOpen(true)}
-        // A click on an option blurs the input first, so the close has to wait
-        // for the click to land. `relatedTarget` is the honest test.
-        onBlur={(event) => {
-          if (!event.currentTarget.parentElement?.contains(event.relatedTarget)) setOpen(false)
+    <Popover open={showList} onOpenChange={(next) => !next && setOpen(false)}>
+      <PopoverAnchor asChild>
+        <div className={className}>
+          <Input
+            id={id}
+            role="combobox"
+            type="text"
+            autoComplete="off"
+            aria-label={label}
+            aria-expanded={showList}
+            aria-controls={`${id}-list`}
+            aria-autocomplete="list"
+            aria-activedescendant={showList ? activeId : undefined}
+            value={text}
+            placeholder={placeholder}
+            autoFocus={autoFocus}
+            disabled={disabled}
+            onChange={(event) => setText(event.target.value)}
+            onFocus={() => setOpen(true)}
+            // After a pick the field keeps focus, so a second click fires no
+            // focus event; without this it would not reopen.
+            onClick={() => setOpen(true)}
+            // The list never takes focus (every mousedown in it is cancelled), so
+            // a blur means the user went somewhere else.
+            onBlur={() => setOpen(false)}
+            onKeyDown={onKeyDown}
+          />
+        </div>
+      </PopoverAnchor>
+      <PopoverContent
+        asChild
+        // The input keeps focus; the popover would otherwise move it into the
+        // list on open and every keystroke after that would be lost.
+        onOpenAutoFocus={(event) => event.preventDefault()}
+        onCloseAutoFocus={(event) => event.preventDefault()}
+        // A click back in the field is not a click outside the list.
+        onInteractOutside={(event) => {
+          if (event.target instanceof Node && document.getElementById(id)?.contains(event.target))
+            event.preventDefault()
         }}
-        onKeyDown={onKeyDown}
-      />
-      <ul
-        ref={listRef}
-        id={`${id}-list`}
-        role="listbox"
-        aria-label={label}
-        aria-busy={loading || undefined}
-        hidden={!showList}
-        className={cn(
-          OVERLAY,
-          "absolute z-50 mt-1 max-h-64 w-full overflow-y-auto overscroll-contain rounded-lg p-1",
-        )}
+        // Matches the field's width; 16rem tall at most, less when the screen
+        // has less room on the side it opened.
+        className="w-(--radix-popover-trigger-width) max-h-[min(16rem,var(--radix-popover-content-available-height))] overscroll-contain p-1"
       >
-        {items.map((item, i) => (
-          <li
-            key={item.id}
-            id={`${id}-option-${i}`}
-            role="option"
-            aria-selected={i === activeIndex}
-            data-active={i === activeIndex}
-            // `onMouseDown`, not `onClick`: click fires after blur, and the
-            // blur has already been told to close the list.
-            onMouseDown={(event) => {
-              event.preventDefault()
-              choose(item)
-            }}
-            onMouseEnter={() => setActive(i)}
-            className={cn(
-              "cursor-pointer rounded-sm px-2 py-1.5 text-sm",
-              i === activeIndex && "bg-accent text-accent-foreground",
-            )}
-          >
-            <div className="truncate">{item.label}</div>
-            {item.hint && <div className="truncate text-xs text-muted-foreground">{item.hint}</div>}
-          </li>
-        ))}
-        {/* The prop existed and drew nothing: a slow search looked like one
-         *  with no results until the first item arrived. */}
-        {loading && items.length === 0 && (
-          <li className="px-2 py-1.5 text-sm text-muted-foreground">{t.loading}</li>
-        )}
-        {!loading && items.length === 0 && (
-          <li className="px-2 py-1.5 text-sm text-muted-foreground">{empty ?? t.noResults}</li>
-        )}
-      </ul>
-    </div>
+        <ul
+          ref={listRef}
+          id={`${id}-list`}
+          role="listbox"
+          aria-label={label}
+          aria-busy={loading || undefined}
+          // A mousedown anywhere in the list, the scrollbar included, would
+          // blur the input and close it mid-scroll.
+          onMouseDown={(event) => event.preventDefault()}
+        >
+          {items.map((item, i) => (
+            <li
+              key={item.id}
+              id={`${id}-option-${i}`}
+              role="option"
+              aria-selected={i === activeIndex}
+              data-active={i === activeIndex}
+              // `onMouseDown`, not `onClick`: click fires after blur, and the
+              // blur has already been told to close the list.
+              onMouseDown={(event) => {
+                event.preventDefault()
+                choose(item)
+              }}
+              onMouseEnter={() => setActive(i)}
+              className={cn(
+                "cursor-pointer rounded-sm px-2 py-1.5 text-sm",
+                i === activeIndex && "bg-accent text-accent-foreground",
+              )}
+            >
+              <div className="truncate">{item.label}</div>
+              {item.hint && (
+                <div className="truncate text-xs text-muted-foreground">{item.hint}</div>
+              )}
+            </li>
+          ))}
+          {/* The prop existed and drew nothing: a slow search looked like one
+           *  with no results until the first item arrived. */}
+          {loading && items.length === 0 && (
+            <li className="px-2 py-1.5 text-sm text-muted-foreground">{t.loading}</li>
+          )}
+          {!loading && items.length === 0 && (
+            <li className="px-2 py-1.5 text-sm text-muted-foreground">{empty ?? t.noResults}</li>
+          )}
+        </ul>
+      </PopoverContent>
+    </Popover>
   )
 }

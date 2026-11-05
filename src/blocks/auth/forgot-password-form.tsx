@@ -17,6 +17,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Link } from "@/lib/link"
+import { AuthFooter, AuthLogo } from "./auth-layout"
 import { useStrings, type UIStrings } from "@/lib/strings"
 
 /** A factory, not a constant: the messages are the app's, from `UIStringsProvider`. */
@@ -53,6 +54,7 @@ export function ForgotPasswordForm({
     return (
       <Card>
         <CardHeader className="items-center text-center">
+          <AuthLogo />
           <EnvelopeSimpleIcon aria-hidden className="size-6 text-success-fg" />
           <CardTitle className="text-xl">{t.sentTitle}</CardTitle>
           <CardDescription>
@@ -73,6 +75,7 @@ export function ForgotPasswordForm({
   return (
     <Card>
       <CardHeader className="text-center">
+        <AuthLogo />
         <CardTitle className="text-xl">{t.resetTitle}</CardTitle>
         <CardDescription>{t.resetDescription}</CardDescription>
       </CardHeader>
@@ -115,6 +118,7 @@ export function ForgotPasswordForm({
             )}
           </form>
         </Form>
+        <AuthFooter />
       </CardContent>
     </Card>
   )

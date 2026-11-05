@@ -17,7 +17,7 @@ export interface LoginFormProps {
     registerHref?: string | null;
     /** `null` renders no "forgot password" link — for an app with no mailer. */
     forgotPasswordHref?: string | null;
-    /** OAuth / SSO buttons rendered under a divider */
+    /** OAuth / SSO buttons, usually `SocialButton`s, above the email fields */
     providers?: React.ReactNode;
 }
 export declare function LoginForm({ onSubmit, error, title, description, registerHref, forgotPasswordHref, providers, }: LoginFormProps): React.JSX.Element;

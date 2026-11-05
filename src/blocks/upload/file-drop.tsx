@@ -139,7 +139,18 @@ export type UploadStatus =
   | { status: "done" }
   | { status: "failed"; error?: string }
 
-export type UploadItem = { id: string; name: string; size: number } & UploadStatus
+export type UploadItem = {
+  id: string
+  name: string
+  size: number
+  /** Where the saved file can be fetched: the app's own download URL. Present
+   *  → a download button. Set on files from an earlier session too, which is
+   *  how a reader coming back gets at what they sent. */
+  url?: string
+  /** When it was saved. Shown beside the size once the reader may be on a
+   *  later visit than the upload. */
+  uploadedAt?: Date
+} & UploadStatus
 
 export interface UploadListProps extends React.ComponentProps<"ul"> {
   items: UploadItem[]
@@ -151,17 +162,27 @@ export interface UploadListProps extends React.ComponentProps<"ul"> {
 export function UploadList({ items, onRemove, onRetry, className, ...props }: UploadListProps) {
   const t = useStrings()
   if (items.length === 0) return null
+  // One width for every row's actions, so the sizes line up in a column: the
+  // retry button only exists on a failed row and used to push that row's size
+  // a button's width to the left of the rest.
+  const slots = (onRemove ? 1 : 0) + (onRetry && items.some((i) => i.status === "failed") ? 1 : 0)
+  const actionWidth = slots === 2 ? "w-16" : slots === 1 ? "w-8" : undefined
   return (
     <ul data-slot="upload-list" className={cn("grid gap-2", className)} {...props}>
       {items.map((item) => (
+        // Centred: icon, size and buttons sit in the middle of the row, beside
+        // a name that may carry an error under it. An uploading row is the
+        // exception: its size belongs to the name line, over the bar.
         <li key={item.id} className="flex items-center gap-3 rounded-md border bg-card px-3 py-2">
           <StatusIcon item={item} />
           <div className="grid min-w-0 flex-1 gap-1">
             <div className="flex items-baseline justify-between gap-2 text-sm">
               <span className="truncate">{item.name}</span>
-              <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
-                {t.format.fileSize(item.size)}
-              </span>
+              {item.status === "uploading" && (
+                <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
+                  {t.format.fileSize(item.size)}
+                </span>
+              )}
             </div>
             {item.status === "uploading" && (
               <Progress value={item.progress} aria-label={t.upload.uploading} className="h-1" />
@@ -170,25 +191,34 @@ export function UploadList({ items, onRemove, onRetry, className, ...props }: Up
               <span className="text-xs text-danger-fg">{item.error ?? t.upload.failed}</span>
             )}
           </div>
-          {item.status === "failed" && onRetry && (
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              aria-label={t.upload.retry}
-              onClick={() => onRetry(item.id)}
-            >
-              <ArrowClockwiseIcon />
-            </Button>
+          {item.status !== "uploading" && (
+            <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
+              {t.format.fileSize(item.size)}
+            </span>
           )}
-          {onRemove && (
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              aria-label={t.upload.remove(item.name)}
-              onClick={() => onRemove(item.id)}
-            >
-              <XIcon />
-            </Button>
+          {actionWidth && (
+            <div className={cn("flex shrink-0 justify-end", actionWidth)}>
+              {item.status === "failed" && onRetry && (
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label={t.upload.retry}
+                  onClick={() => onRetry(item.id)}
+                >
+                  <ArrowClockwiseIcon />
+                </Button>
+              )}
+              {onRemove && (
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label={t.upload.remove(item.name)}
+                  onClick={() => onRemove(item.id)}
+                >
+                  <XIcon />
+                </Button>
+              )}
+            </div>
           )}
         </li>
       ))}

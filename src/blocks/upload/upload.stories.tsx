@@ -121,41 +121,70 @@ const identity: UploadSlot[] = [
     accept: ".pdf",
     maxSize: 5 * MB,
   },
+  {
+    id: "invoices",
+    label: "Invoices",
+    description: "Every invoice for the period. Add more as they arrive.",
+    accept: ".pdf,image/*",
+    maxSize: 10 * MB,
+    multiple: true,
+  },
   { id: "other", label: "Anything else", optional: true },
 ]
 
-/** Named documents, one file each. The front is already in, the back is
- *  uploading; drop a file on the others to fill them. */
+// A one-line text file as a data URL, so the story's download buttons work
+// without a server. An app's `url` is its own endpoint.
+const sample = (name: string) =>
+  "data:text/plain;charset=utf-8," + encodeURIComponent("Sample file: " + name)
+// Sent in an earlier session: these come back from the server with a URL and a date.
+const saved = (id: string, name: string, size: number, on: Date): UploadItem => ({
+  id,
+  name,
+  size,
+  status: "done",
+  url: sample(name),
+  uploadedAt: on,
+})
+
+/**
+ * Named documents from one drop zone, as a reader finds it on a second visit:
+ * the licence front and two invoices came in last week and can be downloaded.
+ * Choose which document the file is (it starts on the first one missing), drop
+ * or browse, and it lands in the list; the select moves on to the next. Choose
+ * Invoices to drop a whole batch at once; it stays selected for the next. The
+ * cross asks before it removes anything.
+ */
 export const Documents: StoryObj = {
   render: function Documents() {
-    const [value, setValue] = React.useState<Partial<Record<string, UploadItem>>>({
-      "licence-front": { id: "f", name: "licence-front.jpg", size: 2_100_000, status: "done" },
-      "licence-back": {
-        id: "b",
-        name: "licence-back.jpg",
-        size: 1_950_000,
-        status: "uploading",
-        progress: 60,
-      },
+    const [value, setValue] = React.useState<Partial<Record<string, UploadItem[]>>>({
+      "licence-front": [saved("f", "licence-front.jpg", 2_100_000, new Date(2026, 9, 28))],
+      invoices: [
+        saved("i1", "invoice-2026-0412.pdf", 184_000, new Date(2026, 9, 28)),
+        saved("i2", "invoice-2026-0419.pdf", 201_000, new Date(2026, 9, 29)),
+      ],
     })
     return (
       <UploadSlots
         slots={identity}
         value={value}
-        onFile={(slot, file) =>
-          setValue((v) => ({
-            ...v,
-            [slot]: { id: slot, name: file.name, size: file.size, status: "done" },
-          }))
-        }
-        onRemove={(slot) =>
+        onFile={(slotId, file) =>
           setValue((v) => {
-            const next = { ...v }
-            delete next[slot]
-            return next
+            const item: UploadItem = {
+              id: file.name + file.lastModified,
+              name: file.name,
+              size: file.size,
+              status: "done",
+              url: URL.createObjectURL(file),
+              uploadedAt: new Date(),
+            }
+            return { ...v, [slotId]: [...(v[slotId] ?? []), item] }
           })
         }
-        className="max-w-2xl"
+        onRemove={(slot, itemId) =>
+          setValue((v) => ({ ...v, [slot]: (v[slot] ?? []).filter((i) => i.id !== itemId) }))
+        }
+        onRetry={() => {}}
+        className="max-w-4xl"
       />
     )
   },

@@ -46,8 +46,11 @@ const RULES: [name: string, pattern: RegExp][] = [
   ],
   // 400, 500 and 600 only.
   ["font weight above 600", /\bfont-(?:bold|extrabold|black)\b/],
-  // Light-only library: a dark variant is dead code that looks like support.
-  ["dark: variant", /\bdark:/],
+  // The dark theme swaps tokens under `data-theme`, so a `dark:` variant is a
+  // second, competing mechanism: it keys on the OS rather than the reader's
+  // pick, and goes wrong the day those differ. Matched as a variant, directly
+  // followed by a utility, so an object key like `dark: "Dark"` is not one.
+  ["dark: variant", /\bdark:(?=[\w[!-])/],
   // Neutrals are tinted tokens, never raw black or white.
   ["raw black or white utility", /\b(?:bg|text|border|ring|from|to)-(?:black|white)\b/],
   // One focus ring: 1.5px of the ring colour at 80%, which is 3:1 against a

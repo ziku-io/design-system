@@ -17,6 +17,9 @@ const percents = new Intl.NumberFormat("pt-PT", {
   signDisplay: "exceptZero",
 })
 const shares = new Intl.NumberFormat("pt-PT", { style: "percent", maximumFractionDigits: 0 })
+const months = new Intl.DateTimeFormat("pt-PT", { month: "long", year: "numeric" })
+const monthNames = new Intl.DateTimeFormat("pt-PT", { month: "long" })
+const weekdays = new Intl.DateTimeFormat("pt-PT", { weekday: "short" })
 const days = new Intl.DateTimeFormat("pt-PT", { dateStyle: "medium" })
 const moments = new Intl.DateTimeFormat("pt-PT", { dateStyle: "medium", timeStyle: "short" })
 
@@ -37,18 +40,16 @@ export const ptPT: UIStrings = {
     loading: "A carregar…",
   },
   auth: {
-    loginTitle: "Bem-vindo de volta",
-    loginDescription: "Inicie sessão na sua conta",
     email: "Email",
     emailPlaceholder: "nome@empresa.pt",
     password: "Palavra-passe",
     forgotPassword: "Esqueceu-se da palavra-passe?",
     signIn: "Iniciar sessão",
-    orContinueWith: "ou continue com",
+    or: "ou",
+    continueWith: (provider) => `Continuar com ${provider}`,
     noAccount: "Não tem conta?",
     createOne: "Criar conta",
     registerTitle: "Criar uma conta",
-    registerDescription: "Comece em menos de um minuto",
     name: "Nome",
     namePlaceholder: "Ana Silva",
     passwordHint: "Pelo menos 8 caracteres",
@@ -72,10 +73,19 @@ export const ptPT: UIStrings = {
   shell: {
     signOut: "Terminar sessão",
     skipToContent: "Saltar para o conteúdo",
+    accountMenu: "Menu da conta",
   },
   preferences: {
+    title: "Preferências",
+    appearance: "Aspeto",
+    themes: { light: "Claro", dark: "Escuro", system: "Sistema" },
+    language: "Idioma",
     zoom: "Zoom",
-    zoomLevel: (percent) => `${num(percent)}%`,
+    zoomIn: "Aumentar",
+    zoomOut: "Diminuir",
+    zoomPercent: "Zoom, percentagem",
+    percentSign: "%",
+    resetZoom: `Repor ${num(100)}%`,
   },
   dataTable: {
     allView: "Todos",
@@ -90,6 +100,21 @@ export const ptPT: UIStrings = {
     layout: "Esquema",
     table: "Tabela",
     board: "Quadro",
+    timeline: "Cronograma",
+    calendar: "Calendário",
+    timelineScale: "Zoom",
+    scales: { week: "Semana", month: "Mês", quarter: "Trimestre" },
+    undated: (count) => `${num(count)} sem data`,
+    moreItems: (count) => `+${num(count)} mais`,
+    previousMonth: "Mês anterior",
+    nextMonth: "Mês seguinte",
+    previousYear: "Ano anterior",
+    nextYear: "Ano seguinte",
+    calendarScale: "Escala do calendário",
+    calendarScales: { month: "Mês", year: "Ano" },
+    rescheduleHint: "As setas esquerda e direita movem-no um dia. Com Shift movem o fim.",
+    calendarRescheduleHint:
+      "As setas movem-no: esquerda e direita um dia, cima e baixo uma semana.",
     visibleColumns: "Colunas visíveis",
     hidden: (count) => `${num(count)} ocultas`,
     filters: "Filtros",
@@ -163,6 +188,9 @@ export const ptPT: UIStrings = {
     dateTime: (date) => moments.format(date),
     fileSize: (value) => bytes(value, num),
     percent: (value) => shares.format(value / 100),
+    month: (date) => months.format(date),
+    monthName: (date) => monthNames.format(date),
+    weekday: (date) => weekdays.format(date),
   },
   dashboard: {
     change: (percent) => percents.format(percent / 100),
@@ -210,5 +238,15 @@ export const ptPT: UIStrings = {
     failed: "Falhou o carregamento",
     retry: "Tentar novamente",
     optional: "Opcional",
+    thisFileIs: "Este ficheiro é",
+    pickDocument: "Escolha um documento",
+    documents: "Documentos",
+    uploadedCount: (done, total) => `${num(done)} de ${num(total)}`,
+    missing: "Ainda não carregado",
+    allIn: "Todos os documentos estão carregados.",
+    removeConfirm: (name) => `Remover ${name}? Não é possível desfazer.`,
+    removeAction: "Remover",
+    download: (name) => `Descarregar ${name}`,
+    uploadedOn: (date) => `Carregado a ${days.format(date)}`,
   },
 }

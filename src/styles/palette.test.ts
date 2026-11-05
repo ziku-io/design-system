@@ -138,8 +138,12 @@ const pairs: [string, string][] = [
   ]),
 ]
 
-describe("palette", () => {
-  const t = block(":root {")
+// Both themes make the same promises, so every check runs against each block.
+describe.each([
+  ["light", ":root {"],
+  ["dark", ':root[data-theme="dark"] {'],
+])("%s palette", (_, marker) => {
+  const t = block(marker)
 
   it.each(pairs)("%s on %s is readable", (fg, bg) => {
     expect(contrast(t[fg], t[bg])).toBeGreaterThanOrEqual(4.5)
@@ -184,11 +188,15 @@ describe("palette", () => {
   })
 
   it("keeps the slots apart from each other", () => {
+    // 12 in dark, not 20: see the slot comment in the dark block. The space of
+    // light text colours that clear 4.5:1 and every status hue cannot hold
+    // five at 20; the search ceiling was 13.4.
+    const floor = marker === ":root {" ? 20 : 12
     const hexes = SLOTS.map((n) => t[`slot-${n}`])
     for (const vision of VISIONS)
       for (const [i, a] of hexes.entries())
         for (const b of hexes.slice(i + 1))
-          expect(distance(a, b, vision)).toBeGreaterThanOrEqual(20)
+          expect(distance(a, b, vision)).toBeGreaterThanOrEqual(floor)
   })
 
   it("keeps a category from reading as a state", () => {

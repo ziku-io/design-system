@@ -1,6 +1,6 @@
 import * as React from "react"
 import type { Icon } from "@phosphor-icons/react"
-import { SignOutIcon, CaretUpDownIcon } from "@phosphor-icons/react"
+import { SignOutIcon } from "@phosphor-icons/react"
 
 import {
   Sidebar,
@@ -18,7 +18,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { Separator } from "@/components/ui/separator"
+import { Button } from "@/components/ui/button"
 import { UserAvatar } from "@/components/ui/avatar"
 import {
   DropdownMenu,
@@ -31,6 +31,7 @@ import {
 import { Link } from "@/lib/link"
 import { cn } from "@/lib/utils"
 import { useStrings } from "@/lib/strings"
+import { Wordmark } from "@/blocks/brand/wordmark"
 
 export interface NavItem {
   title: string
@@ -53,33 +54,26 @@ export interface NavGroup {
 export interface ShellUser {
   name: string
   email: string
-  /** What to show under the name in the sidebar instead of the address: a job
-   *  title, a team, a tenant. The dropdown still shows the email, because that
-   *  is the one place a user goes to check which account they are signed in as.
-   *  Without this an app that wants a role there has to lie in `email`. */
+  /** A job title, a team, a tenant: shown in the account menu between the
+   *  name and the email. The email stays, because that menu is the one place a
+   *  user goes to check which account they are signed in as. */
   role?: string
   avatarUrl?: string
 }
 
 export interface AppShellProps {
-  /** Logo / product name shown at the top of the sidebar */
+  /** Logo shown at the top of the sidebar. A string is set as a `Wordmark`;
+   *  pass a node for a drawn logo. Hidden when the
+   *  sidebar collapses to icons, leaving only the expand toggle. */
   brand: React.ReactNode
   /**
-   * Where the brand links to. `null` renders it as plain content, for an app
-   * whose home is behind the nav rather than at `/`.
-   */
-  brandHref?: string | null
-  /**
-   * Anything above the nav and outside the brand's link: a workspace switcher,
-   * a tenant picker, a search box. It could not go in `brand`, because a
-   * dropdown inside a link is neither valid markup nor operable with a
-   * keyboard, and an app that wanted one had to put it in the top bar instead.
+   * Anything above the nav, under the brand: a workspace switcher, a tenant
+   * picker, a search box.
    */
   sidebarHeader?: React.ReactNode
   /**
-   * Anything below the nav, under the user menu: a build credit, a version
-   * string, a support link. It renders whether or not there is a `user`, and is
-   * hidden with the labels when the sidebar collapses to icons.
+   * Anything below the nav: a build credit, a version string, a support link.
+   * Hidden with the labels when the sidebar collapses to icons.
    */
   sidebarFooter?: React.ReactNode
   nav: NavGroup[]
@@ -89,9 +83,9 @@ export interface AppShellProps {
   /** Extra items in the user dropdown (Settings, Billing…) */
   userMenu?: React.ReactNode
   onSignOut?: () => void
-  /** Right side of the top bar (search, notifications…) */
+  /** Right side of the top bar, before the avatar (search, notifications…) */
   headerActions?: React.ReactNode
-  /** Left side of the top bar, after the trigger (breadcrumbs, page title) */
+  /** Left side of the top bar (breadcrumbs, page title) */
   headerContent?: React.ReactNode
   /**
    * Classes for the three regions a page has reasons to reach: hiding the
@@ -118,7 +112,6 @@ export interface AppShellProps {
 /** Standard authenticated app layout: collapsible sidebar nav + top bar + content area. */
 export function AppShell({
   brand,
-  brandHref = "/",
   sidebarHeader,
   sidebarFooter,
   nav,
@@ -151,18 +144,18 @@ export function AppShell({
       </a>
       <Sidebar collapsible="icon" rootClassName={classNames?.sidebar}>
         <SidebarHeader>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              {brandHref === null ? (
-                <div className="flex h-12 items-center gap-2 p-2 text-sm">{brand}</div>
-              ) : (
-                <SidebarMenuButton size="lg" asChild>
-                  <Link href={brandHref}>{brand}</Link>
-                </SidebarMenuButton>
-              )}
-            </SidebarMenuItem>
-          </SidebarMenu>
-          {/* After the brand and outside its link. Hidden with the labels when
+          {/* The toggle lives here rather than in the top bar, so it sits on the
+           *  thing it collapses. Collapsed to icons there is no room for a
+           *  brand, so only the toggle is left, centred in the 3rem pane. */}
+          <div className="flex h-12 items-center gap-1">
+            {/* Plain content, not a link: the nav's first item is already the
+             *  way home. */}
+            <div className="flex h-12 min-w-0 flex-1 items-center gap-2 p-2 text-sm group-data-[collapsible=icon]:hidden">
+              {typeof brand === "string" ? <Wordmark>{brand}</Wordmark> : brand}
+            </div>
+            <SidebarTrigger className="shrink-0 group-data-[collapsible=icon]:mx-auto" />
+          </div>
+          {/* Hidden with the labels when
            *  the sidebar collapses to icons: a switcher 3rem wide is not one. */}
           {sidebarHeader && (
             <div className="group-data-[collapsible=icon]:hidden">{sidebarHeader}</div>
@@ -201,62 +194,11 @@ export function AppShell({
             </SidebarGroup>
           ))}
         </SidebarContent>
-        {(user || sidebarFooter) && (
+        {sidebarFooter && (
           <SidebarFooter>
-            {user && (
-              <SidebarMenu>
-                <SidebarMenuItem>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <SidebarMenuButton size="lg" className="data-[state=open]:bg-sidebar-accent">
-                        <UserAvatar
-                          name={user.name}
-                          src={user.avatarUrl}
-                          className="size-8 rounded-lg *:rounded-lg"
-                        />
-                        <div className="grid flex-1 text-left text-sm leading-tight">
-                          <span className="truncate font-medium">{user.name}</span>
-                          <span className="truncate text-xs text-muted-foreground">
-                            {user.role ?? user.email}
-                          </span>
-                        </div>
-                        <CaretUpDownIcon className="ml-auto size-4" />
-                      </SidebarMenuButton>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                      side="top"
-                      align="start"
-                      className="w-(--radix-dropdown-menu-trigger-width) min-w-56"
-                    >
-                      <DropdownMenuLabel className="font-normal">
-                        <div className="text-sm font-medium">{user.name}</div>
-                        <div className="text-xs text-muted-foreground">{user.email}</div>
-                      </DropdownMenuLabel>
-                      {userMenu && (
-                        <>
-                          <DropdownMenuSeparator />
-                          {userMenu}
-                        </>
-                      )}
-                      {onSignOut && (
-                        <>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem onSelect={onSignOut}>
-                            <SignOutIcon />
-                            {t.signOut}
-                          </DropdownMenuItem>
-                        </>
-                      )}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </SidebarMenuItem>
-              </SidebarMenu>
-            )}
             {/* Hidden with the labels when the sidebar collapses to icons: a
              *  credit line 3rem wide is not one. */}
-            {sidebarFooter && (
-              <div className="group-data-[collapsible=icon]:hidden">{sidebarFooter}</div>
-            )}
+            <div className="group-data-[collapsible=icon]:hidden">{sidebarFooter}</div>
           </SidebarFooter>
         )}
       </Sidebar>
@@ -267,12 +209,49 @@ export function AppShell({
             classNames?.header,
           )}
         >
-          <SidebarTrigger className="-ml-1" />
-          <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
+          {/* Below `md` the sidebar is an off-screen panel, so the toggle
+           *  inside it cannot be reached until it is open. */}
+          <SidebarTrigger className="-ml-1 md:hidden" />
           {/* min-w-0: a flex child defaults to min-width:auto, so a long
            *  breadcrumb here pushes `headerActions` off the right edge. */}
           <div className="flex min-w-0 flex-1 items-center gap-2">{headerContent}</div>
           {headerActions && <div className="flex items-center gap-2">{headerActions}</div>}
+          {user && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label={t.accountMenu}
+                  className="shrink-0 rounded-full"
+                >
+                  <UserAvatar name={user.name} src={user.avatarUrl} className="size-8" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-56">
+                <DropdownMenuLabel className="font-normal">
+                  <div className="text-sm font-medium">{user.name}</div>
+                  {user.role && <div className="text-xs text-muted-foreground">{user.role}</div>}
+                  <div className="text-xs text-muted-foreground">{user.email}</div>
+                </DropdownMenuLabel>
+                {userMenu && (
+                  <>
+                    <DropdownMenuSeparator />
+                    {userMenu}
+                  </>
+                )}
+                {onSignOut && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onSelect={onSignOut}>
+                      <SignOutIcon />
+                      {t.signOut}
+                    </DropdownMenuItem>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </header>
         {/* `tabIndex={-1}`: an anchor moves focus only to something focusable,
          *  so without it the skip link scrolls and leaves the focus where it

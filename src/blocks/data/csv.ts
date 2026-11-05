@@ -40,9 +40,7 @@ const FORMULA = /^[=+\-@\t\r]/
  *  double the size of every file for the columns that never need it. */
 function field(value: string, delimiter: string): string {
   const safe = FORMULA.test(value) ? `'${value}` : value
-  return /["\n\r]/.test(safe) || safe.includes(delimiter)
-    ? `"${safe.replaceAll('"', '""')}"`
-    : safe
+  return /["\n\r]/.test(safe) || safe.includes(delimiter) ? `"${safe.replaceAll('"', '""')}"` : safe
 }
 
 /**

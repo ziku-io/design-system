@@ -29,6 +29,13 @@ export type UploadItem = {
     id: string;
     name: string;
     size: number;
+    /** Where the saved file can be fetched: the app's own download URL. Present
+     *  → a download button. Set on files from an earlier session too, which is
+     *  how a reader coming back gets at what they sent. */
+    url?: string;
+    /** When it was saved. Shown beside the size once the reader may be on a
+     *  later visit than the upload. */
+    uploadedAt?: Date;
 } & UploadStatus;
 export interface UploadListProps extends React.ComponentProps<"ul"> {
     items: UploadItem[];

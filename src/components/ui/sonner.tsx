@@ -6,6 +6,7 @@ import {
   WarningIcon,
   XCircleIcon,
 } from "@phosphor-icons/react"
+import { useTheme } from "@/lib/preferences"
 import { Toaster as Sonner, toast as sonnerToast, type ToasterProps } from "sonner"
 
 /**
@@ -18,9 +19,12 @@ import { Toaster as Sonner, toast as sonnerToast, type ToasterProps } from "sonn
  * the variables it reads rather than with utility classes, which would lose.
  */
 const Toaster = ({ theme: _theme, ...props }: ToasterProps) => {
+  // The app's theme, not a prop: a toast in the other theme from the page it
+  // lands on is the one thing on screen that did not follow the switch.
+  const { resolved } = useTheme()
   return (
     <Sonner
-      theme="light"
+      theme={resolved}
       // The corner, away from whatever was clicked: a toast is a report on
       // something that happened, and it must not cover the control the reader
       // is still looking at.

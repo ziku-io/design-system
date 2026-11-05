@@ -113,7 +113,15 @@ same file, applied as a class. Never style a field by `[data-slot="input"]`:
 `FormControl` replaces the slot, and a stylesheet rule keyed on it left every
 field inside a form transparent.
 
-**The library is light-only.** Tokens live on `:root`.
+**Light and dark are one set of token names.** Light lives on `:root`, dark on
+`:root[data-theme="dark"]` in the same file. `useTheme` (light, dark or system,
+in `src/lib/preferences.ts` beside zoom) and `antiFlashScript` set
+`data-theme` on `<html>`; components never carry a `dark:` variant, which
+would key on the OS instead of the reader's pick, and `design-rules.test.ts`
+refuses one. `palette.test.ts` runs every check against both blocks, so a new
+token needs a value in each. The one place dark gives ground: five slots
+cannot sit 20 deltaE apart as light text clear of every status hue, so the
+dark floor there is 12, and the comment in `globals.css` says why.
 
 **Two materials, both in `src/lib/surfaces.ts`.** `OVERLAY` for anything that
 floats (dialog, popover, menus, listboxes, tooltips), `SURFACE` for

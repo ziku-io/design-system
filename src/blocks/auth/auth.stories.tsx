@@ -1,11 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import { useState } from "react"
-import { GithubLogoIcon, GoogleLogoIcon } from "@phosphor-icons/react"
 import { AuthLayout } from "./auth-layout"
 import { LoginForm } from "./login-form"
 import { RegisterForm } from "./register-form"
 import { ForgotPasswordForm } from "./forgot-password-form"
-import { Button } from "@/components/ui/button"
+import { SocialButton } from "./social-button"
 import { UIStringsProvider } from "@/lib/strings"
 import { ptPT } from "@/lib/strings-pt"
 
@@ -17,7 +16,7 @@ const meta: Meta = {
 export default meta
 
 const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
-const Logo = <span className="text-lg font-bold tracking-tight text-foreground">ziku</span>
+const Logo = "ziku"
 const Footer = (
   <>
     By continuing you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.
@@ -25,12 +24,10 @@ const Footer = (
 )
 const Providers = (
   <>
-    <Button variant="outline" type="button">
-      <GoogleLogoIcon /> Google
-    </Button>
-    <Button variant="outline" type="button">
-      <GithubLogoIcon /> GitHub
-    </Button>
+    <SocialButton provider="google" />
+    <SocialButton provider="github" />
+    <SocialButton provider="apple" />
+    <SocialButton provider="microsoft" />
   </>
 )
 
@@ -98,8 +95,8 @@ export const Translated: StoryObj = {
     // The whole dictionary: a partial one left "Forgot password?" and
     // "Create one" in English on an otherwise Portuguese form.
     <UIStringsProvider strings={ptPT}>
-      <AuthLayout logo={Logo}>
-        <LoginForm onSubmit={() => wait(800)} />
+      <AuthLayout logo={Logo} footer={Footer}>
+        <LoginForm onSubmit={() => wait(800)} providers={<SocialButton provider="google" />} />
       </AuthLayout>
     </UIStringsProvider>
   ),

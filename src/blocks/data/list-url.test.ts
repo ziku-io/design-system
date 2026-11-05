@@ -79,6 +79,12 @@ describe("the codec", () => {
     })
     expect(toListUrl({ q: "", filters: {}, mode: "table" }).toString()).toBe("")
   })
+
+  // An allowlist, so a mode typed into the URL by hand cannot reach the table.
+  it("reads the dated layouts and drops an unknown mode", () => {
+    expect(parseListUrl("mode=calendar").mode).toBe("calendar")
+    expect(parseListUrl("mode=gantt").mode).toBeUndefined()
+  })
 })
 
 describe("the two adapters", () => {

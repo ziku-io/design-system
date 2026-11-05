@@ -39,6 +39,8 @@ export * from "./blocks/search/combobox"
 export * from "./blocks/data/data-table"
 export * from "./blocks/data/types"
 export * from "./blocks/data/kanban"
+export * from "./blocks/data/timeline"
+export * from "./blocks/data/calendar-view"
 export * from "./blocks/data/new-row"
 export * from "./blocks/data/chip-picker"
 export * from "./blocks/data/csv"
@@ -49,6 +51,8 @@ export {
   type UseDataTableViews,
   type ViewsBackend,
 } from "./blocks/data/use-data-table-views"
+export * from "./blocks/brand/wordmark"
+export * from "./blocks/auth/social-button"
 export * from "./blocks/shell/app-shell"
 export * from "./blocks/shell/preference-menus"
 export * from "./blocks/modal/modal"
@@ -87,4 +91,11 @@ export {
   ZOOM_MIN,
   ZOOM_STEPS,
   type ZoomControl,
+  useTheme,
+  resolveTheme,
+  THEMES,
+  THEME_DEFAULT,
+  type ThemeControl,
+  type ThemePreference,
+  type ResolvedTheme,
 } from "./lib/preferences"

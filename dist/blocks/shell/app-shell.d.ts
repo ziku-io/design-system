@@ -21,32 +21,25 @@ export interface NavGroup {
 export interface ShellUser {
     name: string;
     email: string;
-    /** What to show under the name in the sidebar instead of the address: a job
-     *  title, a team, a tenant. The dropdown still shows the email, because that
-     *  is the one place a user goes to check which account they are signed in as.
-     *  Without this an app that wants a role there has to lie in `email`. */
+    /** A job title, a team, a tenant: shown in the account menu between the
+     *  name and the email. The email stays, because that menu is the one place a
+     *  user goes to check which account they are signed in as. */
     role?: string;
     avatarUrl?: string;
 }
 export interface AppShellProps {
-    /** Logo / product name shown at the top of the sidebar */
+    /** Logo shown at the top of the sidebar. A string is set as a `Wordmark`;
+     *  pass a node for a drawn logo. Hidden when the
+     *  sidebar collapses to icons, leaving only the expand toggle. */
     brand: React.ReactNode;
     /**
-     * Where the brand links to. `null` renders it as plain content, for an app
-     * whose home is behind the nav rather than at `/`.
-     */
-    brandHref?: string | null;
-    /**
-     * Anything above the nav and outside the brand's link: a workspace switcher,
-     * a tenant picker, a search box. It could not go in `brand`, because a
-     * dropdown inside a link is neither valid markup nor operable with a
-     * keyboard, and an app that wanted one had to put it in the top bar instead.
+     * Anything above the nav, under the brand: a workspace switcher, a tenant
+     * picker, a search box.
      */
     sidebarHeader?: React.ReactNode;
     /**
-     * Anything below the nav, under the user menu: a build credit, a version
-     * string, a support link. It renders whether or not there is a `user`, and is
-     * hidden with the labels when the sidebar collapses to icons.
+     * Anything below the nav: a build credit, a version string, a support link.
+     * Hidden with the labels when the sidebar collapses to icons.
      */
     sidebarFooter?: React.ReactNode;
     nav: NavGroup[];
@@ -56,9 +49,9 @@ export interface AppShellProps {
     /** Extra items in the user dropdown (Settings, Billing…) */
     userMenu?: React.ReactNode;
     onSignOut?: () => void;
-    /** Right side of the top bar (search, notifications…) */
+    /** Right side of the top bar, before the avatar (search, notifications…) */
     headerActions?: React.ReactNode;
-    /** Left side of the top bar, after the trigger (breadcrumbs, page title) */
+    /** Left side of the top bar (breadcrumbs, page title) */
     headerContent?: React.ReactNode;
     /**
      * Classes for the three regions a page has reasons to reach: hiding the
@@ -82,4 +75,4 @@ export interface AppShellProps {
     children: React.ReactNode;
 }
 /** Standard authenticated app layout: collapsible sidebar nav + top bar + content area. */
-export declare function AppShell({ brand, brandHref, sidebarHeader, sidebarFooter, nav, currentPath, user, userMenu, onSignOut, headerActions, headerContent, classNames, bleed, children, }: AppShellProps): React.JSX.Element;
+export declare function AppShell({ brand, sidebarHeader, sidebarFooter, nav, currentPath, user, userMenu, onSignOut, headerActions, headerContent, classNames, bleed, children, }: AppShellProps): React.JSX.Element;

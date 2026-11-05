@@ -27,9 +27,9 @@ const meta: Meta<typeof Drawer> = {
 }
 export default meta
 
-/** Opens on load so the story shows the drawer, with a button to bring it back. */
+/** Closed until the button is pressed, the way a page uses it. */
 function Demo({ label, ...props }: Omit<DrawerProps, "open" | "onOpenChange"> & { label: string }) {
-  const [open, setOpen] = React.useState(true)
+  const [open, setOpen] = React.useState(false)
   return (
     <>
       <Button variant="outline" onClick={() => setOpen(true)}>
@@ -77,7 +77,6 @@ export const Filters: StoryObj = {
     <Demo
       label="Filters"
       title="Filters"
-      description="Narrow the list down."
       footer={
         <>
           <Button variant="ghost" className="mr-auto">

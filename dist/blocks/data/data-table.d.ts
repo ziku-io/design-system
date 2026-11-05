@@ -1,7 +1,8 @@
 import { RowData } from '@tanstack/react-table';
+import { CalendarScale } from './calendar-view';
 import { CsvDecimal } from './csv';
 import { NewRowValues } from './new-row';
-import { DataTableColumn, DataTableQuery, DataTableState, DataTableView } from './types';
+import { DataTableColumn, DataTableQuery, DataTableState, DataTableMode, DataTableView } from './types';
 import { ViewsBackend } from './use-data-table-views';
 import * as React from "react";
 /** The feature set every DataTable registers. */
@@ -63,7 +64,31 @@ export interface DataTableProps<T extends RowData> {
     /** Chips the "All" view starts with: `[{ id: "status", value: ["Active"] }]`. */
     defaultFilters?: DataTableState["columnFilters"];
     defaultGroup?: string;
-    defaultMode?: "table" | "board";
+    defaultMode?: DataTableMode;
+    /**
+     * Present → the timeline and calendar layouts become available.
+     *
+     * `start` places a row; a row without one is left off both and counted. `end`
+     * makes it a bar on the timeline and a run of days on the calendar; without
+     * one (or when it returns nothing) the row is a single day, a deadline, drawn
+     * as a diamond. The calendar puts each row on its end day, or its start
+     * when it has no end. An end before the start throws: a swapped pair of fields
+     * should be found, not drawn off the edge. `label` is the text on the bar,
+     * the first column's value by default.
+     */
+    dates?: {
+        start: (row: T) => Date | null | undefined;
+        end?: (row: T) => Date | null | undefined;
+        label?: (row: T) => string;
+        /** The calendar's opening scale: `year` for deadlines spread over years. */
+        calendarScale?: CalendarScale;
+        /** Makes timeline bars and calendar items draggable. See
+         *  `DatedRows.onReschedule`. */
+        onReschedule?: (row: T, span: {
+            start: Date;
+            end: Date | undefined;
+        }) => void | Promise<void>;
+    };
     /** Present → the board layout becomes available. Dragging cards needs the
      *  grouped column to define `onSet`. */
     renderCard?: (row: T) => React.ReactNode;
@@ -137,4 +162,4 @@ export interface DataTableProps<T extends RowData> {
  * and saved views — the Notion-style list every product needs. Built on
  * TanStack Table v9.
  */
-export declare function DataTable<T extends RowData>({ columns, data, loading, error, onRetry, empty, rowId, search, searchPlaceholder, toolbar, onRowClick, pageSize, defaultSort, defaultHidden, defaultFilters, defaultGroup, defaultMode, renderCard, boardSubtitle, presets, viewKey, onStateChange, view, viewsBackend, paged, csv, onAddRow, className, }: DataTableProps<T>): React.JSX.Element;
+export declare function DataTable<T extends RowData>({ columns, data, loading, error, onRetry, empty, rowId, search, searchPlaceholder, toolbar, onRowClick, pageSize, defaultSort, defaultHidden, defaultFilters, defaultGroup, defaultMode, renderCard, boardSubtitle, dates, presets, viewKey, onStateChange, view, viewsBackend, paged, csv, onAddRow, className, }: DataTableProps<T>): React.JSX.Element;

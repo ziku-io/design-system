@@ -123,6 +123,19 @@ export function defaultRangePresets(t: UIStrings["datePicker"]): DateRangePreset
   ]
 }
 
+/**
+ * The range after a click on `day`.
+ *
+ * react-day-picker's own rule edits whichever end is nearer: once a range is
+ * set, every click after its start moves the end, so the start could only ever
+ * move earlier. Here a click on a finished range starts a new one, and the
+ * next click finishes it, the two swapped if the second comes first.
+ */
+export function nextRange(current: DateRange | undefined, day: Date): DateRange {
+  if (!current?.from || current.to) return { from: day, to: undefined }
+  return day < current.from ? { from: day, to: current.from } : { from: current.from, to: day }
+}
+
 export interface DateRangePickerProps extends PickerBase {
   value: DateRange | undefined
   onChange: (range: DateRange | undefined) => void
@@ -192,7 +205,8 @@ export function DateRangePicker({
               defaultMonth={value?.from}
               numberOfMonths={isMobile ? 1 : 2}
               disabled={outOfBounds(min, max)}
-              onSelect={onChange}
+              // The clicked day, not the library's computed range: see `nextRange`.
+              onSelect={(_, clicked) => onChange(nextRange(value, clicked))}
             />
             {value?.from && (
               <div className="flex justify-end border-t p-2">

@@ -2,6 +2,11 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import {
   BellIcon,
   CaretDownIcon,
+  CheckCircleIcon,
+  ClockIcon,
+  UploadSimpleIcon,
+  WalletIcon,
+  WarningIcon,
   ChartBarIcon,
   CreditCardIcon,
   GearIcon,
@@ -10,10 +15,25 @@ import {
   UsersIcon,
   FolderIcon,
 } from "@phosphor-icons/react"
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
 import { AppShell } from "./app-shell"
+import { PreferencesMenu } from "./preference-menus"
 import { PageHeader } from "@/blocks/page/page-header"
 import { EmptyState } from "@/blocks/page/empty-state"
 import { StatTile } from "@/blocks/page/stat-tile"
+import {
+  ActivityList,
+  Dashboard as DashboardBlock,
+  DashboardPanel,
+  type ActivityItem,
+} from "@/blocks/dashboard/dashboard"
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from "@/components/ui/chart"
+import { Link } from "@/lib/link"
 import { Button } from "@/components/ui/button"
 import { CommandMenu, SearchTrigger } from "@/blocks/search/command-menu"
 import {
@@ -60,7 +80,7 @@ const nav = [
   },
 ]
 const user = { name: "Ada Lovelace", email: "ada@ziku.dev" }
-const brand = <span className="px-1 text-base font-bold tracking-tight text-foreground">ziku</span>
+const brand = "ziku"
 
 export const Dashboard: StoryObj<typeof AppShell> = {
   args: {
@@ -119,28 +139,139 @@ export const Dashboard: StoryObj<typeof AppShell> = {
         <Button variant="ghost" size="icon-sm" aria-label="Notifications">
           <BellIcon />
         </Button>
+        <PreferencesMenu />
       </>
     ),
-    children: (
-      <>
-        <PageHeader
-          title="Dashboard"
-          description="Overview of your workspace."
-          actions={
-            <Button>
-              <PlusIcon /> New project
-            </Button>
-          }
-        />
-        <div className="grid gap-3 md:grid-cols-3">
-          <StatTile label="Active projects" value="12" />
-          <StatTile label="Members" value="8" />
-          <StatTile label="Requests / day" value="4.2k" />
-        </div>
-        <div className="min-h-64 flex-1 rounded-lg border bg-card" />
-      </>
-    ),
+    children: <DashboardContent />,
   },
+}
+
+const NOW = new Date("2026-11-04T10:30:00Z")
+const minutesAgo = (m: number) => new Date(NOW.getTime() - m * 60_000)
+
+const revenue = [
+  { month: "Jun", revenue: 18.2, expenses: 12.1 },
+  { month: "Jul", revenue: 21.4, expenses: 12.8 },
+  { month: "Aug", revenue: 19.8, expenses: 13.5 },
+  { month: "Sep", revenue: 24.6, expenses: 14.0 },
+  { month: "Oct", revenue: 27.9, expenses: 14.6 },
+  { month: "Nov", revenue: 31.2, expenses: 15.1 },
+]
+const revenueConfig = {
+  revenue: { label: "Revenue", color: "var(--chart-1)" },
+  expenses: { label: "Expenses", color: "var(--chart-2)" },
+} satisfies ChartConfig
+
+const byProject = [
+  { project: "Atlas", hours: 142 },
+  { project: "Beacon", hours: 98 },
+  { project: "Cobalt", hours: 76 },
+  { project: "Delta", hours: 51 },
+  { project: "Ember", hours: 23 },
+]
+const hoursConfig = { hours: { label: "Hours", color: "var(--chart-1)" } } satisfies ChartConfig
+
+const activity: ActivityItem[] = [
+  { id: "1", title: "Grace Hopper merged Atlas #482", at: minutesAgo(8), icon: CheckCircleIcon },
+  {
+    id: "2",
+    title: "Alan Turing uploaded 4 files",
+    description: "Beacon · Design review",
+    at: minutesAgo(54),
+    icon: UploadSimpleIcon,
+  },
+  { id: "3", title: "Invoice 1043 is 5 days overdue", at: minutesAgo(60 * 20), icon: WarningIcon },
+  {
+    id: "4",
+    title: "Katherine Johnson joined the workspace",
+    at: minutesAgo(60 * 30),
+    icon: UsersIcon,
+  },
+]
+
+/** What a real home screen holds: four numbers, a trend, a breakdown and a
+ *  feed, all through the `Dashboard` block. */
+function DashboardContent() {
+  return (
+    <DashboardBlock
+      title="Dashboard"
+      actions={
+        <Button>
+          <PlusIcon /> New project
+        </Button>
+      }
+      stats={
+        <>
+          <StatTile
+            label="Revenue"
+            value="€31.2k"
+            change={11.8}
+            hint="vs October"
+            icon={WalletIcon}
+          />
+          <StatTile label="Active projects" value="12" change={9.1} icon={FolderIcon} />
+          <StatTile
+            label="Hours logged"
+            value="390"
+            change={-4.2}
+            hint="this month"
+            icon={ClockIcon}
+          />
+          <StatTile label="Overdue invoices" value="2" change={-33} trend="up" icon={WarningIcon} />
+        </>
+      }
+    >
+      <DashboardPanel title="Revenue and expenses, €k" span="full">
+        <ChartContainer config={revenueConfig} className="aspect-auto h-60 w-full">
+          <AreaChart data={revenue} margin={{ left: 8, right: 8 }}>
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="month"
+              tickLine={false}
+              axisLine={false}
+              padding={{ left: 16, right: 16 }}
+            />
+            <ChartTooltip content={<ChartTooltipContent />} />
+            <Area
+              dataKey="revenue"
+              type="monotone"
+              stroke="var(--color-revenue)"
+              fill="var(--color-revenue)"
+              fillOpacity={0.12}
+            />
+            <Area
+              dataKey="expenses"
+              type="monotone"
+              stroke="var(--color-expenses)"
+              fill="var(--color-expenses)"
+              fillOpacity={0.12}
+            />
+          </AreaChart>
+        </ChartContainer>
+      </DashboardPanel>
+      <DashboardPanel title="Hours by project">
+        <ChartContainer config={hoursConfig} className="aspect-auto h-56 w-full">
+          <BarChart data={byProject} layout="vertical" margin={{ left: 8, right: 8 }}>
+            <CartesianGrid horizontal={false} />
+            <XAxis type="number" dataKey="hours" hide />
+            <YAxis type="category" dataKey="project" tickLine={false} axisLine={false} width={56} />
+            <ChartTooltip content={<ChartTooltipContent />} />
+            <Bar dataKey="hours" fill="var(--color-hours)" radius={4} />
+          </BarChart>
+        </ChartContainer>
+      </DashboardPanel>
+      <DashboardPanel
+        title="Recent activity"
+        action={
+          <Link href="#" className="text-link">
+            View all
+          </Link>
+        }
+      >
+        <ActivityList items={activity} />
+      </DashboardPanel>
+    </DashboardBlock>
+  )
 }
 
 export const EmptyPage: StoryObj<typeof AppShell> = {
@@ -163,7 +294,6 @@ export const EmptyPage: StoryObj<typeof AppShell> = {
         <EmptyState
           icon={FolderIcon}
           title="No projects yet"
-          description="Create your first project to get started."
           action={
             <Button>
               <PlusIcon /> New project
@@ -176,8 +306,8 @@ export const EmptyPage: StoryObj<typeof AppShell> = {
 }
 
 /**
- * The sidebar's second line is a job title rather than an address. The dropdown
- * still shows the email, so the account is never ambiguous.
+ * A job title in the account menu, between the name and the email. The email
+ * stays, so the account is never ambiguous.
  */
 export const WithRole: StoryObj<typeof AppShell> = {
   args: {
@@ -239,8 +369,8 @@ export const LongBreadcrumb: StoryObj<typeof AppShell> = {
  * change — here the header is tinted and the sidebar carries `print:hidden`,
  * neither of which used to be possible without a `!important` selector on this
  * library's `data-slot` attributes. `sidebarHeader` is the slot above the nav
- * that is not inside the brand's link, so a dropdown can live in it.
- * `sidebarFooter` is the matching slot under the user menu, for a credit or a
+ * under the brand, so a dropdown can live in it.
+ * `sidebarFooter` is the matching slot under the nav, for a credit or a
  * version string. `bleed` drops `main`'s gutter for a page that runs to the
  * edges.
  */
