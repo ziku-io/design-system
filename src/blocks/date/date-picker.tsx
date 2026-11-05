@@ -21,6 +21,71 @@ interface PickerBase {
   className?: string
   id?: string
   "aria-invalid"?: boolean
+  /** Sends the value with its form as `YYYY-MM-DD`, the local calendar day
+   *  (not UTC). A range sends two fields, `name[from]` and `name[to]`. Empty
+   *  string when nothing is picked. */
+  name?: string
+  /** Blocks the form's submit while empty, through native validation: the
+   *  picker opens instead. A range needs both ends. Sets `aria-required`. */
+  required?: boolean
+}
+
+/** The local calendar day as `YYYY-MM-DD`. `toISOString` would give the UTC
+ *  day, which is yesterday for every midnight east of Greenwich. */
+export function isoDay(date: Date | undefined): string {
+  if (!date) return ""
+  const pad = (n: number) => String(n).padStart(2, "0")
+  return date.getFullYear() + "-" + pad(date.getMonth() + 1) + "-" + pad(date.getDate())
+}
+
+/**
+ * What the picker puts in its form: hidden fields for the value, and for
+ * `required` a stand-in text input, because a `type="hidden"` input is barred
+ * from validation and a button cannot be required at all. It is visually
+ * hidden and out of the tab order; when the form is sent empty it fails
+ * `checkValidity()` and hands the reader to the picker instead of a browser
+ * bubble pointing at nothing.
+ */
+function FormFields({
+  fields,
+  required,
+  filled,
+  message,
+  onInvalid,
+}: {
+  fields: [name: string, value: string][]
+  required?: boolean
+  filled: boolean
+  message: string
+  onInvalid: () => void
+}) {
+  const ref = React.useRef<HTMLInputElement>(null)
+  React.useEffect(() => {
+    ref.current?.setCustomValidity(filled ? "" : message)
+  }, [filled, message])
+  return (
+    <>
+      {fields.map(([name, value]) => (
+        <input key={name} type="hidden" name={name} value={value} />
+      ))}
+      {required && (
+        <input
+          ref={ref}
+          required
+          aria-hidden
+          tabIndex={-1}
+          className="sr-only"
+          value={filled ? "1" : ""}
+          // Controlled by the picker; nothing types here.
+          onChange={() => {}}
+          onInvalid={(e) => {
+            e.preventDefault()
+            onInvalid()
+          }}
+        />
+      )}
+    </>
+  )
 }
 
 function outOfBounds(min?: Date, max?: Date) {
@@ -69,30 +134,52 @@ export function DatePicker({
   min,
   max,
   className,
+  name,
+  required,
   ...aria
 }: DatePickerProps) {
   const t = useStrings()
   const [open, setOpen] = React.useState(false)
+  const [missed, setMissed] = React.useState(false)
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Trigger empty={!value} disabled={disabled} className={className} {...aria}>
-          {value ? t.format.date(value) : (placeholder ?? t.datePicker.placeholder)}
-        </Trigger>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
-        <Calendar
-          mode="single"
-          selected={value}
-          defaultMonth={value}
-          disabled={outOfBounds(min, max)}
-          onSelect={(date) => {
-            onChange(date)
-            setOpen(false)
-          }}
-        />
-      </PopoverContent>
-    </Popover>
+    <>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Trigger
+            empty={!value}
+            disabled={disabled}
+            className={className}
+            {...aria}
+            aria-required={required || undefined}
+            aria-invalid={aria["aria-invalid"] || (missed && !value) || undefined}
+          >
+            {value ? t.format.date(value) : (placeholder ?? t.datePicker.placeholder)}
+          </Trigger>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <Calendar
+            mode="single"
+            selected={value}
+            defaultMonth={value}
+            disabled={outOfBounds(min, max)}
+            onSelect={(date) => {
+              onChange(date)
+              setOpen(false)
+            }}
+          />
+        </PopoverContent>
+      </Popover>
+      <FormFields
+        fields={name ? [[name, isoDay(value)]] : []}
+        required={required}
+        filled={!!value}
+        message={t.datePicker.required}
+        onInvalid={() => {
+          setMissed(true)
+          setOpen(true)
+        }}
+      />
+    </>
   )
 }
 
@@ -155,11 +242,16 @@ export function DateRangePicker({
   min,
   max,
   className,
+  name,
+  required,
   ...aria
 }: DateRangePickerProps) {
   const t = useStrings()
   const isMobile = useIsMobile()
   const [open, setOpen] = React.useState(false)
+  const [missed, setMissed] = React.useState(false)
+  // Half a range is not a period: required wants both ends.
+  const filled = !!value?.from && !!value.to
   const shortcuts = presets === false ? [] : (presets ?? defaultRangePresets(t.datePicker))
 
   const label = value?.from
@@ -169,55 +261,81 @@ export function DateRangePicker({
     : (placeholder ?? t.datePicker.rangePlaceholder)
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Trigger empty={!value?.from} disabled={disabled} className={className} {...aria}>
-          {label}
-        </Trigger>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
-        <div className="flex flex-col sm:flex-row">
-          {shortcuts.length > 0 && (
-            <div className="flex flex-wrap gap-1 border-b p-2 sm:w-36 sm:flex-col sm:flex-nowrap sm:border-r sm:border-b-0">
-              {shortcuts.map((preset) => (
-                <Button
-                  key={preset.label}
-                  variant="ghost"
-                  size="sm"
-                  className="justify-start"
-                  onClick={() => {
-                    const now = new Date()
-                    onChange(
-                      preset.range(new Date(now.getFullYear(), now.getMonth(), now.getDate())),
-                    )
-                    setOpen(false)
-                  }}
-                >
-                  {preset.label}
-                </Button>
-              ))}
-            </div>
-          )}
-          <div className="flex flex-col">
-            <Calendar
-              mode="range"
-              selected={value}
-              defaultMonth={value?.from}
-              numberOfMonths={isMobile ? 1 : 2}
-              disabled={outOfBounds(min, max)}
-              // The clicked day, not the library's computed range: see `nextRange`.
-              onSelect={(_, clicked) => onChange(nextRange(value, clicked))}
-            />
-            {value?.from && (
-              <div className="flex justify-end border-t p-2">
-                <Button variant="ghost" size="sm" onClick={() => onChange(undefined)}>
-                  {t.datePicker.clear}
-                </Button>
+    <>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Trigger
+            empty={!value?.from}
+            disabled={disabled}
+            className={className}
+            {...aria}
+            aria-required={required || undefined}
+            aria-invalid={aria["aria-invalid"] || (missed && !filled) || undefined}
+          >
+            {label}
+          </Trigger>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <div className="flex flex-col sm:flex-row">
+            {shortcuts.length > 0 && (
+              <div className="flex flex-wrap gap-1 border-b p-2 sm:w-36 sm:flex-col sm:flex-nowrap sm:border-r sm:border-b-0">
+                {shortcuts.map((preset) => (
+                  <Button
+                    key={preset.label}
+                    variant="ghost"
+                    size="sm"
+                    className="justify-start"
+                    onClick={() => {
+                      const now = new Date()
+                      onChange(
+                        preset.range(new Date(now.getFullYear(), now.getMonth(), now.getDate())),
+                      )
+                      setOpen(false)
+                    }}
+                  >
+                    {preset.label}
+                  </Button>
+                ))}
               </div>
             )}
+            <div className="flex flex-col">
+              <Calendar
+                mode="range"
+                selected={value}
+                defaultMonth={value?.from}
+                numberOfMonths={isMobile ? 1 : 2}
+                disabled={outOfBounds(min, max)}
+                // The clicked day, not the library's computed range: see `nextRange`.
+                onSelect={(_, clicked) => onChange(nextRange(value, clicked))}
+              />
+              {value?.from && (
+                <div className="flex justify-end border-t p-2">
+                  <Button variant="ghost" size="sm" onClick={() => onChange(undefined)}>
+                    {t.datePicker.clear}
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      </PopoverContent>
-    </Popover>
+        </PopoverContent>
+      </Popover>
+      <FormFields
+        fields={
+          name
+            ? [
+                [name + "[from]", isoDay(value?.from)],
+                [name + "[to]", isoDay(value?.to)],
+              ]
+            : []
+        }
+        required={required}
+        filled={filled}
+        message={t.datePicker.required}
+        onInvalid={() => {
+          setMissed(true)
+          setOpen(true)
+        }}
+      />
+    </>
   )
 }

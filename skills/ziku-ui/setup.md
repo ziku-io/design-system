@@ -83,8 +83,9 @@ const RouterLink = ({ href, ...props }: LinkProps) => <Link to={href} {...props}
 ## 5. Shell
 
 Signed-in pages render inside `AppShell` (`nav`, `currentPath`, `user`,
-`onSignOut`). Put `SearchTrigger` plus one `CommandMenu` in `headerActions`,
-and `PreferencesMenu` in the user menu for theme, zoom and language. Wrap
+`onSignOut`). Put `SearchTrigger`, one `CommandMenu` and `PreferencesMenu`
+(theme, zoom, language) in `headerActions`. `PreferencesMenu` is a popover for
+the top bar; inside a dropdown menu its arrow keys and close-on-pick fight. Wrap
 routes in `ErrorBoundary` with `resetKeys={[pathname]}`.
 
 ## Upgrading

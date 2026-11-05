@@ -1,6 +1,8 @@
 import { afterEach, describe, expect, it } from "vitest"
 import { act, cleanup, render, screen } from "@testing-library/react"
 import { Toaster, toast } from "./sonner"
+import { UIStringsProvider } from "@/lib/strings"
+import { ptPT } from "@/lib/strings-pt"
 
 afterEach(() => {
   act(() => void toast.dismiss())
@@ -33,5 +35,18 @@ describe("toast", () => {
     const list = document.querySelector("[data-sonner-toaster]")
     expect(list?.getAttribute("data-y-position")).toBe("bottom")
     expect(list?.getAttribute("data-x-position")).toBe("right")
+  })
+
+  // Sonner's own labels are English; a Portuguese reader heard "Notifications".
+  it("takes its screen-reader labels from the dictionary", async () => {
+    render(
+      <UIStringsProvider strings={ptPT}>
+        <Toaster />
+      </UIStringsProvider>,
+    )
+    act(() => void toast("Guardado"))
+    await screen.findByText("Guardado")
+    expect(screen.getByRole("region").getAttribute("aria-label")).toContain(ptPT.ui.notifications)
+    expect(screen.getByRole("button", { name: ptPT.ui.closeNotification })).toBeTruthy()
   })
 })

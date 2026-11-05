@@ -40,6 +40,14 @@ export interface StatTileProps extends Omit<React.ComponentProps<"div">, "title"
   /** Which way is up. Only colours the hint; the value stays readable. Pass it
    *  with `change` when falling is the good direction, e.g. churn or cost. */
   trend?: "up" | "down" | "flat"
+  /**
+   * The tile as a toggle, for a row of tiles that filters the table under it.
+   * Needs `onPressedChange`: a pressed state nothing can change is a caller bug.
+   */
+  pressed?: boolean
+  /** Given → the tile is a `<button aria-pressed>`, disabled while it is
+   *  loading or failed. Absent → a plain tile, the markup unchanged. */
+  onPressedChange?: (pressed: boolean) => void
 }
 
 // No `onRetry`: a tile is too small for a button. The panel or page that
@@ -67,46 +75,90 @@ export function StatTile({
   trend,
   loading,
   error,
+  pressed,
+  onPressedChange,
   className,
   ...props
 }: StatTileProps) {
   const strings = useStrings()
   const t = strings.dashboard
+  // Apps used to wrap the tile in their own `<button aria-pressed>`; a
+  // `pressed` that arrives without the handler is that wrapper half-removed,
+  // and would render a toggle that looks selected and does nothing.
+  if (pressed !== undefined && !onPressedChange)
+    throw new Error(
+      "StatTile: pressed needs onPressedChange; pass both, or neither for a plain tile",
+    )
   const tone = trend ?? (change === undefined || change === 0 ? "flat" : change > 0 ? "up" : "down")
-  return (
-    <div data-slot="stat-tile" className={cn(SURFACE, "p-4", className)} {...props}>
-      <div className="flex items-center justify-between gap-2">
+  // Inside a button the wrappers are spans: a button holds phrasing content only.
+  const Box = onPressedChange ? "span" : "div"
+  const body = (
+    <>
+      <Box className="flex items-center justify-between gap-2">
         <span className={LABEL}>{label}</span>
         {TileIcon && <TileIcon aria-hidden className="size-4 shrink-0 text-muted-foreground" />}
-      </div>
+      </Box>
       {/* `tabular-nums`: a column of these should not shuffle sideways when a
        *  digit changes, and a dashboard that polls changes them constantly. */}
       {loading ? (
         // The same two lines the tile will have, so the row does not jump.
-        <div role="status" aria-label={strings.common.loading}>
+        <Box className="block" role="status" aria-label={strings.common.loading}>
           <Skeleton className="mt-2 h-8 w-24" />
           <Skeleton className="mt-1.5 h-3 w-32" />
-        </div>
+        </Box>
       ) : error ? (
         <>
-          <div className="mt-2 text-2xl font-semibold text-muted-foreground" aria-hidden>
+          <Box className="mt-2 block text-2xl font-semibold text-muted-foreground" aria-hidden>
             —
-          </div>
-          <div className="mt-1 text-xs text-danger-fg">
+          </Box>
+          <Box className="mt-1 block text-xs text-danger-fg">
             {errorTitle(error) ?? strings.common.loadFailed}
-          </div>
+          </Box>
         </>
       ) : (
-        <div className="mt-2 text-2xl font-semibold tabular-nums">{value}</div>
+        <Box className="mt-2 block text-2xl font-semibold tabular-nums">{value}</Box>
       )}
       {!loading && !error && (hint || change !== undefined) && (
-        <div className={cn("mt-1 flex flex-wrap gap-x-1 text-xs", TREND[tone])}>
+        <Box className={cn("mt-1 flex flex-wrap gap-x-1 text-xs", TREND[tone])}>
           {change !== undefined && (
             <span className="font-medium tabular-nums">{t.change(change)}</span>
           )}
           {hint && <span>{hint}</span>}
-        </div>
+        </Box>
       )}
-    </div>
+    </>
+  )
+
+  if (!onPressedChange)
+    return (
+      <div data-slot="stat-tile" className={cn(SURFACE, "p-4", className)} {...props}>
+        {body}
+      </div>
+    )
+  return (
+    <button
+      type="button"
+      data-slot="stat-tile"
+      aria-pressed={pressed ?? false}
+      // Nothing to filter by while the number is missing.
+      disabled={loading || !!error}
+      className={cn(
+        SURFACE,
+        "block w-full p-4 text-left transition-colors outline-none",
+        "hover:bg-accent/50 focus-visible:ring-[1.5px] focus-visible:ring-ring/80",
+        "aria-pressed:border-primary aria-pressed:bg-accent",
+        "disabled:pointer-events-none",
+        className,
+      )}
+      // The div's own attributes, on a button: the handlers fire the same
+      // events, only `currentTarget`'s element type differs.
+      {...(props as React.ComponentProps<"button">)}
+      onClick={(e) => {
+        props.onClick?.(e as unknown as React.MouseEvent<HTMLDivElement>)
+        onPressedChange(!pressed)
+      }}
+    >
+      {body}
+    </button>
   )
 }

@@ -17,12 +17,13 @@ import type {
   DataTableView,
   SavedView,
 } from "./types"
-import { TrophyIcon, XCircleIcon } from "@phosphor-icons/react"
+import { TrashIcon, TrophyIcon, XCircleIcon } from "@phosphor-icons/react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { UIStringsProvider } from "@/lib/strings"
 import { Drawer } from "@/blocks/drawer/drawer"
+import { ConfirmProvider, useConfirm } from "@/blocks/modal/confirm"
 
 const meta: Meta = {
   title: "Blocks/DataTable",
@@ -49,7 +50,7 @@ interface Deal {
 }
 
 const STAGES = ["Lead", "Qualified", "Proposal", "Won", "Lost"] as const
-const OWNERS = ["Ada Lovelace", "Grace Hopper", "Alan Turing", "Radia Perlman"]
+const OWNERS = ["Jay Oak", "Mia Fern", "Leo Birch", "Ivy Ash"]
 const COMPANIES = ["Northwind", "Acme", "Globex", "Initech", "Umbrella", "Soylent"]
 
 const deals: Deal[] = Array.from({ length: 42 }, (_, i) => ({
@@ -313,6 +314,92 @@ export const ClickableRows: Story = {
       rowId={(d) => String(d.id)}
       onRowClick={() => {}}
     />
+  ),
+}
+
+interface Owner {
+  id: number
+  name: string
+  nif: string
+  quota: number
+}
+
+const OWNER_ROWS: Owner[] = [
+  { id: 1, name: "Jay Oak", nif: "000 000 001", quota: 50 },
+  { id: 2, name: "Mia Fern", nif: "000 000 002", quota: 30 },
+  { id: 3, name: "Leo Birch", nif: "000 000 003", quota: 20 },
+]
+
+function OwnersTable() {
+  const [rows, setRows] = useState(OWNER_ROWS)
+  const { confirm } = useConfirm()
+  const update = (id: number, patch: Partial<Owner>) =>
+    setRows((old) => old.map((o) => (o.id === id ? { ...o, ...patch } : o)))
+  const ownerColumns: DataTableColumn<Owner>[] = [
+    {
+      key: "name",
+      header: "Name",
+      editInput: { required: true },
+      onEdit: (o, name) => update(o.id, { name }),
+    },
+    {
+      key: "nif",
+      header: "NIF",
+      editInput: { inputMode: "numeric", required: true },
+      onEdit: async (o, nif) => {
+        await new Promise((r) => setTimeout(r, 300))
+        // The page validates; a rejection keeps the field open with the text.
+        if (!/^\d{3} ?\d{3} ?\d{3}$/.test(nif)) throw new Error("A NIF has nine digits")
+        update(o.id, { nif })
+      },
+    },
+    {
+      key: "quota",
+      header: "Quota %",
+      value: (o) => String(o.quota),
+      className: "text-right",
+      editInput: { inputMode: "decimal", required: true },
+      onEdit: (o, text) => {
+        const quota = Number(text.replace(",", "."))
+        if (!Number.isFinite(quota) || quota < 0 || quota > 100)
+          throw new Error("Between 0 and 100")
+        update(o.id, { quota })
+      },
+    },
+    {
+      // Furniture: no header, so it is never offered in a picker or hidden.
+      key: "remove",
+      header: "",
+      sortable: false,
+      className: "w-10",
+      render: (o) => (
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          aria-label={`Remove ${o.name}`}
+          onClick={async () => {
+            if (await confirm({ title: `Remove ${o.name}?`, confirmLabel: "Remove", danger: true }))
+              setRows((old) => old.filter((x) => x.id !== o.id))
+          }}
+        >
+          <TrashIcon />
+        </Button>
+      ),
+    },
+  ]
+  return <DataTable columns={ownerColumns} data={rows} rowId={(o) => String(o.id)} search={false} />
+}
+
+/** Cells that edit in place: a column with `onEdit` renders through
+ *  `EditableText`, and the page writes the change back into `data`. A NIF that
+ *  is not nine digits, or a quota outside 0-100, rejects and the field stays
+ *  open. Removing a row needs no API: a header-less furniture column holds a
+ *  button that asks through `useConfirm` and drops the row itself. */
+export const EditableCells: Story = {
+  render: () => (
+    <ConfirmProvider>
+      <OwnersTable />
+    </ConfirmProvider>
   ),
 }
 
@@ -644,7 +731,7 @@ const tasks: Task[] = [
   {
     id: "t1",
     title: "Discovery interviews",
-    owner: "Ada Lovelace",
+    owner: "Jay Oak",
     status: "Done",
     start: on(-24),
     due: on(-12),
@@ -652,16 +739,16 @@ const tasks: Task[] = [
   {
     id: "t2",
     title: "Brand refresh",
-    owner: "Grace Hopper",
+    owner: "Mia Fern",
     status: "In progress",
     start: on(-10),
     due: on(8),
   },
-  { id: "t3", title: "Design review", owner: "Alan Turing", status: "Planned", start: on(3) },
+  { id: "t3", title: "Design review", owner: "Leo Birch", status: "Planned", start: on(3) },
   {
     id: "t4",
     title: "API v2",
-    owner: "Radia Perlman",
+    owner: "Ivy Ash",
     status: "In progress",
     start: on(-6),
     due: on(26),
@@ -669,16 +756,16 @@ const tasks: Task[] = [
   {
     id: "t5",
     title: "Billing migration",
-    owner: "Ada Lovelace",
+    owner: "Jay Oak",
     status: "Planned",
     start: on(12),
     due: on(40),
   },
-  { id: "t6", title: "Beta launch", owner: "Grace Hopper", status: "Planned", start: on(30) },
+  { id: "t6", title: "Beta launch", owner: "Mia Fern", status: "Planned", start: on(30) },
   {
     id: "t7",
     title: "Help centre articles",
-    owner: "Alan Turing",
+    owner: "Leo Birch",
     status: "Planned",
     start: on(14),
     due: on(21),
@@ -686,16 +773,16 @@ const tasks: Task[] = [
   {
     id: "t8",
     title: "Security audit",
-    owner: "Radia Perlman",
+    owner: "Ivy Ash",
     status: "Planned",
     start: on(1),
     due: on(4),
   },
-  { id: "t9", title: "Quarterly report", owner: "Ada Lovelace", status: "Planned", start: on(5) },
-  { id: "t10", title: "Customer webinar", owner: "Grace Hopper", status: "Planned", start: on(5) },
-  { id: "t11", title: "Invoice run", owner: "Alan Turing", status: "Planned", start: on(5) },
-  { id: "t12", title: "Board pack", owner: "Radia Perlman", status: "Planned", start: on(5) },
-  { id: "t13", title: "Office move", owner: "Ada Lovelace", status: "Planned" },
+  { id: "t9", title: "Quarterly report", owner: "Jay Oak", status: "Planned", start: on(5) },
+  { id: "t10", title: "Customer webinar", owner: "Mia Fern", status: "Planned", start: on(5) },
+  { id: "t11", title: "Invoice run", owner: "Leo Birch", status: "Planned", start: on(5) },
+  { id: "t12", title: "Board pack", owner: "Ivy Ash", status: "Planned", start: on(5) },
+  { id: "t13", title: "Office move", owner: "Jay Oak", status: "Planned" },
 ]
 
 const fmt = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short" })
@@ -795,17 +882,17 @@ const deadlines: Deadline[] = (() => {
     out.push({ id: `${title}-${due.getTime()}`, title, category, owner, due })
   for (let y = 2026; y <= 2030; y++) {
     ;[1, 4, 7, 10].forEach((m, q) =>
-      add(`VAT return Q${q === 0 ? 4 : q}`, "Tax", "Ana Silva", new Date(y, m, 15)),
+      add(`VAT return Q${q === 0 ? 4 : q}`, "Tax", "Jay Oak", new Date(y, m, 15)),
     )
-    add("Corporate tax (Modelo 22)", "Tax", "Ana Silva", new Date(y, 4, 31))
-    add("Annual accounts", "Accounts", "Rui Costa", new Date(y, 5, 30))
-    add("IES declaration", "Accounts", "Rui Costa", new Date(y, 6, 15))
-    add("Insurance renewal", "Insurance", "Marta Reis", new Date(y, 2, 1))
-    if (y % 2 === 0) add("Operating licence renewal", "Licence", "Marta Reis", new Date(y, 8, 30))
+    add("Corporate tax (Modelo 22)", "Tax", "Jay Oak", new Date(y, 4, 31))
+    add("Annual accounts", "Accounts", "Leo Birch", new Date(y, 5, 30))
+    add("IES declaration", "Accounts", "Leo Birch", new Date(y, 6, 15))
+    add("Insurance renewal", "Insurance", "Mia Fern", new Date(y, 2, 1))
+    if (y % 2 === 0) add("Operating licence renewal", "Licence", "Mia Fern", new Date(y, 8, 30))
   }
-  add("Supply contract: price review", "Contract", "Rui Costa", new Date(2027, 0, 31))
-  add("Supply contract: renewal notice", "Contract", "Rui Costa", new Date(2028, 9, 1))
-  add("Lease break option", "Contract", "Marta Reis", new Date(2029, 3, 30))
+  add("Supply contract: price review", "Contract", "Leo Birch", new Date(2027, 0, 31))
+  add("Supply contract: renewal notice", "Contract", "Leo Birch", new Date(2028, 9, 1))
+  add("Lease break option", "Contract", "Mia Fern", new Date(2029, 3, 30))
   return out
 })()
 

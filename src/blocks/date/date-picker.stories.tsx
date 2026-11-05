@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import { DatePicker, DateRangePicker, type DateRange } from "./date-picker"
 import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
 import { UIStringsProvider } from "@/lib/strings"
 import { ptPT } from "@/lib/strings-pt"
 
@@ -47,6 +48,49 @@ export const Bounded: StoryObj = {
         min={new Date(2026, 0, 1)}
         max={new Date(2026, 11, 31)}
       />
+    )
+  },
+}
+
+/**
+ * In a plain form: `name` sends `due` and `period[from]`/`period[to]` as
+ * `YYYY-MM-DD`, and `required` stops the submit while empty, opening the
+ * picker instead. Send it empty, then pick, then send: the line under the
+ * button shows what the form posted.
+ */
+export const InAForm: StoryObj = {
+  render: function InAForm() {
+    const [due, setDue] = React.useState<Date | undefined>()
+    const [period, setPeriod] = React.useState<DateRange | undefined>()
+    const [sent, setSent] = React.useState("")
+    return (
+      <form
+        className="grid max-w-xs gap-3"
+        onSubmit={(e) => {
+          e.preventDefault()
+          setSent(
+            [...new FormData(e.currentTarget)].map(([k, v]) => k + "=" + String(v)).join(" & "),
+          )
+        }}
+      >
+        <input type="hidden" name="client" value="jay.oak@example.com" />
+        <div className="grid gap-2">
+          <Label htmlFor="form-due">Due date</Label>
+          <DatePicker id="form-due" name="due" required value={due} onChange={setDue} />
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor="form-period">Billing period</Label>
+          <DateRangePicker
+            id="form-period"
+            name="period"
+            required
+            value={period}
+            onChange={setPeriod}
+          />
+        </div>
+        <Button type="submit">Send</Button>
+        {sent && <code className="text-xs break-all">{sent}</code>}
+      </form>
     )
   },
 }

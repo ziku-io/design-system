@@ -72,6 +72,48 @@ export const Register: StoryObj = {
     </AuthLayout>
   ),
 }
+/** A phone number and a box to tick before the account exists. The consent
+ *  label is the app's own content, link and all. */
+export const WithPhoneAndConsent: StoryObj = {
+  render: () => (
+    <AuthLayout logo={Logo}>
+      <RegisterForm
+        onSubmit={() => wait(800)}
+        phone="optional"
+        consent={
+          <>
+            I accept the{" "}
+            <a href="#" className="text-link underline underline-offset-4">
+              privacy policy
+            </a>
+            .
+          </>
+        }
+      />
+    </AuthLayout>
+  ),
+}
+export const WithPhoneAndConsentTranslated: StoryObj = {
+  render: () => (
+    <UIStringsProvider strings={ptPT}>
+      <AuthLayout logo={Logo}>
+        <RegisterForm
+          onSubmit={() => wait(800)}
+          phone="required"
+          consent={
+            <>
+              Aceito a{" "}
+              <a href="#" className="text-link underline underline-offset-4">
+                política de privacidade
+              </a>
+              .
+            </>
+          }
+        />
+      </AuthLayout>
+    </UIStringsProvider>
+  ),
+}
 function ForgotDemo() {
   const [sent, setSent] = useState(false)
   return (

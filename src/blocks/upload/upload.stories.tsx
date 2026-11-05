@@ -189,3 +189,33 @@ export const Documents: StoryObj = {
     )
   },
 }
+
+/**
+ * `onDownload` for a download URL behind a bearer token: the button calls the
+ * app, which fetches with its header and saves the blob. Here the first file
+ * downloads after a second; the second rejects, as an expired session would.
+ */
+export const AuthenticatedDownload: StoryObj = {
+  render: () => (
+    <UploadSlots
+      slots={[
+        { id: "id", label: "Identity card, Jay Oak" },
+        { id: "address", label: "Proof of address" },
+      ]}
+      value={{
+        id: [{ id: "c", name: "jay-oak-id.pdf", size: 412_000, status: "done" }],
+        address: [{ id: "a", name: "utility-bill.pdf", size: 96_000, status: "done" }],
+      }}
+      onFile={() => {}}
+      onDownload={(slotId) =>
+        new Promise<void>((resolve, reject) =>
+          setTimeout(
+            () => (slotId === "id" ? resolve() : reject(new Error("401 Unauthorized"))),
+            1000,
+          ),
+        )
+      }
+      className="max-w-4xl"
+    />
+  ),
+}

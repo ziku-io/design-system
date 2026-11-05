@@ -67,6 +67,7 @@ import { CalendarView, type CalendarScale } from "./calendar-view"
 import { ErrorState, errorTitle } from "@/blocks/page/error-state"
 import { downloadCsv, toCsv, type CsvDecimal } from "./csv"
 import { useStrings } from "@/lib/strings"
+import { EditableText } from "@/blocks/edit/editable-text"
 
 import {
   Control,
@@ -362,9 +363,36 @@ export function DataTable<T extends RowData>({
             : u,
       } as Partial<DataTableState>)
 
-  const defs = React.useMemo<ColumnDef<Features, T, any>[]>(
-    () =>
-      columns.map((col) => ({
+  const defs = React.useMemo<ColumnDef<Features, T, any>[]>(() => {
+    // What an editable cell's field is named after: the row's first named
+    // column, as the reader sees it ("Quota for Jay Oak").
+    const first = columns.find(named)
+    const rowName = (row: T) =>
+      first
+        ? facetText(
+            first,
+            str(
+              first.facetKey
+                ? first.facetKey(row)
+                : first.value
+                  ? first.value(row)
+                  : (row as unknown as Record<string, unknown>)[first.key],
+            ),
+          )
+        : ""
+    return columns.map((col) => {
+      // The field edits the text it shows. A drawn cell or a stored key
+      // behind a word would show one thing and save another.
+      if (col.onEdit && (col.render || col.facetKey)) {
+        throw new Error(
+          "DataTable: column " +
+            JSON.stringify(col.key) +
+            " has onEdit with " +
+            (col.render ? "render" : "facetKey") +
+            "; an editable column shows and saves its value(row) text, so drop one of them",
+        )
+      }
+      return {
         id: col.key,
         header: col.header,
         // `facetKey` first: with one, the value the table sorts, groups and
@@ -378,7 +406,18 @@ export function DataTable<T extends RowData>({
           return v == null || v === "" ? undefined : (v as string | number)
         },
         cell: (ctx) =>
-          col.render ? col.render(ctx.row.original) : facetText(col, str(ctx.getValue())) || NONE,
+          col.onEdit ? (
+            <EditableCell
+              column={col}
+              row={ctx.row.original}
+              value={str(ctx.getValue())}
+              rowName={rowName(ctx.row.original)}
+            />
+          ) : col.render ? (
+            col.render(ctx.row.original)
+          ) : (
+            facetText(col, str(ctx.getValue())) || NONE
+          ),
         // Server-side, only the columns the API knows how to sort by are
         // clickable: the browser holds part of the list, so ordering it here
         // would order the loaded rows and nothing else.
@@ -401,9 +440,9 @@ export function DataTable<T extends RowData>({
             ? (value as string[]).includes(cell)
             : cell.toLowerCase().includes(String(value).toLowerCase())
         },
-      })),
-    [columns, server],
-  )
+      }
+    })
+  }, [columns, server])
 
   const [expanded, setExpanded] = React.useState<ExpandedState>(true)
   const [pageIndex, setPageIndex] = React.useState(0)
@@ -1103,7 +1142,7 @@ export function DataTable<T extends RowData>({
       {/* Only there once something is set, so a clean table stays clean. Each
           chip opens the condition it describes. */}
       {(chips.length > 0 || state.sorting.length > 0 || group) && (
-        <div className="flex flex-wrap items-center gap-2 border-b px-3 py-2">
+        <div className="flex flex-wrap items-center gap-2 border-b px-4 py-2">
           {state.sorting.length > 0 && (
             <PopoverPanel
               width="w-88"
@@ -1207,7 +1246,7 @@ export function DataTable<T extends RowData>({
         // The columns that are about to arrive, not five bars: a skeleton of a
         // different shape moves the whole page when the real table lands.
         <div className="overflow-auto" role="status" aria-live="polite" aria-busy="true">
-          <Table>
+          <Table className={CELL_X}>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
                 {table.getVisibleLeafColumns().map((c) => (
@@ -1279,6 +1318,7 @@ export function DataTable<T extends RowData>({
       ) : (
         <div className="overflow-auto">
           <Table
+            className={CELL_X}
             containerRef={scrollRef}
             containerClassName={cn(windowed && `${WINDOW_HEIGHT} overflow-y-auto`)}
             // The list, not the window: a screen reader that counted the
@@ -1480,7 +1520,7 @@ export function DataTable<T extends RowData>({
       )}
 
       {paginated && !loading && !error && filtered.length > 0 && (
-        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t px-3 py-2 text-sm text-muted-foreground">
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t px-4 py-2 text-sm text-muted-foreground">
           <span role="status" aria-live="polite">
             {t.rowCount(filtered.length)}
           </span>
@@ -1546,6 +1586,14 @@ const BAR_GHOST = cn(buttonVariants({ variant: "ghost", size: "sm" }), "text-mut
 // the same treatment as `LABEL_CLASS` elsewhere minus the capitals.
 const HEAD = "h-9 text-xs font-medium whitespace-nowrap text-muted-foreground"
 
+/** Cell gutters: 12px between columns and 16px at the table's two edges, the
+ *  same 16px as the toolbar and footer, so the first column's text lines up
+ *  with the bars above and below it. Set on the table rather than on each
+ *  cell, so every row kind (group headers, the add-row line, the loading
+ *  skeleton) gets it, and the `Table` primitive keeps its 8px for apps that
+ *  put it inside a card with its own padding. */
+const CELL_X = "[&_td]:px-3 [&_th]:px-3 [&_tr>:first-child]:pl-4 [&_tr>:last-child]:pr-4"
+
 /** How long the search box waits before it becomes a request. */
 const SEARCH_DEBOUNCE_MS = 300
 
@@ -1557,4 +1605,39 @@ function useDebounced(value: string, ms: number) {
     return () => clearTimeout(timer)
   }, [value, ms])
   return held
+}
+
+/**
+ * A cell that edits in place. The wrapper keeps the field's clicks and keys
+ * inside the cell: the row around it may open on a click or on Enter, and
+ * saving with Enter, or opening the field, must not open the record as well.
+ */
+function EditableCell<T>({
+  column,
+  row,
+  value,
+  rowName,
+}: {
+  column: DataTableColumn<T>
+  row: T
+  value: string
+  rowName: string
+}) {
+  const t = useStrings().dataTable
+  const onEdit = column.onEdit!
+  return (
+    <span
+      className="contents"
+      onClick={(e) => e.stopPropagation()}
+      onKeyDown={(e) => e.stopPropagation()}
+    >
+      <EditableText
+        value={value}
+        onSave={(next) => onEdit(row, next)}
+        aria-label={t.editCell(column.header, rowName)}
+        inputMode={column.editInput?.inputMode}
+        required={column.editInput?.required}
+      />
+    </span>
+  )
 }

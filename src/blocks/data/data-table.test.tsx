@@ -699,3 +699,68 @@ describe("TableAddRow", () => {
     expect(screen.getByRole("button", { name: "Add row" })).toBeTruthy()
   })
 })
+
+describe("DataTable onEdit", () => {
+  const editable = (onEdit: DataTableColumn<Deal>["onEdit"]): DataTableColumn<Deal>[] => [
+    columns[0],
+    { key: "stage", header: "Stage", onEdit },
+  ]
+  const open = (onEdit: DataTableColumn<Deal>["onEdit"], onRowClick = vi.fn()) => {
+    render(
+      <DataTable columns={editable(onEdit)} data={deals} search={false} onRowClick={onRowClick} />,
+    )
+    fireEvent.click(screen.getByRole("button", { name: "Edit Stage for Alpha" }))
+    return screen.getByRole("textbox", { name: "Stage for Alpha" })
+  }
+
+  it("calls onEdit with the row and the trimmed text", async () => {
+    const onEdit = vi.fn()
+    const field = open(onEdit)
+    fireEvent.change(field, { target: { value: "  Won " } })
+    await act(async () => {
+      fireEvent.keyDown(field, { key: "Enter" })
+    })
+    expect(onEdit).toHaveBeenCalledWith(deals[0], "Won")
+    expect(screen.queryByRole("textbox")).toBeNull()
+  })
+
+  it("keeps the field open with the text when onEdit rejects", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {})
+    const field = open(() => Promise.reject(new Error("nope")))
+    fireEvent.change(field, { target: { value: "Won" } })
+    await act(async () => {
+      fireEvent.keyDown(field, { key: "Enter" })
+    })
+    expect(screen.getByRole("alert")).toBeTruthy()
+    expect(
+      (screen.getByRole("textbox", { name: "Stage for Alpha" }) as HTMLInputElement).value,
+    ).toBe("Won")
+  })
+
+  it("does not open the row from a click or a key inside the editor", async () => {
+    const onRowClick = vi.fn()
+    const field = open(vi.fn(), onRowClick)
+    fireEvent.click(field)
+    fireEvent.change(field, { target: { value: "Won" } })
+    await act(async () => {
+      fireEvent.keyDown(field, { key: "Enter" })
+    })
+    expect(onRowClick).not.toHaveBeenCalled()
+  })
+
+  it("leaves a column without onEdit as plain text", () => {
+    render(<DataTable columns={editable(vi.fn())} data={deals} search={false} />)
+    expect(screen.getByText("Alpha")).toBeTruthy()
+    expect(screen.queryByRole("button", { name: /Edit Deal/ })).toBeNull()
+  })
+
+  it("refuses onEdit on a column drawn by render", () => {
+    vi.spyOn(console, "error").mockImplementation(() => {})
+    const bad: DataTableColumn<Deal>[] = [
+      { key: "name", header: "Deal", render: (d) => d.name, onEdit: vi.fn() },
+    ]
+    expect(() => render(<DataTable columns={bad} data={deals} search={false} />)).toThrow(
+      /onEdit with render/,
+    )
+  })
+})

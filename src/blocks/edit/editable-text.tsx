@@ -16,6 +16,9 @@ export interface EditableTextProps {
   placeholder?: string
   /** Rejects a blank value instead of saving it. */
   required?: boolean
+  /** Which keyboard a phone opens: `decimal` for a quota, `numeric` for a
+   *  tax number. The value stays a string either way. */
+  inputMode?: "text" | "numeric" | "decimal"
   disabled?: boolean
   /** The reading text's classes, e.g. `text-2xl font-semibold` for a title
    *  that renames in place. The field always uses the control size. */
@@ -37,6 +40,7 @@ export function EditableText({
   onSave,
   placeholder,
   required,
+  inputMode,
   disabled,
   className,
   "aria-label": ariaLabel,
@@ -112,6 +116,7 @@ export function EditableText({
         <Input
           size="sm"
           autoFocus
+          inputMode={inputMode}
           value={draft}
           placeholder={placeholder}
           aria-label={ariaLabel}

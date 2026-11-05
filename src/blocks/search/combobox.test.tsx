@@ -9,7 +9,7 @@ afterEach(cleanup)
 const PEOPLE: ComboboxItem[] = [
   { id: "1", label: "Ana Silva" },
   { id: "2", label: "António Silvestre" },
-  { id: "3", label: "Ada Lovelace" },
+  { id: "3", label: "Mia Fern" },
 ]
 
 function setup() {
@@ -52,7 +52,7 @@ describe("Combobox", () => {
     const active = () => screen.getByRole("option", { selected: true }).textContent
     expect(active()).toBe("Ana Silva")
     key(input, "ArrowUp")
-    expect(active()).toBe("Ada Lovelace")
+    expect(active()).toBe("Mia Fern")
     key(input, "ArrowDown")
     expect(active()).toBe("Ana Silva")
 
@@ -68,10 +68,10 @@ describe("Combobox", () => {
     key(input, "ArrowDown")
 
     // Three matches down to one: an index of 2 now points past the end.
-    fireEvent.change(input, { target: { value: "Lovelace" } })
+    fireEvent.change(input, { target: { value: "Fern" } })
     key(input, "Enter")
 
-    expect(onSelect).toHaveBeenCalledWith(expect.objectContaining({ label: "Ada Lovelace" }))
+    expect(onSelect).toHaveBeenCalledWith(expect.objectContaining({ label: "Mia Fern" }))
   })
 
   it("leaves Enter alone when the list is closed, so the form can submit", () => {

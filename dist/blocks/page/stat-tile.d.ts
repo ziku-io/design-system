@@ -28,6 +28,14 @@ export interface StatTileProps extends Omit<React.ComponentProps<"div">, "title"
     /** Which way is up. Only colours the hint; the value stays readable. Pass it
      *  with `change` when falling is the good direction, e.g. churn or cost. */
     trend?: "up" | "down" | "flat";
+    /**
+     * The tile as a toggle, for a row of tiles that filters the table under it.
+     * Needs `onPressedChange`: a pressed state nothing can change is a caller bug.
+     */
+    pressed?: boolean;
+    /** Given → the tile is a `<button aria-pressed>`, disabled while it is
+     *  loading or failed. Absent → a plain tile, the markup unchanged. */
+    onPressedChange?: (pressed: boolean) => void;
 }
 type TileState = Pick<AsyncStateProps, "loading" | "error">;
 /**
@@ -36,5 +44,5 @@ type TileState = Pick<AsyncStateProps, "loading" | "error">;
  * Not a `Card`: a row of these is a row of tiles, and `CardHeader`'s padding
  * makes each one twice the height it needs.
  */
-export declare function StatTile({ label, value, hint, icon: TileIcon, change, trend, loading, error, className, ...props }: StatTileProps): React.JSX.Element;
+export declare function StatTile({ label, value, hint, icon: TileIcon, change, trend, loading, error, pressed, onPressedChange, className, ...props }: StatTileProps): React.JSX.Element;
 export {};

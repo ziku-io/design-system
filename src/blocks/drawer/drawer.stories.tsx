@@ -60,7 +60,7 @@ export const Details: StoryObj = {
           <Badge variant="warning">Missing documents</Badge>
         </dd>
         <dt className="text-muted-foreground">Owner</dt>
-        <dd>Ana Silva</dd>
+        <dd>Jay Oak</dd>
         <dt className="text-muted-foreground">To refund</dt>
         <dd className="tabular-nums">€4,120.00</dd>
         <dt className="text-muted-foreground">Deadline</dt>

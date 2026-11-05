@@ -342,9 +342,21 @@ function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {
   )
 }
 
-function SidebarInset({ className, ...props }: React.ComponentProps<"main">) {
+/**
+ * The content beside the sidebar. A `<main>` by default, which is right when
+ * the inset is the page. `as="div"` when the caller puts its own `<main>`
+ * inside, as `AppShell` does to keep its header out of the main landmark: two
+ * nested mains left a screen reader with two "main" landmarks to choose from.
+ */
+function SidebarInset({
+  className,
+  as: Comp = "main",
+  ...props
+}: React.HTMLAttributes<HTMLElement> & { as?: "main" | "div" }) {
+  // HTMLAttributes rather than ComponentProps<"main">: the ref of a <main> and
+  // of a <div> are different types, and nothing passes one to the inset.
   return (
-    <main
+    <Comp
       data-slot="sidebar-inset"
       className={cn(
         "relative flex w-full min-w-0 flex-1 flex-col bg-background",

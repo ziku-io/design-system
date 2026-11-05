@@ -49,6 +49,26 @@ export interface DataTableColumn<T> {
   /** `false` leaves this column blank on the row `onAddRow` opens: an id, a
    *  timestamp, anything the server fills in. Furniture is always blank. */
   addable?: boolean
+  /**
+   * Makes this column's cells edit in place, through `EditableText`: the cell
+   * shows `value(row)` with a pencil, and saving calls this with the row and
+   * the new text, trimmed, only when it changed. Return a promise and the
+   * field waits; reject and it stays open with the reader's text in it. The
+   * table never changes `data` itself: the edited record comes back through
+   * `data`, as it would from anywhere else. Table layout only.
+   *
+   * Cannot be combined with `render` or `facetKey`: the field edits the text
+   * it shows, so a cell drawn by `render`, or one storing a key behind its
+   * word, would show one thing and save another.
+   */
+  onEdit?: (row: T, value: string) => void | Promise<void>
+  /** How the field behind `onEdit` takes input. */
+  editInput?: {
+    /** The keyboard a phone opens. The value still arrives as a string. */
+    inputMode?: "text" | "numeric" | "decimal"
+    /** Refuses a blank value instead of calling `onEdit` with one. */
+    required?: boolean
+  }
   /** Extra classes on this column's cells (width, alignment, whitespace). */
   className?: string
   /**

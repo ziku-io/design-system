@@ -89,3 +89,31 @@ export const Stats: StoryObj = {
     </div>
   ),
 }
+
+/** Tiles as a filter over the table below them: one pressed at a time, a
+ *  second click clears it. The tile is the button, no wrapper needed. */
+export const StatFilter: StoryObj = {
+  render: function StatFilter() {
+    const [filter, setFilter] = React.useState<string | undefined>("overdue")
+    const toggle = (id: string) => (on: boolean) => setFilter(on ? id : undefined)
+    return (
+      <div className="grid gap-3 sm:grid-cols-3">
+        <StatTile
+          label="Open"
+          value="12"
+          pressed={filter === "open"}
+          onPressedChange={toggle("open")}
+        />
+        <StatTile
+          label="Overdue"
+          value="4"
+          hint="Oldest: Jay Oak"
+          trend="down"
+          pressed={filter === "overdue"}
+          onPressedChange={toggle("overdue")}
+        />
+        <StatTile label="Paid" value="—" loading onPressedChange={toggle("paid")} />
+      </div>
+    )
+  },
+}

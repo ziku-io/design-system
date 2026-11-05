@@ -204,6 +204,14 @@ the same commit as the convention or block they describe; `src/skills.test.ts`
 fails when they name an export that no longer exists, but it cannot see a rule
 that went stale.
 
+**Stories use mock data, never real values.** The mock person is "Jay Oak"
+(the signed-in user, a contact, a placeholder, the first of a list). A list
+that needs several distinct people adds clearly fictional names (Mia Fern, Leo
+Birch, Ivy Ash), never real or historical people. Emails are `@example.com`,
+bank details are all-zero (`PT50 0000 0000 0000 0000 0000 0`, BIC `MOCKPTPL`),
+keys read `mock_key_…`. Storybook is published: a real IBAN copied from an app
+into a story is a real account on a public page.
+
 ## Releasing
 
 Apps pin a tag, so a tag is a promise: once pushed, someone's lockfile points at

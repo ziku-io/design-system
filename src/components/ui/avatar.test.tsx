@@ -21,10 +21,10 @@ describe("UserAvatar tint", () => {
     const names = [
       "Ana Silva",
       "Rui Costa",
-      "Ada Lovelace",
+      "Mia Fern",
       "Beatriz Costa",
       "Carlos Dias",
-      "Grace Hopper",
+      "Leo Birch",
     ]
     expect(new Set(names.map(tint)).size).toBeGreaterThan(1)
   })

@@ -93,16 +93,16 @@ export const Group: Story = {
 export const Users: StoryObj = {
   render: () => (
     <div className="flex items-center gap-6">
-      <UserAvatar name="Maria de Sousa Pinto" />
-      <UserAvatar name="Ada Lovelace" size="lg" />
+      <UserAvatar name="Jay Oak Fern Ashby" />
+      <UserAvatar name="Jay Oak" size="lg" />
       <AvatarStack
         max={3}
         people={[
-          { name: "Ana Silva" },
-          { name: "António Silvestre" },
-          { name: "Ada Lovelace" },
-          { name: "Beatriz Costa" },
-          { name: "Carlos Dias" },
+          { name: "Jay Oak" },
+          { name: "Jayden Oakes" },
+          { name: "Mia Fern" },
+          { name: "Ivy Ash" },
+          { name: "Sam Elm" },
         ]}
       />
     </div>

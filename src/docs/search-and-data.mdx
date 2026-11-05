@@ -69,6 +69,9 @@ One object per column, not a TanStack `ColumnDef`:
 - `facet: true` — turns on the distinct-values filter, and allows grouping by this column.
 - `order` — fixed order for groups and filter options (`["Lead", "Won", "Lost"]`), instead of alphabetical. Labels not in the list sort last.
 - `icon`, `className`, `sortable: false`.
+- `onEdit(row, value)` — the cell edits in place through `EditableText`: it shows `value(row)` with a pencil and saves the trimmed text, only when it changed. Reject and the field stays open with the text; the table never changes `data`, so write the edit back yourself. `editInput` sets `inputMode` (`numeric`, `decimal`) and `required`. Clicks and keys in the field never reach `onRowClick`. Not with `render` or `facetKey` (it throws). Table layout only.
+
+A row's remove button needs no prop: put it in a furniture column (`header: ""`) and ask with `useConfirm` before dropping the row. The `EditableCells` story does both.
 
 ### Filtering
 

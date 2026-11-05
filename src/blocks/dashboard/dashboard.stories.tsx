@@ -48,10 +48,10 @@ const NOW = new Date("2026-11-04T10:30:00Z")
 const minutesAgo = (m: number) => new Date(NOW.getTime() - m * 60_000)
 
 const activity: ActivityItem[] = [
-  { id: "1", title: "Ana Silva approved dossier 214", at: minutesAgo(12), icon: CheckCircleIcon },
+  { id: "1", title: "Jay Oak approved dossier 214", at: minutesAgo(12), icon: CheckCircleIcon },
   {
     id: "2",
-    title: "Rui Costa uploaded 3 invoices",
+    title: "Leo Birch uploaded 3 invoices",
     description: "Dossier 209 · Q3 2026",
     at: minutesAgo(95),
     icon: UploadSimpleIcon,
@@ -70,7 +70,7 @@ const tasks: Task[] = Array.from({ length: 8 }, (_, i) => ({
   id: String(i + 1),
   dossier: `Dossier ${200 + i}`,
   kind: (["Review", "Missing document", "Payment"] as const)[i % 3],
-  owner: ["Ana Silva", "Rui Costa"][i % 2],
+  owner: ["Jay Oak", "Leo Birch"][i % 2],
 }))
 
 const columns: DataTableColumn<Task>[] = [

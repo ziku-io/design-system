@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { cleanup, fireEvent, render, screen } from "@testing-library/react"
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react"
 import { UploadSlots } from "./upload-slots"
 import { defaultStrings } from "@/lib/strings"
 
@@ -62,6 +62,44 @@ describe("UploadSlots", () => {
     render(<UploadSlots slots={slots} value={{ front: [saved] }} onFile={() => {}} />)
     const link = screen.getByRole("link", { name: t.download("front.png") })
     expect(link.getAttribute("href")).toBe("/files/1")
+  })
+
+  it("downloads through onDownload, as a button, when given", async () => {
+    let finish!: () => void
+    const onDownload = vi.fn(() => new Promise<void>((r) => (finish = r)))
+    const saved = { ...held, url: "/files/1" }
+    render(
+      <UploadSlots
+        slots={slots}
+        value={{ front: [saved] }}
+        onFile={() => {}}
+        onDownload={onDownload}
+      />,
+    )
+    expect(screen.queryByRole("link")).toBeNull()
+    fireEvent.click(screen.getByRole("button", { name: t.download("front.png") }))
+    expect(onDownload).toHaveBeenCalledWith("front", saved)
+    const pending = screen.getByRole("button", { name: t.downloading("front.png") })
+    expect((pending as HTMLButtonElement).disabled).toBe(true)
+    await act(async () => finish())
+    expect(screen.getByRole("button", { name: t.download("front.png") })).toBeTruthy()
+    expect(screen.queryByRole("alert")).toBeNull()
+  })
+
+  it("shows a failed state when onDownload rejects", async () => {
+    const onDownload = vi.fn(() => Promise.reject(new Error("401")))
+    render(
+      <UploadSlots
+        slots={slots}
+        value={{ front: [held] }}
+        onFile={() => {}}
+        onDownload={onDownload}
+      />,
+    )
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: t.download("front.png") }))
+    })
+    expect(screen.getByRole("alert").textContent).toBe(t.downloadFailed)
   })
 
   // One stray click on the cross used to delete the only copy.

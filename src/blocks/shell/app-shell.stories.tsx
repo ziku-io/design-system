@@ -79,7 +79,7 @@ const nav = [
     ],
   },
 ]
-const user = { name: "Ada Lovelace", email: "ada@ziku.dev" }
+const user = { name: "Jay Oak", email: "jay@example.com" }
 const brand = "ziku"
 
 export const Dashboard: StoryObj<typeof AppShell> = {
@@ -172,10 +172,10 @@ const byProject = [
 const hoursConfig = { hours: { label: "Hours", color: "var(--chart-1)" } } satisfies ChartConfig
 
 const activity: ActivityItem[] = [
-  { id: "1", title: "Grace Hopper merged Atlas #482", at: minutesAgo(8), icon: CheckCircleIcon },
+  { id: "1", title: "Mia Fern merged Atlas #482", at: minutesAgo(8), icon: CheckCircleIcon },
   {
     id: "2",
-    title: "Alan Turing uploaded 4 files",
+    title: "Leo Birch uploaded 4 files",
     description: "Beacon · Design review",
     at: minutesAgo(54),
     icon: UploadSimpleIcon,

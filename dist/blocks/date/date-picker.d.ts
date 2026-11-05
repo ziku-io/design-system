@@ -12,13 +12,23 @@ interface PickerBase {
     className?: string;
     id?: string;
     "aria-invalid"?: boolean;
+    /** Sends the value with its form as `YYYY-MM-DD`, the local calendar day
+     *  (not UTC). A range sends two fields, `name[from]` and `name[to]`. Empty
+     *  string when nothing is picked. */
+    name?: string;
+    /** Blocks the form's submit while empty, through native validation: the
+     *  picker opens instead. A range needs both ends. Sets `aria-required`. */
+    required?: boolean;
 }
+/** The local calendar day as `YYYY-MM-DD`. `toISOString` would give the UTC
+ *  day, which is yesterday for every midnight east of Greenwich. */
+export declare function isoDay(date: Date | undefined): string;
 export interface DatePickerProps extends PickerBase {
     value: Date | undefined;
     onChange: (date: Date | undefined) => void;
 }
 /** One day, in a popover. Closes on pick. */
-export declare function DatePicker({ value, onChange, placeholder, disabled, min, max, className, ...aria }: DatePickerProps): React.JSX.Element;
+export declare function DatePicker({ value, onChange, placeholder, disabled, min, max, className, name, required, ...aria }: DatePickerProps): React.JSX.Element;
 export interface DateRangePreset {
     label: string;
     /** Called with today at midnight, when the preset is clicked. */
@@ -44,4 +54,4 @@ export interface DateRangePickerProps extends PickerBase {
 }
 /** A period: two months side by side on a desktop, one on a phone, with
  *  shortcuts for the periods a dashboard asks for most. */
-export declare function DateRangePicker({ value, onChange, presets, placeholder, disabled, min, max, className, ...aria }: DateRangePickerProps): React.JSX.Element;
+export declare function DateRangePicker({ value, onChange, presets, placeholder, disabled, min, max, className, name, required, ...aria }: DateRangePickerProps): React.JSX.Element;

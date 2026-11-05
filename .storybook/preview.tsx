@@ -69,32 +69,33 @@ const preview: Preview = {
     docs: { container: ThemedDocs },
     backgrounds: { disable: true },
     options: {
-      storySort: {
-        order: [
-          "Docs",
-          ["Getting started", "Foundations", "Auth flows", "Navigation", "Search and data"],
-          "Components",
-          // Alphabetical. Storybook otherwise lists blocks in the order their
-          // files happen to load; a new block goes into this list in its place.
-          "Blocks",
-          [
-            "AppShell",
-            "Auth",
-            "ChipPicker",
-            "Combobox",
-            "CommandMenu",
-            "Dashboard",
-            "DataTable",
-            "DatePicker",
-            "Drawer",
-            "EditableText",
-            "Modal",
-            "Page",
-            "Preferences",
-            "Upload",
-            "Wordmark",
-          ],
-        ],
+      // Docs in reading order, then Components and Blocks, each alphabetical
+      // by title so a new block lands in its place without anyone keeping a
+      // list. Stories inside one component keep the order of their file.
+      // Storybook stringifies this function, so it may not reference anything
+      // outside its own body.
+      // Untyped on purpose: Storybook reads this inline function as source and
+      // runs it as plain JavaScript, so an annotation is a syntax error there,
+      // and wrapping it in a type assertion is rejected as not inline.
+      // @ts-expect-error -- implicit any on (a, b), see above
+      storySort: (a, b) => {
+        const groups = ["Docs", "Components", "Blocks"]
+        const docs = ["Getting started", "Foundations", "Auth flows", "Navigation", "Search and data"]
+        const [groupA, ...restA] = a.title.split("/")
+        const [groupB, ...restB] = b.title.split("/")
+        if (groupA !== groupB) {
+          const ga = groups.indexOf(groupA)
+          const gb = groups.indexOf(groupB)
+          return (ga < 0 ? groups.length : ga) - (gb < 0 ? groups.length : gb) || groupA.localeCompare(groupB)
+        }
+        const titleA = restA.join("/")
+        const titleB = restB.join("/")
+        if (groupA === "Docs" && titleA !== titleB) {
+          const da = docs.indexOf(titleA)
+          const db = docs.indexOf(titleB)
+          return (da < 0 ? docs.length : da) - (db < 0 ? docs.length : db) || titleA.localeCompare(titleB)
+        }
+        return titleA.localeCompare(titleB, "en", { sensitivity: "base" })
       },
     },
   },

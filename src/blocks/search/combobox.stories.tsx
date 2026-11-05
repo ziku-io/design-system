@@ -13,10 +13,10 @@ const meta: Meta<typeof Combobox> = {
 export default meta
 
 const PEOPLE: ComboboxItem[] = [
-  { id: "1", label: "Ana Silva", hint: "ana@ziku.dev" },
-  { id: "2", label: "António Silvestre", hint: "antonio@ziku.dev" },
-  { id: "3", label: "Ada Lovelace", hint: "ada@ziku.dev" },
-  { id: "4", label: "Beatriz Costa", hint: "beatriz@ziku.dev" },
+  { id: "1", label: "Jay Oak", hint: "jay@example.com" },
+  { id: "2", label: "Jayden Oakes", hint: "jayden@example.com" },
+  { id: "3", label: "Mia Fern", hint: "mia@example.com" },
+  { id: "4", label: "Ivy Ash", hint: "ivy@example.com" },
 ]
 
 /**

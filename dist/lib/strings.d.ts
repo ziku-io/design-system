@@ -70,6 +70,14 @@ export interface UIStrings {
         nameTooShort: string;
         passwordTooShort: string;
         passwordsDoNotMatch: string;
+        /** Register, when the app asks for a phone number (`phone` prop). */
+        phone: string;
+        /** After a field's label when the field may be left empty. */
+        optional: string;
+        phoneRequired: string;
+        invalidPhone: string;
+        /** Under the consent checkbox when it is submitted unticked. */
+        consentRequired: string;
     };
     shell: {
         signOut: string;
@@ -181,6 +189,9 @@ export interface UIStrings {
         /** Next to a shared view somebody else owns, in the picker. */
         sharedBy: (owner: string) => string;
         noGrouping: string;
+        /** Names an editable cell's field: `editCell("Quota", "Jay Oak")` reads
+         *  "Quota for Jay Oak", and its pencil "Edit Quota for Jay Oak". */
+        editCell: (column: string, row: string) => string;
         /** Under the last row when the page passes `onAddRow`. */
         addRow: string;
         /** The check on the new row. Cancel is `common.cancel`. */
@@ -234,6 +245,10 @@ export interface UIStrings {
         sidebarDescription: string;
         commandTitle: string;
         commandDescription: string;
+        /** The toast region's landmark name, and each toast's close button.
+         *  Sonner's own defaults are English and unreachable through children. */
+        notifications: string;
+        closeNotification: string;
         /** A file input with nothing picked yet. */
         chooseFile: string;
         /** A multiple file input once more than one is picked: "3 files". */
@@ -276,6 +291,9 @@ export interface UIStrings {
         last90Days: string;
         thisMonth: string;
         thisYear: string;
+        /** A `required` picker left empty when its form was sent. The form's
+         *  validation message, so an app showing `validationMessage` reads it. */
+        required: string;
         /** Month and weekday names, the calendar's own aria-labels, and the first
          *  day of the week. A react-day-picker locale, not a string. */
         locale: DayPickerLocale;
@@ -290,6 +308,15 @@ export interface UIStrings {
         /** Under the field when `onSave` rejected. The field stays open with the
          *  reader's text in it, so nothing they typed is lost. */
         saveFailed: string;
+    };
+    copy: {
+        /** The button's label and tooltip: `copy("IBAN")` reads "Copy IBAN". */
+        copy: (label?: string) => string;
+        /** Shown and announced for two seconds after the value reached the clipboard. */
+        copied: string;
+        /** The clipboard refused (an insecure page, a denied permission). Says how
+         *  to get the value anyway, since the reader still needs it. */
+        failed: string;
     };
     upload: {
         /** The drop zone's line: "Drop files here or" ahead of `browse`. */
@@ -335,6 +362,10 @@ export interface UIStrings {
         removeAction: string;
         /** The download button's name: `download("a.pdf")`. */
         download: (name: string) => string;
+        /** The download button's name while `onDownload` is still running. */
+        downloading: (name: string) => string;
+        /** Under a file when `onDownload` rejected. */
+        downloadFailed: string;
         /** Beside a saved file: `uploadedOn(date)` reads "Uploaded 3 Nov 2026". */
         uploadedOn: (date: Date) => string;
     };

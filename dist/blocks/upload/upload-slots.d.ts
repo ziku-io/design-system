@@ -35,6 +35,13 @@ export interface UploadSlotsProps {
     /** Called after the reader confirms. The app deletes it and drops it from `value`. */
     onRemove?: (slotId: string, itemId: string) => void;
     onRetry?: (slotId: string, itemId: string) => void;
+    /**
+     * Fetch a saved file yourself: for a download URL that needs a bearer token,
+     * which a plain link cannot send. Given → the download control is a button
+     * calling this, shown pending while its promise runs and failed if it
+     * rejects. Absent → a plain `<a href={item.url} download>`.
+     */
+    onDownload?: (slotId: string, item: UploadItem) => void | Promise<void>;
     disabled?: boolean;
     className?: string;
 }
@@ -46,8 +53,8 @@ export interface UploadSlotsProps {
  * starts on the first one still missing and moves on once that one is in. A
  * `multiple` document takes a batch in one drop and stays selected.
  * Right, the checklist: every document, with its files once it has them, each
- * one downloadable when the app gives it a `url` and removable after a
+ * one downloadable when the app gives it a `url` (or `onDownload`) and removable after a
  * confirmation. The list is what was saved, so a reader coming back in a later
  * session sees and fetches what they sent last time.
  */
-export declare function UploadSlots({ slots, value, onFile, onReject, onRemove, onRetry, disabled, className, }: UploadSlotsProps): React.JSX.Element;
+export declare function UploadSlots({ slots, value, onFile, onReject, onRemove, onRetry, onDownload, disabled, className, }: UploadSlotsProps): React.JSX.Element;

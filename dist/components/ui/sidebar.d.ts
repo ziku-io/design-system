@@ -37,7 +37,15 @@ declare function Sidebar({ side, variant, collapsible, className, rootClassName,
 }): React.JSX.Element;
 declare function SidebarTrigger({ className, onClick, ...props }: React.ComponentProps<typeof Button>): React.JSX.Element;
 declare function SidebarRail({ className, ...props }: React.ComponentProps<"button">): React.JSX.Element;
-declare function SidebarInset({ className, ...props }: React.ComponentProps<"main">): React.JSX.Element;
+/**
+ * The content beside the sidebar. A `<main>` by default, which is right when
+ * the inset is the page. `as="div"` when the caller puts its own `<main>`
+ * inside, as `AppShell` does to keep its header out of the main landmark: two
+ * nested mains left a screen reader with two "main" landmarks to choose from.
+ */
+declare function SidebarInset({ className, as: Comp, ...props }: React.HTMLAttributes<HTMLElement> & {
+    as?: "main" | "div";
+}): React.JSX.Element;
 declare function SidebarInput({ className, ...props }: React.ComponentProps<typeof Input>): React.JSX.Element;
 declare function SidebarHeader({ className, ...props }: React.ComponentProps<"div">): React.JSX.Element;
 declare function SidebarFooter({ className, ...props }: React.ComponentProps<"div">): React.JSX.Element;

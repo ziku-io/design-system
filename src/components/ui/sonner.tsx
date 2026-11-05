@@ -7,6 +7,7 @@ import {
   XCircleIcon,
 } from "@phosphor-icons/react"
 import { useTheme } from "@/lib/preferences"
+import { useStrings } from "@/lib/strings"
 import { Toaster as Sonner, toast as sonnerToast, type ToasterProps } from "sonner"
 
 /**
@@ -22,9 +23,11 @@ const Toaster = ({ theme: _theme, ...props }: ToasterProps) => {
   // The app's theme, not a prop: a toast in the other theme from the page it
   // lands on is the one thing on screen that did not follow the switch.
   const { resolved } = useTheme()
+  const t = useStrings().ui
   return (
     <Sonner
       theme={resolved}
+      containerAriaLabel={t.notifications}
       // The corner, away from whatever was clicked: a toast is a report on
       // something that happened, and it must not cover the control the reader
       // is still looking at.
@@ -71,6 +74,7 @@ const Toaster = ({ theme: _theme, ...props }: ToasterProps) => {
       toastOptions={{
         // A floating surface, so the overlay shadow rather than sonner's own.
         style: { boxShadow: "var(--shadow-overlay)" },
+        closeButtonAriaLabel: t.closeNotification,
         classNames: {
           // Room on the right for the close button, so a long title wraps
           // before it instead of running under the X.

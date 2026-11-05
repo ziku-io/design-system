@@ -5,6 +5,7 @@ import {
   CircleDashedIcon,
   DownloadSimpleIcon,
   FileIcon,
+  SpinnerIcon,
   WarningCircleIcon,
   XIcon,
 } from "@phosphor-icons/react"
@@ -60,6 +61,13 @@ export interface UploadSlotsProps {
   /** Called after the reader confirms. The app deletes it and drops it from `value`. */
   onRemove?: (slotId: string, itemId: string) => void
   onRetry?: (slotId: string, itemId: string) => void
+  /**
+   * Fetch a saved file yourself: for a download URL that needs a bearer token,
+   * which a plain link cannot send. Given → the download control is a button
+   * calling this, shown pending while its promise runs and failed if it
+   * rejects. Absent → a plain `<a href={item.url} download>`.
+   */
+  onDownload?: (slotId: string, item: UploadItem) => void | Promise<void>
   disabled?: boolean
   className?: string
 }
@@ -72,7 +80,7 @@ export interface UploadSlotsProps {
  * starts on the first one still missing and moves on once that one is in. A
  * `multiple` document takes a batch in one drop and stays selected.
  * Right, the checklist: every document, with its files once it has them, each
- * one downloadable when the app gives it a `url` and removable after a
+ * one downloadable when the app gives it a `url` (or `onDownload`) and removable after a
  * confirmation. The list is what was saved, so a reader coming back in a later
  * session sees and fetches what they sent last time.
  */
@@ -83,6 +91,7 @@ export function UploadSlots({
   onReject,
   onRemove,
   onRetry,
+  onDownload,
   disabled,
   className,
 }: UploadSlotsProps) {
@@ -217,6 +226,7 @@ export function UploadSlots({
                           item={item}
                           onRemove={onRemove && (() => onRemove(slot.id, item.id))}
                           onRetry={onRetry && (() => onRetry(slot.id, item.id))}
+                          onDownload={onDownload && (() => onDownload(slot.id, item))}
                         />
                       ))}
                     </ul>
@@ -236,14 +246,29 @@ function FileLine({
   item,
   onRemove,
   onRetry,
+  onDownload,
 }: {
   item: UploadItem
   onRemove?: () => void
   onRetry?: () => void
+  onDownload?: () => void | Promise<void>
 }) {
   const strings = useStrings()
   const t = strings.upload
   const format = strings.format
+  const [download, setDownload] = React.useState<"idle" | "pending" | "failed">("idle")
+  const fetchFile = async () => {
+    if (!onDownload) return
+    setDownload("pending")
+    try {
+      await onDownload()
+      setDownload("idle")
+    } catch {
+      // Shown, not swallowed: a button that did nothing is how an expired
+      // token looked before. The error itself is the app's to log, in onDownload.
+      setDownload("failed")
+    }
+  }
   return (
     <li className="grid gap-1">
       <div className="flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground">
@@ -262,7 +287,23 @@ function FileLine({
           {/* A link, not a button that fetches: the app's own URL, so its
            *  auth, its headers and its filename apply, and the browser's
            *  download handling (open, save, resume) comes with it. */}
-          {item.url && item.status === "done" && (
+          {onDownload && item.status === "done" && (
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              aria-label={download === "pending" ? t.downloading(item.name) : t.download(item.name)}
+              aria-busy={download === "pending" || undefined}
+              disabled={download === "pending"}
+              onClick={fetchFile}
+            >
+              {download === "pending" ? (
+                <SpinnerIcon className="animate-spin" />
+              ) : (
+                <DownloadSimpleIcon />
+              )}
+            </Button>
+          )}
+          {!onDownload && item.url && item.status === "done" && (
             <Button variant="ghost" size="icon-xs" asChild>
               <a href={item.url} download={item.name} aria-label={t.download(item.name)}>
                 <DownloadSimpleIcon />
@@ -277,6 +318,11 @@ function FileLine({
       )}
       {item.status === "failed" && (
         <span className="text-xs text-danger-fg">{item.error ?? t.failed}</span>
+      )}
+      {download === "failed" && (
+        <span role="alert" className="text-xs text-danger-fg">
+          {t.downloadFailed}
+        </span>
       )}
     </li>
   )

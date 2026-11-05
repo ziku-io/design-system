@@ -9,6 +9,9 @@ export interface EditableTextProps {
     placeholder?: string;
     /** Rejects a blank value instead of saving it. */
     required?: boolean;
+    /** Which keyboard a phone opens: `decimal` for a quota, `numeric` for a
+     *  tax number. The value stays a string either way. */
+    inputMode?: "text" | "numeric" | "decimal";
     disabled?: boolean;
     /** The reading text's classes, e.g. `text-2xl font-semibold` for a title
      *  that renames in place. The field always uses the control size. */
@@ -24,4 +27,4 @@ export interface EditableTextProps {
  * reader clicks away to check something, and races the check button, whose
  * click arrives after the blur.
  */
-export declare function EditableText({ value, onSave, placeholder, required, disabled, className, "aria-label": ariaLabel, }: EditableTextProps): React.JSX.Element;
+export declare function EditableText({ value, onSave, placeholder, required, inputMode, disabled, className, "aria-label": ariaLabel, }: EditableTextProps): React.JSX.Element;

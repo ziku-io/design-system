@@ -51,7 +51,7 @@ export const ptPT: UIStrings = {
     createOne: "Criar conta",
     registerTitle: "Criar uma conta",
     name: "Nome",
-    namePlaceholder: "Ana Silva",
+    namePlaceholder: "Jay Oak",
     passwordHint: "Pelo menos 8 caracteres",
     confirmPassword: "Confirmar palavra-passe",
     createAccount: "Criar conta",
@@ -69,6 +69,11 @@ export const ptPT: UIStrings = {
     nameTooShort: "Indique o seu nome",
     passwordTooShort: "Pelo menos 8 caracteres",
     passwordsDoNotMatch: "As palavras-passe não coincidem",
+    phone: "Telefone",
+    optional: "(opcional)",
+    phoneRequired: "Indique o seu número de telefone",
+    invalidPhone: "Indique um número de telefone válido",
+    consentRequired: "Tem de aceitar para continuar.",
   },
   shell: {
     signOut: "Terminar sessão",
@@ -144,6 +149,7 @@ export const ptPT: UIStrings = {
     shareView: "Partilhar com todos",
     sharedBy: (owner) => `Partilhada por ${owner}`,
     noGrouping: "Sem agrupamento",
+    editCell: (column, row) => (row ? `${column} de ${row}` : column),
     loadingMore: "A carregar mais…",
     noMatches: "Nada corresponde a estas condições.",
     clearAllFilters: "Limpar filtros",
@@ -179,6 +185,8 @@ export const ptPT: UIStrings = {
     sidebarDescription: "Mostra a barra lateral em ecrãs pequenos.",
     commandTitle: "Paleta de comandos",
     commandDescription: "Procure um comando para executar…",
+    notifications: "Notificações",
+    closeNotification: "Fechar notificação",
     chooseFile: "Escolha um ficheiro",
     filesChosen: (count) => `${num(count)} ficheiros`,
   },
@@ -207,6 +215,7 @@ export const ptPT: UIStrings = {
     last90Days: "Últimos 90 dias",
     thisMonth: "Este mês",
     thisYear: "Este ano",
+    required: "Escolha uma data.",
     // date-fns starts the Portuguese week on Sunday; calendars in Portugal
     // start on Monday (ISO 8601).
     locale: { ...pt, options: { ...pt.options, weekStartsOn: 1 } },
@@ -216,6 +225,11 @@ export const ptPT: UIStrings = {
     save: "Guardar",
     required: "Não pode ficar vazio.",
     saveFailed: "Não foi possível guardar. Tente novamente.",
+  },
+  copy: {
+    copy: (label) => (label ? `Copiar ${label}` : "Copiar"),
+    copied: "Copiado",
+    failed: "Não foi possível copiar. Selecione o texto e copie-o manualmente.",
   },
   upload: {
     dropHere: "Largue os ficheiros aqui ou",
@@ -247,6 +261,8 @@ export const ptPT: UIStrings = {
     removeConfirm: (name) => `Remover ${name}? Não é possível desfazer.`,
     removeAction: "Remover",
     download: (name) => `Descarregar ${name}`,
+    downloading: (name) => `A descarregar ${name}…`,
+    downloadFailed: "Não foi possível descarregar. Tente novamente.",
     uploadedOn: (date) => `Carregado a ${days.format(date)}`,
   },
 }

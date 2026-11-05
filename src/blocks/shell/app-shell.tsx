@@ -202,7 +202,8 @@ export function AppShell({
           </SidebarFooter>
         )}
       </Sidebar>
-      <SidebarInset>
+      {/* A div: the `<main>` is the content below the header, not the header too. */}
+      <SidebarInset as="div">
         <header
           className={cn(
             "flex h-14 shrink-0 items-center gap-2 border-b border-[var(--surface-glass-border)] bg-[var(--surface-glass)] px-4 backdrop-blur-xl",

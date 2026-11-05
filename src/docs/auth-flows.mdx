@@ -62,6 +62,10 @@ Name, email, password, confirm. Password min 8 chars; mismatch is caught client-
 
 <Canvas of={Auth.Register} />
 
+Two fields are opt-in. `phone="optional"` or `phone="required"` adds a tel field after the name; a value must hold 6 to 20 digits (spaces, `+`, `-` and parentheses allowed) and arrives in `onSubmit` trimmed, or not at all when left empty. `consent` takes the label of a checkbox that has to be ticked before `onSubmit` runs, so the app writes its own sentence and links; the values then carry `consent: true`. Without either prop the values are the same four fields as before. `registerSchema(t, { phone, consent: true })` gives the matching schema for a server that re-validates.
+
+<Canvas of={Auth.WithPhoneAndConsent} />
+
 ## Forgot password
 
 Pass `sent` once the request succeeds; the block swaps to the "check your inbox" state. Message is deliberately the same whether or not the account exists.

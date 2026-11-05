@@ -43,6 +43,7 @@ rg -n 'weight="(bold|duotone|thin|light)"|<\w+Icon\b[^>]*\bsize=\{' $S          
 rg -n 'lucide-react|@heroicons|react-icons' $S                                    # other icon sets
 rg -n '<(table|select|dialog)\b|type="checkbox"|role="dialog"' $S --glob '*.tsx'  # hand-rolled block
 rg -n 'fixed inset-0' $S --glob '*.tsx'                                           # hand-rolled overlay
+rg -n 'navigator\.clipboard' $S                                                   # hand-rolled copy (CopyButton)
 ```
 
 ## Pass 3: judgement
@@ -51,7 +52,7 @@ Read each changed screen with `blocks.md` open.
 
 - **Hand-rolled block.** A list of records outside `DataTable`, a modal or side
   panel outside `Modal`/`Drawer`, "No X yet" text outside `EmptyState`, a
-  failed read drawn as empty, a yes/no `Modal` that should be `useConfirm`, a
+  failed read drawn as empty, a yes/no `Modal` that should be `useConfirm`, a copy icon wired to `navigator.clipboard` instead of `CopyButton`, a
   uppercase label outside `SectionLabel`.
 - **States.** Every fetched region wires `loading`/`error`/`onRetry`; every
   write returns its promise so a rejection restores input. A missing state
