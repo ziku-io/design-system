@@ -44,6 +44,9 @@ rg -n 'lucide-react|@heroicons|react-icons' $S                                  
 rg -n '<(table|select|dialog)\b|type="checkbox"|role="dialog"' $S --glob '*.tsx'  # hand-rolled block
 rg -n 'fixed inset-0' $S --glob '*.tsx'                                           # hand-rolled overlay
 rg -n 'navigator\.clipboard' $S                                                   # hand-rolled copy (CopyButton)
+rg -n 'gradient|blur-3xl' $S --glob '*.{tsx,css}'                                  # gradient or blob (public pages)
+rg -n 'size-(8|9|10|11|12) [^"]*rounded-(md|lg|xl|full) border' $S --glob '*.tsx'  # icon in a tile
+rg -n '<footer\b|<header\b' $S --glob '*.tsx'                                     # hand-rolled site frame
 ```
 
 ## Pass 3: judgement
@@ -67,6 +70,14 @@ Read each changed screen with `blocks.md` open.
   is not a verb on a button.
 - **Small screens.** A fixed width over 288px, a row of unknown length with no
   wrap or scroll, side-by-side panels that never stack.
+- **Public pages** (against [site.md](../ziku-ui/site.md) and the `ziku-design`
+  rules). A price or `PricingTable` on a landing page; more than one
+  `Testimonial`, or one without a name, role and number; a small uppercase
+  line over a title; an icon in a bordered or tinted tile; a section that
+  writes its own padding instead of sitting in a `Section`; a nav or footer
+  that differs between pages instead of one shared `SiteFooter`; a picture
+  that is a stock photo, a render or an illustration rather than product
+  output; a number in the copy with no source.
 
 ## Output
 

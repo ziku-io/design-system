@@ -53,6 +53,53 @@ Done when every region and every state has a line.
   using it. Its docs page at https://ziku-io.github.io/design-system/ shows
   each state rendered.
 
+## Public pages (landing, pricing, contact, legal, blog)
+
+Start from [site.md](../ziku-ui/site.md). Ziku products are mostly technical
+(AI, crypto, distributed systems, security, infrastructure) and their reader is
+an engineer; the generic template covers everything else.
+
+Before writing a word, collect the facts: what it is, what it runs on, and
+measured numbers with how they were measured. A section with no fact behind
+it is cut, not padded.
+
+- **Hero title** names the thing in under eight words: "A queue that survives
+  losing a zone". Never a slogan ("The future of infrastructure"), a question,
+  a colon headline, or "AI-powered".
+- **Numbers, not adjectives.** "38 ms p50, 8B model on one H100" instead of
+  "blazing fast". No "secure", "scalable", "enterprise-grade" without the
+  mechanism next to it.
+- **One ask.** The hero's primary button, the header's button and the
+  `CtaBand` use the same verb ("Run a node"). Docs is the secondary. A
+  technical product puts its install `command` under the buttons.
+- **Every section is a picture and a claim.** Each `FeatureSplit` row pairs one
+  capability with the thing that proves it: the terminal session, the chart,
+  the table of nodes, in a `WindowFrame` or `Terminal`. Build those from the
+  library's components with the product's real output, never a mocked-up
+  generic dashboard.
+- **Detail lives elsewhere.** The landing page covers what it is, proof, how it
+  works (three rows), code, what it runs on, three questions, and the ask.
+  No price on a landing page, ever: pricing is its own page with the plan
+  comparison. At most one testimonial, from a real named customer, with the
+  number it is about.
+  Full pricing, the threat model, the architecture and the changelog are
+  pages, reached through `PageLinks`.
+- **Proof is real or absent.** No invented benchmarks, customers or
+  audit claims. A number in the copy needs a source the team can show.
+- **No decoration the blocks do not draw.** No gradients, glow, blobs, emoji,
+  3D renders, stock photos or illustrations. The pictures are product output:
+  `Terminal`, `WindowFrame` around real components, `CodeBlock`, a real
+  screenshot, or the ASCII field behind an AI hero.
+- **One frame.** Every public page uses the same `SiteLayout` header and the
+  same `SiteFooter` element, built once. A page that changes its nav or its
+  footer reads as a different site.
+- **No icon in a box.** An icon sits inline before its label or title, at
+  `size-4`, unframed. A glyph in a bordered or tinted tile is the most
+  recognisable template pattern there is; the blocks no longer draw one.
+- Legal pages state what the business has decided (retention,
+  notice period, audit date, disclosure address). Leave a section out rather
+  than ship boilerplate nobody agreed to, and have a person approve the text.
+
 ## 4. Check
 
 - Typecheck and the app's tests.

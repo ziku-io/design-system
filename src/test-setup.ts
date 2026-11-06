@@ -46,3 +46,9 @@ Element.prototype.getBoundingClientRect = function (this: Element) {
   if (this.classList.contains("recharts-responsive-container")) return new DOMRect(0, 0, 320, 200)
   return measure.call(this)
 }
+
+// jsdom has no canvas and logs "Not implemented" on every `getContext`, which
+// the story smoke test reads as an error. Null is what a browser returns for a
+// context it cannot make, so canvas code already handles it.
+HTMLCanvasElement.prototype.getContext = (() =>
+  null) as typeof HTMLCanvasElement.prototype.getContext

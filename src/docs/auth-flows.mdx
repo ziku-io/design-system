@@ -1,5 +1,5 @@
-import { Meta, Canvas } from "@storybook/addon-docs/blocks";
-import * as Auth from "../blocks/auth/auth.stories";
+import { Meta, Canvas } from "@storybook/addon-docs/blocks"
+import * as Auth from "../blocks/auth/auth.stories"
 
 <Meta title="Docs/Auth flows" />
 
@@ -9,12 +9,46 @@ Every app uses the same three screens. Routes are conventions the blocks link to
 
 <table>
   <thead>
-    <tr><th>Route</th><th>Block</th><th>Links to</th></tr>
+    <tr>
+      <th>Route</th>
+      <th>Block</th>
+      <th>Links to</th>
+    </tr>
   </thead>
   <tbody>
-    <tr><td><code>/login</code></td><td><code>LoginForm</code></td><td><code>/register</code>, <code>/forgot-password</code></td></tr>
-    <tr><td><code>/register</code></td><td><code>RegisterForm</code></td><td><code>/login</code></td></tr>
-    <tr><td><code>/forgot-password</code></td><td><code>ForgotPasswordForm</code></td><td><code>/login</code></td></tr>
+    <tr>
+      <td>
+        <code>/login</code>
+      </td>
+      <td>
+        <code>LoginForm</code>
+      </td>
+      <td>
+        <code>/register</code>, <code>/forgot-password</code>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>/register</code>
+      </td>
+      <td>
+        <code>RegisterForm</code>
+      </td>
+      <td>
+        <code>/login</code>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>/forgot-password</code>
+      </td>
+      <td>
+        <code>ForgotPasswordForm</code>
+      </td>
+      <td>
+        <code>/login</code>
+      </td>
+    </tr>
   </tbody>
 </table>
 
@@ -35,7 +69,7 @@ All three sit inside `AuthLayout` (centered card, optional logo and footer).
 >
   <LoginForm
     onSubmit={async ({ email, password }) => {
-      await signIn(email, password);
+      await signIn(email, password)
     }}
     error={serverError}
     providers={

@@ -166,6 +166,13 @@ link colour for reading against the page. A link inside a sentence also needs
 `underline underline-offset-4` — colour alone fails WCAG 1.4.1 and the a11y
 addon flags it.
 
+**Public pages get their colour from stages.** `--stage-1` to `--stage-4`
+(lavender, teal, sage, sand; `STAGES`/`stageAt` in `src/lib/surfaces.ts`) are
+the flat tinted panels a picture, the closing ask or the newsletter sits on.
+Neighbours never share a hue, the hero always takes the brand one, and
+`palette.test.ts` holds foreground and muted text above 4.5:1 on every stage
+in both themes. No gradients: a stage is one flat fill.
+
 **Status colours come in fours.** `--x` (fill), `--x-foreground` (text on the
 fill), `--x-fg` (text on a page background), `--x-subtle`/`--x-border` (banner),
 for `danger`, `warning`, `success` and `info`.
@@ -248,6 +255,7 @@ src/blocks/modal/    Modal (title bar, scrolling body, footer)
 src/blocks/search/   CommandMenu (cmdk), SearchTrigger
 src/blocks/page/     PageHeader, EmptyState, StatTile
 src/blocks/dashboard/ Dashboard, DashboardPanel, ActivityList
+src/blocks/site/     SiteLayout, Section, Hero, Terminal, WindowFrame, pricing, FAQ, ContactForm, LegalPage, blog
 src/docs/            MDX docs pages
 src/lib/             cn, Link/LinkProvider, UIStrings, Phosphor icon aliases
 src/styles/          globals.css — GitHub Primer tokens

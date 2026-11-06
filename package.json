@@ -67,6 +67,7 @@
     "@vitejs/plugin-react": "^6.1.0",
     "eslint": "^10.9.1",
     "jsdom": "^30.0.1",
+    "performative-ui": "0.7.0",
     "prettier": "^3.9.6",
     "storybook": "^10.6.5",
     "tailwindcss": "^4.3.3",

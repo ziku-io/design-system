@@ -130,6 +130,12 @@ const pairs: [string, string][] = [
     [`${s}-fg`, "background"],
     [`${s}-fg`, "card"],
   ]),
+  // Stages carry text: the closing ask's title and line, a testimonial's
+  // number, the copy around a hero picture.
+  ...[1, 2, 3, 4].flatMap((n): [string, string][] => [
+    ["foreground", `stage-${n}`],
+    ["muted-foreground", `stage-${n}`],
+  ]),
   // Button text on its tinted fill. Hover is `brightness-95`, which darkens
   // fill and text together, so the ratio barely moves.
   ...(["primary", "danger", "success", "warning"] as const).map((s): [string, string] => [

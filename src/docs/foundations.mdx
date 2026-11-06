@@ -22,17 +22,102 @@ in prose or a tile stay in the sans with `tabular-nums`.
 
 <table>
   <thead>
-    <tr><th>Use</th><th>Class</th><th>Where</th></tr>
+    <tr>
+      <th>Use</th>
+      <th>Class</th>
+      <th>Where</th>
+    </tr>
   </thead>
   <tbody>
-    <tr><td>Page title</td><td><code>text-2xl font-semibold tracking-tight</code></td><td><code>PageHeader</code>, the <code>h1</code></td></tr>
-    <tr><td>Surface title</td><td><code>text-base font-semibold</code></td><td>Dialog, Modal, Drawer, <code>EmptyState</code></td></tr>
-    <tr><td>Panel title</td><td><code>text-sm font-semibold</code></td><td><code>DashboardPanel</code>, Card</td></tr>
-    <tr><td>Body</td><td><code>text-sm</code></td><td>Everywhere</td></tr>
-    <tr><td>Secondary text</td><td><code>text-sm text-muted-foreground</code></td><td>Any description under a title</td></tr>
-    <tr><td>Row meta</td><td><code>text-xs text-muted-foreground</code></td><td>The second line of a list row, a timestamp</td></tr>
-    <tr><td>Small label</td><td><code>SectionLabel</code> or <code>LABEL_CLASS</code></td><td>Never hand-rolled uppercase</td></tr>
-    <tr><td>A number that changes</td><td>add <code>tabular-nums</code></td><td>Tiles, tables, counters</td></tr>
+    <tr>
+      <td>Page title</td>
+      <td>
+        <code>text-2xl font-semibold tracking-tight</code>
+      </td>
+      <td>
+        <code>PageHeader</code>, the <code>h1</code>
+      </td>
+    </tr>
+    <tr>
+      <td>Surface title</td>
+      <td>
+        <code>text-base font-semibold</code>
+      </td>
+      <td>
+        Dialog, Modal, Drawer, <code>EmptyState</code>
+      </td>
+    </tr>
+    <tr>
+      <td>Panel title</td>
+      <td>
+        <code>text-sm font-semibold</code>
+      </td>
+      <td>
+        <code>DashboardPanel</code>, Card
+      </td>
+    </tr>
+    <tr>
+      <td>Body</td>
+      <td>
+        <code>text-sm</code>
+      </td>
+      <td>Everywhere</td>
+    </tr>
+    <tr>
+      <td>Secondary text</td>
+      <td>
+        <code>text-sm text-muted-foreground</code>
+      </td>
+      <td>Any description under a title</td>
+    </tr>
+    <tr>
+      <td>Row meta</td>
+      <td>
+        <code>text-xs text-muted-foreground</code>
+      </td>
+      <td>The second line of a list row, a timestamp</td>
+    </tr>
+    <tr>
+      <td>Hero headline (public site)</td>
+      <td>
+        <code>text-4xl sm:text-5xl font-semibold tracking-tight</code>
+      </td>
+      <td>
+        <code>Hero</code>, the only display size
+      </td>
+    </tr>
+    <tr>
+      <td>Section title (public site)</td>
+      <td>
+        <code>text-2xl sm:text-3xl font-semibold tracking-tight</code>
+      </td>
+      <td>
+        <code>Section</code>, <code>CtaBand</code>
+      </td>
+    </tr>
+    <tr>
+      <td>Long-form body</td>
+      <td>
+        <code>text-base leading-7</code>
+      </td>
+      <td>
+        <code>Prose</code>: posts and policies, where 14px tires the reader
+      </td>
+    </tr>
+    <tr>
+      <td>Small label</td>
+      <td>
+        <code>SectionLabel</code> or <code>LABEL_CLASS</code>
+      </td>
+      <td>Never hand-rolled uppercase</td>
+    </tr>
+    <tr>
+      <td>A number that changes</td>
+      <td>
+        add <code>tabular-nums</code>
+      </td>
+      <td>Tiles, tables, counters</td>
+    </tr>
   </tbody>
 </table>
 
@@ -84,6 +169,8 @@ The rules that matter day to day:
 - Selected is `bg-accent`, everywhere: a menu row, a toggle, a table row, the
   sidebar's active item.
 - Motion that brings something in uses `ease-settle`.
+- Public pages take their colour from four stage tints (`bg-stage-1` to `bg-stage-4`: lavender, teal, sage, sand), flat panels behind pictures and the closing ask. Never a gradient.
+- Scroll motion on public pages is CSS only: `scroll-reveal` (fade up on entry), `scroll-drift` (a picture moving against its text), `scroll-recede` and `scroll-sink` (hero copy and background parting as you scroll). Each is off under reduced motion and does nothing in a browser without `animation-timeline`.
 
 ### Accent
 
@@ -93,11 +180,23 @@ One brand colour, a muted blue-purple.
 
 <TokenTable
   rows={[
-    { token: "primary", on: "primary-foreground", use: "Small marks: a checked checkbox or switch, progress, a calendar day" },
-    { token: "primary-button", on: "primary-button-foreground", use: "The default button and badge: a tint with dark text, not the solid fill" },
+    {
+      token: "primary",
+      on: "primary-foreground",
+      use: "Small marks: a checked checkbox or switch, progress, a calendar day",
+    },
+    {
+      token: "primary-button",
+      on: "primary-button-foreground",
+      use: "The default button and badge: a tint with dark text, not the solid fill",
+    },
     { token: "link", use: "Inline links. Never text-primary" },
     { token: "ring", use: "Focus rings: 1.5px at 80% opacity, 3:1 against a card and the page" },
-    { token: "accent", on: "accent-foreground", use: "Hover and selected surfaces, tinted toward the brand" },
+    {
+      token: "accent",
+      on: "accent-foreground",
+      use: "Hover and selected surfaces, tinted toward the brand",
+    },
   ]}
 />
 
@@ -117,8 +216,16 @@ jobs. Every text pairing clears 4.5:1; the numbers are measured by
     { token: "success-fg", use: "Text or an icon on the page, a card or a banner" },
     { token: "success-subtle", use: "Banner and badge ground" },
     { token: "success-border", use: "Banner and badge border" },
-    { token: "success-button", on: "success-button-foreground", use: "A success button: tint with dark text" },
-    { token: "success", on: "success-foreground", use: "The solid fill, for a dot or a bar, not for text" },
+    {
+      token: "success-button",
+      on: "success-button-foreground",
+      use: "A success button: tint with dark text",
+    },
+    {
+      token: "success",
+      on: "success-foreground",
+      use: "The solid fill, for a dot or a bar, not for text",
+    },
   ]}
 />
 
@@ -134,9 +241,21 @@ jobs. Every text pairing clears 4.5:1; the numbers are measured by
   rows={[
     { token: "background", on: "foreground", use: "The page" },
     { token: "foreground", use: "Body text: a gray, about 8:1 on the page" },
-    { token: "card", on: "card-foreground", use: "Cards, tiles, dashboard panels, tables (SURFACE)" },
-    { token: "popover", on: "popover-foreground", use: "Dialogs, sheets, popovers, menus, listboxes (OVERLAY)" },
-    { token: "muted", on: "muted-foreground", use: "Subtle fills; its foreground is secondary text" },
+    {
+      token: "card",
+      on: "card-foreground",
+      use: "Cards, tiles, dashboard panels, tables (SURFACE)",
+    },
+    {
+      token: "popover",
+      on: "popover-foreground",
+      use: "Dialogs, sheets, popovers, menus, listboxes (OVERLAY)",
+    },
+    {
+      token: "muted",
+      on: "muted-foreground",
+      use: "Subtle fills; its foreground is secondary text",
+    },
     { token: "secondary", on: "secondary-foreground", use: "Neutral button fill" },
     { token: "border", use: "Every border, unless a status owns it" },
     { token: "input", use: "Control borders" },
@@ -191,7 +310,11 @@ least 25° off the status hues and the brand.
 
 <TokenTable
   rows={[
-    { token: "slot-1", on: "slot-1-subtle", use: "The first category, whatever the app's first category is" },
+    {
+      token: "slot-1",
+      on: "slot-1-subtle",
+      use: "The first category, whatever the app's first category is",
+    },
     { token: "slot-2", on: "slot-2-subtle", use: "The second" },
     { token: "slot-3", on: "slot-3-subtle", use: "The third" },
     { token: "slot-4", on: "slot-4-subtle", use: "The fourth" },
@@ -207,14 +330,48 @@ written out: an app with a sixth category adds a sixth pair to `globals.css`.
 
 <table>
   <thead>
-    <tr><th>Radius</th><th>Size</th><th>Where</th></tr>
+    <tr>
+      <th>Radius</th>
+      <th>Size</th>
+      <th>Where</th>
+    </tr>
   </thead>
   <tbody>
-    <tr><td><code>rounded-xs</code></td><td>4px</td><td>A 16px checkbox. Nothing else.</td></tr>
-    <tr><td><code>rounded-sm</code></td><td>8px</td><td>Rows inside a menu or listbox: concentric with the 12px panel and its 4px padding</td></tr>
-    <tr><td><code>rounded-md</code></td><td>10px</td><td>Controls: buttons, fields, toggles, tabs</td></tr>
-    <tr><td><code>rounded-lg</code></td><td>12px</td><td>Surfaces and overlays: cards, tiles, panels, dialogs, menus</td></tr>
-    <tr><td><code>rounded-full</code></td><td></td><td>Badges, avatars, switches, the slider</td></tr>
+    <tr>
+      <td>
+        <code>rounded-xs</code>
+      </td>
+      <td>4px</td>
+      <td>A 16px checkbox. Nothing else.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>rounded-sm</code>
+      </td>
+      <td>8px</td>
+      <td>Rows inside a menu or listbox: concentric with the 12px panel and its 4px padding</td>
+    </tr>
+    <tr>
+      <td>
+        <code>rounded-md</code>
+      </td>
+      <td>10px</td>
+      <td>Controls: buttons, fields, toggles, tabs</td>
+    </tr>
+    <tr>
+      <td>
+        <code>rounded-lg</code>
+      </td>
+      <td>12px</td>
+      <td>Surfaces and overlays: cards, tiles, panels, dialogs, menus</td>
+    </tr>
+    <tr>
+      <td>
+        <code>rounded-full</code>
+      </td>
+      <td></td>
+      <td>Badges, avatars, switches, the slider</td>
+    </tr>
   </tbody>
 </table>
 
@@ -233,7 +390,7 @@ once:
 ```tsx
 import { ptPT, UIStringsProvider } from "@ziku/ui"
 
-<UIStringsProvider strings={ptPT}>{app}</UIStringsProvider>
+;<UIStringsProvider strings={ptPT}>{app}</UIStringsProvider>
 ```
 
 - `ptPT` is complete European Portuguese. English is the default when nothing
@@ -274,7 +431,11 @@ the same contrast: `palette.test.ts` only measures the library's own values.
 
 ```css
 @import "@ziku/ui/styles.css";
-:root { --primary: #3f6fb0; --ring: #3f6fb0; --link: #355f99; }
+:root {
+  --primary: #3f6fb0;
+  --ring: #3f6fb0;
+  --link: #355f99;
+}
 ```
 
 ## Enforced

@@ -37,3 +37,14 @@ export type EdgeSide = Exclude<keyof typeof EDGE_PANEL, "base">
 /** The scrim behind a dialog or a drawer. */
 export const SCRIM =
   "fixed inset-0 z-50 bg-overlay data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0"
+
+/**
+ * The four tinted panels a public page sets its pictures on, in the order a
+ * page uses them: brand first (the hero), then teal, sage and sand. Written
+ * out because Tailwind only ships classes it finds as literals.
+ */
+export const STAGES = ["bg-stage-1", "bg-stage-2", "bg-stage-3", "bg-stage-4"] as const
+
+/** The stage for the `index`th picture on a page, cycling through the four. */
+export const stageAt = (index: number) =>
+  STAGES[((index % STAGES.length) + STAGES.length) % STAGES.length]

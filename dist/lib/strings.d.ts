@@ -369,6 +369,60 @@ export interface UIStrings {
         /** Beside a saved file: `uploadedOn(date)` reads "Uploaded 3 Nov 2026". */
         uploadedOn: (date: Date) => string;
     };
+    /** The public site: `SiteLayout`, `LegalPage`, `ArticlePage`, `PostList`,
+     *  `PricingTable`, `ContactForm`. Only the chrome: headlines, features and
+     *  posts are the app's copy and arrive as props. */
+    site: {
+        /** The first tab stop on every page, for keyboard readers. */
+        skipToContent: string;
+        /** The phone menu button's label and the drawer's title. */
+        menu: string;
+        /** `aria-label` on the header's and the footer's `<nav>`. */
+        mainNav: string;
+        footerNav: string;
+        /** Footer small print: `copyright(2026, "Ziku")` reads "© 2026 Ziku". */
+        copyright: (year: number, owner: string) => string;
+        /** The legal page's table of contents. */
+        contents: string;
+        /** Under a legal page's title: "Last updated 6 Nov 2026". */
+        lastUpdated: (date: Date) => string;
+        /** A post's publication date, as written under its title. */
+        published: (date: Date) => string;
+        /** `readingTime(4)` reads "4 min read". */
+        readingTime: (minutes: number) => string;
+        /** `ArticlePage`'s link back to the index. */
+        allPosts: string;
+        /** `PostList` with nothing in it. */
+        noPosts: string;
+        /** `NewsletterForm`: the field's label (read to a screen reader), its
+         *  placeholder, the button, and the line that replaces the form once sent. */
+        newsletterEmail: string;
+        newsletterPlaceholder: string;
+        subscribe: string;
+        subscribed: string;
+        /** `PlanComparison`: the first column's heading, read to a screen reader. */
+        feature: string;
+        /** A tick or a dash in `PlanComparison`, read to a screen reader. */
+        included: string;
+        notIncluded: string;
+        /** The badge on the one plan `PricingTable` marks `highlighted`. */
+        recommended: string;
+        /** `ContactForm`. */
+        name: string;
+        email: string;
+        message: string;
+        messagePlaceholder: string;
+        send: string;
+        sentTitle: string;
+        sentDescription: string;
+        nameRequired: string;
+        invalidEmail: string;
+        messageTooShort: string;
+        /** `ContactForm` with `topics`: the group's legend, and the error when
+         *  none is picked. */
+        topic: string;
+        topicRequired: string;
+    };
 }
 /** Bytes in 1024 steps, one decimal under ten. Shared by every locale: only
  *  the number format and the unit letters differ, and those are passed in. */

@@ -101,6 +101,17 @@
   --slot-4-subtle: #eff4ec;
   --slot-5: #343e29;
   --slot-5-subtle: #f0f4ec;
+
+  /* Stages: the tinted panels a public page sets its pictures on (a hero
+     screenshot, a terminal, a feature's fragment) and the closing ask sits in.
+     Four hues, so a page of them alternates instead of repeating: brand
+     lavender, teal, sage, sand. OKLCH lightness 0.948, chroma 0.028 to 0.045,
+     balanced by eye so the teal does not shout over the lavender. Text sits on
+     them: foreground clears 7.7:1 and muted-foreground 4.52:1 on every one. */
+  --stage-1: #eaeaff;
+  --stage-2: #d9f4f7;
+  --stage-3: #e1f4e1;
+  --stage-4: #fdebd2;
   --sidebar: #f4f6f8;
   --sidebar-foreground: #44484e;
   --sidebar-primary: #706cbb;
@@ -197,6 +208,11 @@
   --slot-4-subtle: #30212c;
   --slot-5: #a6c597;
   --slot-5-subtle: #202a1b;
+  /* Same hues at lightness 0.255; foreground 10.9:1, muted 6.3:1. */
+  --stage-1: #212034;
+  --stage-2: #152628;
+  --stage-3: #1b261b;
+  --stage-4: #2b2112;
   --sidebar: #14161a;
   --sidebar-foreground: #d5d8db;
   --sidebar-primary: #9794e0;
@@ -284,6 +300,10 @@
   --color-slot-4-subtle: var(--slot-4-subtle);
   --color-slot-5: var(--slot-5);
   --color-slot-5-subtle: var(--slot-5-subtle);
+  --color-stage-1: var(--stage-1);
+  --color-stage-2: var(--stage-2);
+  --color-stage-3: var(--stage-3);
+  --color-stage-4: var(--stage-4);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -322,6 +342,91 @@
     }
     to {
       translate: 200% 0;
+    }
+  }
+}
+
+/*
+ * Scroll motion for the public site. CSS scroll-driven animations: no script,
+ * nothing runs on the main thread, and each utility is inside two guards: a
+ * reader who asked for reduced motion gets none, and a browser without
+ * `animation-timeline` (Firefox today) shows the element at rest. Screen
+ * only: on paper, or in a full-page capture, a block below the fold has not
+ * "entered", and a reveal would print it blank. Utilities
+ * rather than component classes because the declarations have to stay
+ * together: the `animation` shorthand resets `animation-timeline`, and two
+ * Tailwind classes give no guarantee which lands last.
+ *
+ * A stagger across a list is an `animation-range` set per item, inline: a
+ * delay means nothing on a scroll timeline.
+ */
+@keyframes site-reveal {
+  from {
+    opacity: 0;
+    translate: 0 28px;
+  }
+}
+@keyframes site-drift {
+  from {
+    translate: 0 40px;
+  }
+  to {
+    translate: 0 -40px;
+  }
+}
+@keyframes site-recede {
+  to {
+    opacity: 0.25;
+    translate: 0 -72px;
+  }
+}
+@keyframes site-sink {
+  to {
+    translate: 0 30vh;
+  }
+}
+
+/* Fades a block up as it enters the viewport. */
+@utility scroll-reveal {
+  @media screen and (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      animation: site-reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+  }
+}
+
+/* Moves against the scroll while the element crosses the viewport: the
+ * picture beside a block of text, so the two separate in depth. */
+@utility scroll-drift {
+  @media screen and (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      animation: site-drift linear both;
+      animation-timeline: view();
+      animation-range: cover 0% cover 100%;
+    }
+  }
+}
+
+/* The hero's copy, lifting and fading faster than the page as you scroll away. */
+@utility scroll-recede {
+  @media screen and (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: scroll()) {
+      animation: site-recede linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 80vh;
+    }
+  }
+}
+
+/* A background layer falling behind: it moves at a fraction of the scroll. */
+@utility scroll-sink {
+  @media screen and (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: scroll()) {
+      animation: site-sink linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 100vh;
     }
   }
 }

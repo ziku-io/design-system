@@ -20,6 +20,9 @@ API before using it. Live docs: https://ziku-io.github.io/design-system/
 - Setting up, auditing the wiring, or upgrading the tag: [setup.md](setup.md).
 - Choosing a block for a job: [blocks.md](blocks.md). Read it before writing
   any markup for a page, list, form, dialog, panel or empty/error state.
+- Pages before sign-in (landing, pricing, contact, terms, blog):
+  [site.md](site.md) has the shared frame and footer, both landing templates
+  and the pages they link to.
 
 ## Rules
 
